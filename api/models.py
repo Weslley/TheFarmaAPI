@@ -51,3 +51,61 @@ class Cidade(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.nome, self.uf)
+
+
+class Medicamento(models.Model):
+    codigo_barras = models.BigIntegerField(null=True, blank=True)
+    registro = models.CharField(max_length=17, null=True, blank=True)
+    nome = models.CharField(max_length=40, null=True, blank=True)
+    nome_complementar = models.CharField(max_length=40, null=True, blank=True)
+    grupo = models.ForeignKey('GrupoMedicamento', null=True, blank=True)
+    principio_ativo = models.ForeignKey('PrincipioAtivo')
+    laboratorio = models.ForeignKey('Laboratorio')
+    generico = models.BooleanField(default=False)
+    tipo = models.IntegerField(default=0)
+    preco_maximo = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        ordering = ('-id', )
+
+    def __str__(self):
+        return '{}'.format(self.nome if self.nome else self.principio_ativo)
+
+
+class PrincipioAtivo(models.Model):
+    nome = models.CharField(max_length=50, null=True, blank=True)
+
+    class Meta:
+        ordering = ('nome', )
+        verbose_name = 'Princípio ativo'
+        verbose_name_plural = 'Princípios ativo'
+
+    def __str__(self):
+        return '{}'.format(self.nome if self.nome else self.id)
+
+
+class Laboratorio(models.Model):
+    nome = models.CharField(max_length=50, null=True, blank=True)
+    nome_completo = models.CharField(max_length=50, null=True, blank=True)
+
+    class Meta:
+        ordering = ('nome', 'nome_completo')
+        verbose_name = 'Laboratório'
+        verbose_name_plural = 'Laboratórios'
+
+    def __str__(self):
+        return '{}'.format(self.nome if self.nome else self.nome_completo if self.nome_completo else self.id)
+
+
+class GrupoMedicamento(models.Model):
+    nome = models.CharField(max_length=50, null=True, blank=True)
+    principio_ativo = models.ForeignKey(PrincipioAtivo)
+    quantidade = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ('nome',)
+        verbose_name = 'Grupo de medicamento'
+        verbose_name_plural = 'Grupos de medicamento'
+
+    def __str__(self):
+        return '{}'.format(self.nome if self.nome else self.principio_ativo)
