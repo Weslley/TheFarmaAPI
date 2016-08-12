@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from api.utils import UFs
+
 
 class Farmacia(models.Model):
     cnpj = models.CharField(verbose_name='CNPJ', max_length=14)
@@ -33,6 +35,7 @@ class Farmacia(models.Model):
     class Meta:
         verbose_name = 'Farmácia'
         verbose_name_plural = 'Farmácias'
+        ordering = ('-id', )
 
     def __str__(self):
         return self.razao_social
@@ -41,4 +44,10 @@ class Farmacia(models.Model):
 class Cidade(models.Model):
     ibge = models.IntegerField(primary_key=True)
     nome = models.CharField(max_length=150)
-    uf = models.CharField(max_length=2)
+    uf = models.CharField(max_length=2, choices=UFs)
+
+    class Meta:
+        ordering = ('nome',)
+
+    def __str__(self):
+        return '{} - {}'.format(self.nome, self.uf)
