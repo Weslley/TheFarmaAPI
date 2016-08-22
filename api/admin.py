@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from api.models import Farmacia, Cidade
+from api.models import *
 
 
 class FarmaciaAdmin(admin.ModelAdmin):
@@ -73,3 +73,7 @@ class FarmaciaAdmin(admin.ModelAdmin):
 
 admin.site.register(Farmacia, FarmaciaAdmin)
 admin.site.register(Cidade)
+admin.site.register(Medicamento)
+admin.site.register(GrupoMedicamento)
+admin.site.register(PrincipioAtivo)
+admin.site.register(Laboratorio)

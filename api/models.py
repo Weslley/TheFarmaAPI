@@ -57,7 +57,7 @@ class Medicamento(models.Model):
     codigo_barras = models.BigIntegerField(null=True, blank=True)
     registro = models.CharField(max_length=17, null=True, blank=True)
     nome = models.CharField(max_length=40, null=True, blank=True)
-    nome_complementar = models.CharField(max_length=40, null=True, blank=True)
+    nome_complementar = models.CharField(max_length=60, null=True, blank=True)
     grupo = models.ForeignKey('GrupoMedicamento', null=True, blank=True)
     principio_ativo = models.ForeignKey('PrincipioAtivo')
     laboratorio = models.ForeignKey('Laboratorio')
