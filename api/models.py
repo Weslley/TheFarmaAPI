@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
-from api.utils import UFs
+from api.utils import ufs
 
 
 class Farmacia(models.Model):
@@ -44,7 +44,7 @@ class Farmacia(models.Model):
 class Cidade(models.Model):
     ibge = models.IntegerField(primary_key=True)
     nome = models.CharField(max_length=150)
-    uf = models.CharField(max_length=2, choices=UFs)
+    uf = models.CharField(max_length=2, choices=ufs.CHOICES)
 
     class Meta:
         ordering = ('nome',)
