@@ -40,6 +40,36 @@ class Farmacia(models.Model):
     def __str__(self):
         return self.razao_social
 
+    def __repr__(self):
+        return """class Farmacia(models.Model):
+    cnpj = models.CharField(verbose_name='CNPJ', max_length=14)
+    nome_fantasia = models.CharField(max_length=100, blank=True, null=True)
+    razao_social = models.CharField(max_length=100)
+    telefone = models.CharField(max_length=11)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    cliente_infog2 = models.BooleanField(verbose_name='Cliente INFOG2 ?', default=True)
+    cep = models.CharField(verbose_name='CEP', max_length=8, blank=True, null=True)
+    logradouro = models.CharField(max_length=150)
+    numero = models.IntegerField(verbose_name='Número')
+    cidade = models.ForeignKey('Cidade', related_name='farmacias')
+    bairro = models.CharField(max_length=150)
+    complemento = models.CharField(max_length=150, blank=True, null=True)
+    nome_responsavel = models.CharField(verbose_name='Nome', max_length=60)
+    sobrenome_responsavel = models.CharField(verbose_name='Sobrenome', max_length=60, blank=True, null=True)
+    rg_responsavel = models.CharField(verbose_name='RG', max_length=14, blank=True, null=True)
+    cpf_responsavel = models.CharField(verbose_name='CPF', max_length=11)
+    telefone_responsavel = models.CharField(verbose_name='Telefone', max_length=11)
+    cep_responsavel = models.CharField(verbose_name='CEP', max_length=8, blank=True, null=True)
+    logradouro_responsavel = models.CharField(verbose_name='Logradouro', max_length=150, blank=True, null=True)
+    numero_responsavel = models.IntegerField(verbose_name='Número', blank=True, null=True)
+    cidade_responsavel = models.ForeignKey('Cidade', verbose_name='Cidade',  related_name='responsaveis_farmacias', blank=True, null=True)
+    bairro_responsavel = models.CharField(verbose_name='Bairro', max_length=150, blank=True, null=True)
+    complemento_responsavel = models.CharField(verbose_name='Complemento', max_length=150, blank=True, null=True)
+    data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', blank=True, null=True)
+    """
+
 
 class Cidade(models.Model):
     ibge = models.IntegerField(primary_key=True)
@@ -51,6 +81,13 @@ class Cidade(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.nome, self.uf)
+
+    def __repr__(self):
+        return """class Cidade(models.Model):
+    ibge = models.IntegerField(primary_key=True)
+    nome = models.CharField(max_length=150)
+    uf = models.CharField(max_length=2, choices=ufs.CHOICES)
+    """
 
 
 class Medicamento(models.Model):
@@ -71,6 +108,20 @@ class Medicamento(models.Model):
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.principio_ativo)
 
+    def __repr__(self):
+        return """class Medicamento(models.Model):
+    codigo_barras = models.BigIntegerField(null=True, blank=True)
+    registro = models.CharField(max_length=17, null=True, blank=True)
+    nome = models.CharField(max_length=40, null=True, blank=True)
+    nome_complementar = models.CharField(max_length=60, null=True, blank=True)
+    grupo = models.ForeignKey('GrupoMedicamento', null=True, blank=True)
+    principio_ativo = models.ForeignKey('PrincipioAtivo')
+    laboratorio = models.ForeignKey('Laboratorio')
+    generico = models.BooleanField(default=False)
+    tipo = models.IntegerField(default=0)
+    preco_maximo = models.DecimalField(max_digits=10, decimal_places=2)
+    """
+
 
 class PrincipioAtivo(models.Model):
     nome = models.CharField(max_length=50, null=True, blank=True)
@@ -82,6 +133,11 @@ class PrincipioAtivo(models.Model):
 
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.id)
+
+    def __repr__(self):
+        return """class PrincipioAtivo(models.Model):
+    nome = models.CharField(max_length=50, null=True, blank=True)
+    """
 
 
 class Laboratorio(models.Model):
@@ -96,6 +152,12 @@ class Laboratorio(models.Model):
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.nome_completo if self.nome_completo else self.id)
 
+    def __repr__(self):
+        return """class Laboratorio(models.Model):
+    nome = models.CharField(max_length=50, null=True, blank=True)
+    nome_completo = models.CharField(max_length=50, null=True, blank=True)
+    """
+
 
 class GrupoMedicamento(models.Model):
     nome = models.CharField(max_length=50, null=True, blank=True)
@@ -109,3 +171,10 @@ class GrupoMedicamento(models.Model):
 
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.principio_ativo)
+
+    def __repr__(self):
+        return """class GrupoMedicamento(models.Model):
+    nome = models.CharField(max_length=50, null=True, blank=True)
+    principio_ativo = models.ForeignKey(PrincipioAtivo)
+    quantidade = models.IntegerField(default=0)
+    """
