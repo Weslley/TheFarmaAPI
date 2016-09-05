@@ -22,7 +22,7 @@ from rest_framework_docs import urls as rest_framework_docs_urls
 
 urlpatterns = [
     url(r'^api/', include(api_urls)),
-    url(r'^api/docs/$', include(rest_framework_docs_urls)),
+    url(r'^api/docs/', include(rest_framework_docs_urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework'))
 ]
