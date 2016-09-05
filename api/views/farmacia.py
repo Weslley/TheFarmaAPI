@@ -2,11 +2,12 @@
 
 from rest_framework import generics
 from api.models import Farmacia
+from api.mixins.base import IsAuthenticatedMixin
 from api.pagination import SmallResultsSetPagination
 from api.serializers import FarmaciaSerializer, FarmaciaListSerializer
 
 
-class FarmaciaList(generics.ListAPIView):
+class FarmaciaList(generics.ListAPIView, IsAuthenticatedMixin):
     queryset = Farmacia.objects.all()
     serializer_class = FarmaciaListSerializer
     pagination_class = SmallResultsSetPagination
