@@ -40,8 +40,3 @@ class LaboratorioSerializer(serializers.ModelSerializer):
         model = Laboratorio
         fields = '__all__'
 
-
-class GrupoMedicamentoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GrupoMedicamento
-        fields = '__all__'

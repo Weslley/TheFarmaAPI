@@ -2,7 +2,6 @@
 
 from django.conf.urls import url
 from api.views.medicamento import *
-from api.views.grupo_medicamento import *
 from api.views.laboratorio import *
 from api.views.cidade import *
 from api.views.farmacia import *
@@ -28,6 +27,4 @@ urlpatterns = [
     # Laboratorios
     url(r'^laboratorios/$', LaboratorioList.as_view(), name='laboratorio-list'),
 
-    # Grupo de medicamentos
-    url(r'^grupos_medicamentos/$', GrupoMedicamentoList.as_view(), name='grupo-medicamento-list'),
 ]

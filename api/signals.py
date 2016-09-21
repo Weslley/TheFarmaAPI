@@ -59,10 +59,3 @@ def laboratorio_update_signal(sender, **kwargs):
     serializer = LaboratorioSerializer(kwargs['instance'])
     data = serializer.data
     update_model(sender.__name__.lower(), data)
-
-
-@receiver(post_save, sender=GrupoMedicamento)
-def grupo_medicamento_update_signal(sender, **kwargs):
-    serializer = GrupoMedicamentoSerializer(kwargs['instance'])
-    data = serializer.data
-    update_model(sender.__name__.lower(), data)
