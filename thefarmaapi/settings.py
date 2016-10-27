@@ -154,10 +154,10 @@ REST_FRAMEWORK = {
     ),
 }
 
-PYREBASE_CONFIG = {
-    "apiKey": config('DB_FIREBASE_API_KEY'),
-    "authDomain": config('DB_FIREBASE_AUTH_DOMAIN'),
-    "databaseURL": config('DB_FIREBASE_URL'),
-    "storageBucket": config('DB_FIREBASE_STORAGE_BUCKET'),
-    "serviceAccount": config('DB_FIREBASE_SERVICE_ACCOUNT')
-}
+#PYREBASE_CONFIG = {
+#    "apiKey": config('DB_FIREBASE_API_KEY'),
+#    "authDomain": config('DB_FIREBASE_AUTH_DOMAIN'),
+#    "databaseURL": config('DB_FIREBASE_URL'),
+#    "storageBucket": config('DB_FIREBASE_STORAGE_BUCKET'),
+#    "serviceAccount": config('DB_FIREBASE_SERVICE_ACCOUNT')
+#}
