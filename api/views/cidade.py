@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from rest_framework import generics
-from api.models import Cidade
+from api.models.cidade import Cidade
 from api.pagination import SmallResultsSetPagination
-from api.serializers import CidadeSerializer
+from api.serializers.cidade import CidadeSerializer
 
 
 class CidadeList(generics.ListAPIView):

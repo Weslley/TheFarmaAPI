@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from rest_framework import generics
-from api.models import PrincipioAtivo
+from api.models.principio_ativo import PrincipioAtivo
 from api.pagination import SmallResultsSetPagination
-from api.serializers import PrincipioAtivoSerializer
+from api.serializers.principio_ativo import PrincipioAtivoSerializer
 
 
 class PrincipioAtivoList(generics.ListAPIView):

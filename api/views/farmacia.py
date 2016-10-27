@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from rest_framework import generics
-from api.models import Farmacia
+from api.models.farmacia import Farmacia
 from api.mixins.base import IsAuthenticatedMixin
 from api.pagination import SmallResultsSetPagination
-from api.serializers import FarmaciaSerializer, FarmaciaListSerializer
+from api.serializers.farmacia import FarmaciaSerializer, FarmaciaListSerializer
 
 
 class FarmaciaList(generics.ListAPIView, IsAuthenticatedMixin):

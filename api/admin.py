@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from api.models import *
+from api.models.cidade import Cidade
+from api.models.farmacia import Farmacia
+from api.models.laboratorio import Laboratorio
+from api.models.medicamento import Medicamento
+from api.models.principio_ativo import PrincipioAtivo
 
 
 # class FarmaciaAdmin(admin.ModelAdmin):
