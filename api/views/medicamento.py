@@ -3,7 +3,7 @@
 from rest_framework import generics
 from api.models.medicamento import Medicamento
 from api.pagination import SmallResultsSetPagination
-from api.serializers.medicamento import MedicamentoSerializer
+from api.serializers.medicamento import *
 
 
 class MedicamentoList(generics.ListAPIView):
@@ -11,5 +11,16 @@ class MedicamentoList(generics.ListAPIView):
     Listagem dos medicamentos cadastrados
     """
     queryset = Medicamento.objects.all()
-    serializer_class = MedicamentoSerializer
+    serializer_class = MedicamentoListSerializer
     pagination_class = SmallResultsSetPagination
+
+
+class MedicamentoRetrieve(generics.RetrieveAPIView):
+    lookup_url_kwarg = 'id'
+    serializer_class = MedicamentoSerializer
+
+    def get_queryset(self):
+        if 'id' in self.kwargs and self.kwargs['id']:
+            return Medicamento.objects.filter(id=self.kwargs['id'])
+        else:
+            return Medicamento.objects.none()

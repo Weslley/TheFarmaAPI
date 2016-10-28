@@ -6,6 +6,7 @@ from api.views.laboratorio import *
 from api.views.cidade import *
 from api.views.farmacia import *
 from api.views.principio_ativo import *
+from api.views.apresentacao import *
 from api.views.root import HomeApiView
 
 urlpatterns = [
@@ -20,6 +21,10 @@ urlpatterns = [
 
     # Medicamentos
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-list'),
+    url(r'^medicamentos/(?P<id>[0-9]+)/$', MedicamentoRetrieve.as_view(), name='medicamento-view'),
+
+    # Apresetação
+    url(r'^apresentacoes/(?P<id>[0-9]+)/$', ApresentacaoRetrieve.as_view(), name='apresentacao-view'),
 
     # Principios ativos
     url(r'^principios/$', PrincipioAtivoList.as_view(), name='principio-list'),

@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from api.models.representante_legal import RepresentanteLegal
+from api.models.tabela_preco import TabelaPreco
+from api.models.uf import Uf
+from api.models.apresentacao import Apresentacao
+from api.models.bairro import Bairro
 from api.models.cidade import Cidade
+from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
 from api.models.laboratorio import Laboratorio
 from api.models.medicamento import Medicamento
@@ -74,9 +80,14 @@ from api.models.principio_ativo import PrincipioAtivo
 #     )
 #     ordering = ('id',)
 
-
 admin.site.register(Farmacia)
-admin.site.register(Cidade)
 admin.site.register(Medicamento)
 admin.site.register(PrincipioAtivo)
 admin.site.register(Laboratorio)
+admin.site.register(Endereco)
+admin.site.register(Cidade)
+admin.site.register(Bairro)
+admin.site.register(Uf)
+admin.site.register(RepresentanteLegal)
+admin.site.register(Apresentacao)
+admin.site.register(TabelaPreco)
