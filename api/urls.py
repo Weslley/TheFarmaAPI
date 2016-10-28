@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import url
+
+from api.views.bairro import BairroList
 from api.views.medicamento import *
 from api.views.laboratorio import *
 from api.views.cidade import *
@@ -19,15 +21,19 @@ urlpatterns = [
     # Cidades
     url(r'^cidades/$', CidadeList.as_view(), name='cidade-list'),
 
+    # Bairros
+    url(r'^bairros/$', BairroList.as_view(), name='bairro-list'),
+
     # Medicamentos
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-list'),
     url(r'^medicamentos/(?P<id>[0-9]+)/$', MedicamentoRetrieve.as_view(), name='medicamento-view'),
 
     # Apresetação
     url(r'^apresentacoes/(?P<id>[0-9]+)/$', ApresentacaoRetrieve.as_view(), name='apresentacao-view'),
+    url(r'^apresentacoes/$', ApresentacaoList.as_view(), name='apresentacao-list'),
 
     # Principios ativos
-    url(r'^principios/$', PrincipioAtivoList.as_view(), name='principio-list'),
+    url(r'^principios_ativos/$', PrincipioAtivoList.as_view(), name='principio_ativo-list'),
 
     # Laboratorios
     url(r'^laboratorios/$', LaboratorioList.as_view(), name='laboratorio-list'),

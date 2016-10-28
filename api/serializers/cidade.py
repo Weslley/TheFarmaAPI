@@ -10,3 +10,11 @@ class CidadeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cidade
         fields = '__all__'
+
+
+class CidadeBasicSerializer(serializers.ModelSerializer):
+    uf = serializers.CharField(source='uf.sigla')
+
+    class Meta:
+        model = Cidade
+        fields = ('ibge', 'nome', 'uf')
