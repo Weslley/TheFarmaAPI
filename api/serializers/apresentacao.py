@@ -13,8 +13,8 @@ class ApresentacaoListSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ApresentacaoSerializer(serializers.ModelSerializer):
-    tabela = TabelaPrecoSerializer()
+    tabelas = TabelaPrecoSerializer()
 
     class Meta:
         model = Apresentacao
-        fields = ('codigo_barras', 'nome', 'registro_ms', 'imagem', 'tabela')
+        fields = ('codigo_barras', 'nome', 'registro_ms', 'imagem', 'tabelas')
