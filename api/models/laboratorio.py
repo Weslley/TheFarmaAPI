@@ -3,14 +3,14 @@ from api.models.endereco import Endereco
 
 
 class Laboratorio(models.Model):
-    nome = models.CharField(max_length=50, null=True, blank=True)
-    nome_completo = models.CharField(max_length=50, null=True, blank=True)
-    endereco = models.OneToOneField(Endereco)
+    nome = models.CharField(max_length=110)
+    cnpj = models.CharField(max_length=14, null=True, blank=True)
+    endereco = models.OneToOneField(Endereco, null=True, blank=True)
 
     class Meta:
-        ordering = ('nome', 'nome_completo')
+        ordering = ('nome', )
         verbose_name = 'Laboratório'
         verbose_name_plural = 'Laboratórios'
 
     def __str__(self):
-        return '{}'.format(self.nome if self.nome else self.nome_completo if self.nome_completo else self.id)
+        return '{}'.format(self.nome if self.nome else self.id)

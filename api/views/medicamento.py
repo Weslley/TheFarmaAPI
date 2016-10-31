@@ -2,7 +2,7 @@
 
 from rest_framework import generics
 from api.models.medicamento import Medicamento
-from api.pagination import SmallResultsSetPagination
+from api.pagination import SmallResultsSetPagination, StandardResultsSetPagination
 from api.serializers.medicamento import *
 
 
@@ -12,7 +12,9 @@ class MedicamentoList(generics.ListAPIView):
     """
     queryset = Medicamento.objects.all()
     serializer_class = MedicamentoListSerializer
-    pagination_class = SmallResultsSetPagination
+    pagination_class = StandardResultsSetPagination
+
+
 
 
 class MedicamentoRetrieve(generics.RetrieveAPIView):
