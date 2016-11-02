@@ -6,7 +6,7 @@ from api.models.laboratorio import Laboratorio
 
 
 class Medicamento(models.Model):
-    nome = models.CharField(max_length=40, null=True, blank=True)
+    nome = models.CharField(max_length=200, null=True, blank=True)
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Laboratorio)
     tipo = models.IntegerField(choices=tipo_medicamento.CHOICES)
