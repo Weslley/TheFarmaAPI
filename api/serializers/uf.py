@@ -7,3 +7,9 @@ class UfSerializer(serializers.ModelSerializer):
     class Meta:
         model = Uf
         fields = '__all__'
+
+
+class UfReduzidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Uf
+        fields = ('sigla', )

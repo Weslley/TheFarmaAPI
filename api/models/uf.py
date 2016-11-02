@@ -7,4 +7,7 @@ class Uf(models.Model):
     nome = models.CharField(max_length=20)
 
     def __str__(self):
-        return self.nome
+        return self.sigla
+
+    def __unicode__(self):
+        return self.sigla
