@@ -4,7 +4,7 @@ from api.models.medicamento import Medicamento
 
 
 class Apresentacao(models.Model):
-    codigo_barras = models.BigIntegerField(null=True, blank=True)
+    codigo_barras = models.BigIntegerField(null=True, blank=True, unique=True)
     nome = models.CharField(max_length=60, null=True, blank=True)
     registro_ms = models.CharField(max_length=17, null=True, blank=True)
     imagem = models.ImageField(upload_to='apresentacoes')
