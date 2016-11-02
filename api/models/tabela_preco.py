@@ -5,7 +5,7 @@ from api.models.uf import Uf
 
 
 class TabelaPreco(models.Model):
-    icm = models.DecimalField(max_digits=15, decimal_places=2)
+    icms = models.DecimalField(max_digits=15, decimal_places=2)
     pmc = models.DecimalField(max_digits=15, decimal_places=2)
     pmf = models.DecimalField(max_digits=15, decimal_places=2)
     data_vigencia = models.DateField()
