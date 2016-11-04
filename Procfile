@@ -1,0 +1,1 @@
+web: gunicorn thefarmaapi.wsgi --log-file -
