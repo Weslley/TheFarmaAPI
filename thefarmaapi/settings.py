@@ -157,6 +157,10 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': 'order',
 }
 
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
 #PYREBASE_CONFIG = {
 #    "apiKey": config('DB_FIREBASE_API_KEY'),
 #    "authDomain": config('DB_FIREBASE_AUTH_DOMAIN'),
