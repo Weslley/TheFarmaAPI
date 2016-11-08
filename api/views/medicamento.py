@@ -15,7 +15,7 @@ class MedicamentoList(generics.ListAPIView):
     Listagem dos medicamentos cadastrados
     """
     queryset = Medicamento.objects.all()
-    serializer_class = MedicamentoListSerializer
+    serializer_class = MedicamentoSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = MedicamentoFilter
@@ -32,3 +32,4 @@ class MedicamentoRetrieve(generics.RetrieveAPIView):
             return Medicamento.objects.filter(id=self.kwargs['id'])
         else:
             return Medicamento.objects.none()
+
