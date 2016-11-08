@@ -3,12 +3,10 @@ from api.models.apresentacao import Apresentacao
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 
 
-class ApresentacaoListSerializer(serializers.HyperlinkedModelSerializer):
-    apresentacao = serializers.HyperlinkedIdentityField(view_name='apresentacao-view', lookup_field='id', format='html')
-
+class ApresentacaoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Apresentacao
-        fields = ('nome', 'apresentacao')
+        fields = ('nome', 'id')
 
 
 class ApresentacaoSerializer(serializers.ModelSerializer):
@@ -17,3 +15,11 @@ class ApresentacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Apresentacao
         fields = ('codigo_barras', 'nome', 'registro_ms', 'imagem', 'tabelas')
+
+
+class ApresentacaoExportSerializer(serializers.ModelSerializer):
+    tabelas = serializers.SlugRelatedField(many=True, read_only=True, slug_field='id')
+
+    class Meta:
+        model = Apresentacao
+        fields = '__all__'

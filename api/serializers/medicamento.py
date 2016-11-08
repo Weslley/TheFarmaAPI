@@ -11,10 +11,15 @@ class MedicamentoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MedicamentoListSerializer(serializers.HyperlinkedModelSerializer):
-    nome = serializers.ReadOnlyField()
-    medicamento = serializers.HyperlinkedIdentityField(view_name='medicamento-view', lookup_field='id', format='html')
+class MedicamentoListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medicamento
+        fields = ('nome', 'id')
+
+
+class MedicamentoExportSerializer(serializers.ModelSerializer):
+    apresentacoes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='id')
 
     class Meta:
         model = Medicamento
-        fields = ('nome', 'medicamento')
+        fields = '__all__'
