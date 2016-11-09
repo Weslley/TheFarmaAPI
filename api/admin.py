@@ -80,7 +80,36 @@ from api.models.principio_ativo import PrincipioAtivo
 #     )
 #     ordering = ('id',)
 
-admin.site.register(Farmacia)
+from api.utils.reverse_admin import ReverseModelAdmin
+
+
+class FarmaciaAdmin(ReverseModelAdmin):
+    inline_type = 'tabular'
+    list_display = ('get_cidade', )
+    fieldsets = (
+        (
+            'Dados da Farmácia',
+            {
+                'fields': (
+                    ('cnpj', 'nome_fantasia', 'razao_social'),
+                    ('telefone', 'cliente_infog2', 'logo'),
+                )
+            }
+        ),
+    )
+
+    inline_reverse = (
+        'endereco',
+    )
+
+    def get_cidade(self, obj):
+        return obj.endereco.cidade
+
+    get_cidade.short_description = 'Cidade'
+    get_cidade.admin_order_field = 'endereco__cidade'
+
+
+admin.site.register(Farmacia, FarmaciaAdmin)
 admin.site.register(Medicamento)
 admin.site.register(PrincipioAtivo)
 admin.site.register(Laboratorio)
