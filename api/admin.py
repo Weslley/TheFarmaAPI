@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+
+from api.models.curtida import Curtida
+from api.models.perfil import Perfil
+from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
@@ -109,6 +113,31 @@ class FarmaciaAdmin(ReverseModelAdmin):
     get_cidade.admin_order_field = 'endereco__cidade'
 
 
+class PerfilAdmin(ReverseModelAdmin):
+    inline_type = 'tabular'
+    list_display = ('get_nome', )
+    fieldsets = (
+        (
+            'Dados da Farmácia',
+            {
+                'fields': (
+                    ('sexo', 'sobre'),
+                )
+            }
+        ),
+    )
+
+    inline_reverse = (
+        'usuario',
+    )
+
+    def get_nome(self, obj):
+        return obj.usuario.first_name
+
+    get_nome.short_description = 'Nome'
+    get_nome.admin_order_field = 'usuario__nome'
+
+
 admin.site.register(Farmacia, FarmaciaAdmin)
 admin.site.register(Medicamento)
 admin.site.register(PrincipioAtivo)
@@ -120,3 +149,6 @@ admin.site.register(Uf)
 admin.site.register(RepresentanteLegal)
 admin.site.register(Apresentacao)
 admin.site.register(TabelaPreco)
+admin.site.register(Post)
+admin.site.register(Perfil)
+admin.site.register(Curtida)

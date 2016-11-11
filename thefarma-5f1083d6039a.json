@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "thefarma-f3206",
+  "private_key_id": "5f1083d6039ac7599d435f45206efc766d2f1bcf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC33sSWWcO4Mdxj\n62WjXx34YKHIN4t13Q/eC1FY5EtAtrKBpzMVM6ckaKWUhcFeVxmBvfBSu00k76E0\ni2rSCUet5qZjSJMXv35eapYw/ARBsC+LLmSyikHqD3Y2dYi1qhPUGwR2hZ8Qt69B\npd7zztzfeb89oMDA7jJfOAzFBB4+tHuoUjjA1wb+4HubRaPOgn2IV8GQbqB9s9EW\nKywvOuo5a82nuv2smoNteFsKO2TBYUVnDHGxMiDUV/PzjstcjwnqVoPgz0w11ti3\nOE5UBpji7+kgcbd1OmgCc/TXvLKDlK0RZFmM0H4o0vmU2irLizWdr1LzzBEzbeDq\nLQ7ijP3rAgMBAAECggEAKu8ail0FhZIm+zHxNre0INY3kK/fobLvzJJp+U69f6vp\nfLrVA8Ne6PKCj264G1ZNP21hm3/e4JwP0VwookjGcwXjnlVI+4ecc2GCFogSWmBQ\nibhYjRQZlhTsLoU9WeYP4Tw5y48h+F5bzwFzUQzhqFEeZb6Oo747Bt7opGx0v4Ex\ntuefNYle7x+o0h6o8mNAk/xs06bRhYcIfAJZXbqONVWMbYrgflXqHBRdnG+8/Xr/\n4ELZaHat6xErjS0saEoyvsoUp6MHllj+hRcqrSBGzqAzrA7ie9hHlO58C49FtImZ\nQpl+aH8myWRo2Rked1oBiI/y0gzNtt8GulvBo2g7+QKBgQDo7kOXV7wqWJL7DbHf\nP6QUF2szvJLxUyPq08KGXrztsjBn3vBjHE7VhIDmlYWff2ZqUxWphCTBkGR9G46s\n4ZzReWBaBtvW1+N6yBhBEPZvojwg+cbkhu21gBFyX6+y1vMNjxtWBVFDqurRxRsa\nLyQXyzeuYG/mTWA3np5tCsVHdwKBgQDKFJ7213RrdGQWPtxE4iyz9rQqH3pex2KD\noEKEQVh3BJnvi0ZUNzmWjoowGwV50vwfBpoxoPbZTk39Z2us1Yn3YiSPxIKRsv1o\nCW2To5sCxzwVKnSUjcugvWcX/V+iYZ1TwgJVry9YDyR9+QiPwh5DxSjxx2BA2inf\nZ/zofFOCLQKBgA0wiLVGK4p+T3xVzy+kC+dzWAeq8uslWRBQA2DWdn5DK8iF8Di8\nfp5KjX4BE3rvnN4CbGSX7fjj8zy+VbrmX5ng9JrEbqhguynVsMHmcv3pQtxfKGsC\nVO2FHffLAUjwMP0gkFyzmmFpiThtn9ZAuxt5z2JZZZy13u/nVHM6O+eLAoGBAK/E\nLdwP3NAV5XQ/6sDzZOSHQX+d74b+r55DR3fXioXC982V+28Gtc1RX7ql1iZ3MBog\nWP+vvOWYKVeum8Yx2hXVRG3UA6mM4MKb6LZQyGQrPQQ/8DTB/IpsE36XQJZxhzEx\n/2vduzVBvoDfmeXIdyCFHa7mtr7RwzfxL9ZbRRtlAoGAbGWN6YH8qB5hyffS6ckA\n44rE04tE5xkW+YLwRUXCLhilWTyQBr3HZE5cpJTiPBEoGeCpy2pTjkk7KWZnPsfP\nX63NmBRwIOgw6s+GfwnplkKdd0rJlyHICl2Cl+2Bm5muBGhMa113R3EHencDv/Ea\ntDVGxgErQrQEKbVOkGf9by0=\n-----END PRIVATE KEY-----\n",
+  "client_email": "thefarma@thefarma-f3206.iam.gserviceaccount.com",
+  "client_id": "109423270324477210120",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/thefarma%40thefarma-f3206.iam.gserviceaccount.com"
+}

@@ -7,6 +7,7 @@ from api.views.medicamento import *
 from api.views.laboratorio import *
 from api.views.cidade import *
 from api.views.farmacia import *
+from api.views.post import *
 from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
@@ -40,6 +41,9 @@ urlpatterns = [
     url(r'^laboratorios/$', LaboratorioList.as_view(), name='laboratorio-list'),
 
     # Tabelas de preços
-    url(r'^tabela_precos/$', TabelaPrecoList.as_view(), name='tabela_preco-list')
+    url(r'^tabela_precos/$', TabelaPrecoList.as_view(), name='tabela_preco-list'),
+
+    # Post
+    url(r'^posts/$', PostExportList.as_view(), name='post-list')
 
 ]
