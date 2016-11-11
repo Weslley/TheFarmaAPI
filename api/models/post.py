@@ -19,6 +19,9 @@ class Post(models.Model):
     tipo = models.IntegerField(choices=tipo_post.CHOICES, default=0)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.titulo
+
     @property
     def likes(self):
         return int(self.curtidas.count())

@@ -151,6 +151,7 @@ class PerfilAdmin(ReverseModelAdmin):
 
 
 class PostAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'usuario', 'tipo', 'likes', 'data_criacao', 'data_atualizacao')
     fieldsets = (
         (None, {
             'fields': (
