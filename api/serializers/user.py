@@ -4,7 +4,13 @@ from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='get_full_name')
-    foto = serializers.ImageField(source='perfil.foto')
+    foto = serializers.SerializerMethodField('get_foto_url')
+
+    def get_foto_url(self, obj):
+        if hasattr(obj, 'perfil'):
+            if obj.perfil.foto:
+                return self.context['request'].build_absolute_uri(obj.perfil.foto.url)
+        return ''
 
     class Meta:
         model = User
