@@ -7,9 +7,10 @@ class UserSerializer(serializers.ModelSerializer):
     foto = serializers.SerializerMethodField('get_foto_url')
 
     def get_foto_url(self, obj):
+        base = ''
         if hasattr(obj, 'perfil'):
             if obj.perfil.foto:
-                return self.context['request'].build_absolute_uri(obj.perfil.foto.url)
+                return 'http://thefarmaapi.herokuapp.com{}'.format(obj.perfil.foto.url)
         return ''
 
     class Meta:
