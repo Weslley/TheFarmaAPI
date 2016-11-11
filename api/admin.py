@@ -114,7 +114,7 @@ class FarmaciaAdmin(ReverseModelAdmin):
 
 
 class PerfilAdmin(ReverseModelAdmin):
-    inline_type = 'tabular'
+    inline_type = 'stacked'
     list_display = ('get_nome', )
     fieldsets = (
         (
@@ -127,9 +127,21 @@ class PerfilAdmin(ReverseModelAdmin):
         ),
     )
 
+    declared_fieldsets = (
+        (
+            'Dados Principais',
+            {
+                'fields': (
+                    ('first_name', 'last_name')
+                )
+            }
+        ),
+    )
+
     inline_reverse = (
         'usuario',
     )
+
 
     def get_nome(self, obj):
         return obj.usuario.first_name
@@ -137,6 +149,23 @@ class PerfilAdmin(ReverseModelAdmin):
     get_nome.short_description = 'Nome'
     get_nome.admin_order_field = 'usuario__nome'
 
+
+class PostAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (
+                'titulo',
+                'conteudo',
+                'tipo',
+                ('imagem', 'video'),
+                'url_referencia'
+            )
+        }),
+    )
+
+    def save_model(self, request, obj, form, change):
+        obj.usuario = request.user
+        obj.save()
 
 admin.site.register(Farmacia, FarmaciaAdmin)
 admin.site.register(Medicamento)
@@ -149,6 +178,6 @@ admin.site.register(Uf)
 admin.site.register(RepresentanteLegal)
 admin.site.register(Apresentacao)
 admin.site.register(TabelaPreco)
-admin.site.register(Post)
+admin.site.register(Post, PostAdmin)
 admin.site.register(Perfil)
-admin.site.register(Curtida)
+
