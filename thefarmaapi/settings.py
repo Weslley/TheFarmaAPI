@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_docs',
     'crispy_forms'
 ]
@@ -91,10 +92,6 @@ DATABASES = {
         'DATABASE_URL',
         cast=parse_db_url
     ),
-    # 'protecar': config(
-    #     'PROTECAR',
-    #     cast=parse_db_url
-    # )
 }
 
 
