@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import url
-
 from api.views.bairro import BairroList
 from api.views.medicamento import *
 from api.views.laboratorio import *
@@ -12,10 +11,14 @@ from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
 from api.views.tabela_preco import TabelaPrecoList
+from api.views.user import Login
 
 urlpatterns = [
     # Raiz
     url(r'^$', HomeApiView.as_view(), name='home-api'),
+
+    # Login token
+    url(r'^login/', Login.as_view(), name='login'),
 
     # Farmacias
     url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-list'),
