@@ -34,6 +34,7 @@ urlpatterns = [
     # Medicamentos
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-list'),
     url(r'^medicamentos/(?P<id>[0-9]+)/$', MedicamentoRetrieve.as_view(), name='medicamento-view'),
+    url(r'^medicamentos_export/$', MedicamentoExport.as_view(), name='medicamento-export'),
 
     # Apresetação
     url(r'^apresentacoes/(?P<id>[0-9]+)/$', ApresentacaoRetrieve.as_view(), name='apresentacao-view'),
