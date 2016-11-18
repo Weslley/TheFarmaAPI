@@ -23,7 +23,7 @@ class TabelaPrecoExport(APIView):
             user = auth.current_user
             db = firebase.database()
             data = db.child('tabelas_preco').get()
-            resultado = [pyre.item[1] for pyre in data.pyres]
+            resultado = [pyre.item[1] for pyre in data.pyres if pyre]
             return Response(resultado)
         except Exception as err:
             print(err)
