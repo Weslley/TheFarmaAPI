@@ -27,5 +27,4 @@ class LaboratorioExport(APIView):
             resultado = [pyre.item[1] for pyre in data.pyres]
             return Response(resultado)
         except Exception as err:
-            print(err)
-            return Response({'detail': 'Erro ao carregar os dados'})
+            return Response({'detail': 'Erro ao carregar os dados - {}'.format(str(err))})
