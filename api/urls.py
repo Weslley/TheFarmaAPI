@@ -37,6 +37,7 @@ urlpatterns = [
     # Apresetação
     url(r'^apresentacoes/(?P<id>[0-9]+)/$', ApresentacaoRetrieve.as_view(), name='apresentacao-view'),
     url(r'^apresentacoes/$', ApresentacaoList.as_view(), name='apresentacao-list'),
+    url(r'^apresentacoes/(?P<id>[0-9]+)/rank/$', RankingApresentacao.as_view(), name='apresentacao-ranking'),
 
     # Principios ativos
     url(r'^principios_ativos/$', PrincipioAtivoList.as_view(), name='principio_ativo-list'),

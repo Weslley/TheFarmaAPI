@@ -24,7 +24,7 @@ class CurtirView(IsAuthenticatedMixin):
     Class based view para curtida
     """
 
-    def get(self, request, id, format=None):
+    def post(self, request, id, format=None):
         try:
             post = Post.objects.get(id=id)
         except Post.DoesNotExist:
