@@ -181,4 +181,5 @@ admin.site.register(Apresentacao)
 admin.site.register(TabelaPreco)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Perfil)
+admin.site.register(Curtida)
 

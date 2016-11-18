@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^tabela_precos/$', TabelaPrecoList.as_view(), name='tabela_preco-list'),
 
     # Post
-    url(r'^posts/$', PostExportList.as_view(), name='post-list')
+    url(r'^posts/$', PostExportList.as_view(), name='post-list'),
+    url(r'^posts/(?P<id>[0-9]+)/like/$', CurtirView.as_view(), name='post-list')
 
 ]

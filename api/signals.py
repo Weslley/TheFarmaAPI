@@ -1,9 +1,10 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from pyrebase import pyrebase
 from django.conf import settings
 
 from api.models.cidade import Cidade
+from api.models.curtida import Curtida
 from api.models.farmacia import Farmacia
 from api.models.laboratorio import Laboratorio
 from api.models.medicamento import Medicamento
@@ -73,10 +74,23 @@ def update_model(model_name, data):
 
 
 @receiver(post_save, sender=Post)
-def laboratorio_update_signal(sender, **kwargs):
+def post_update_signal(sender, **kwargs):
     serializer = PostExportSerializer(kwargs['instance'])
     data = serializer.data
     update_model(sender.__name__.lower(), data)
 
 
+@receiver(post_save, sender=Curtida)
+def curtida_crete_signal(sender, **kwargs):
+    curtida = kwargs['instance']
+    serializer = PostExportSerializer(curtida.post)
+    data = serializer.data
+    update_model(sender.__name__.lower(), data)
 
+
+@receiver(post_delete, sender=Curtida)
+def curtida_delete_signal(sender, **kwargs):
+    curtida = kwargs['instance']
+    serializer = PostExportSerializer(curtida.post)
+    data = serializer.data
+    update_model(sender.__name__.lower(), data)

@@ -18,19 +18,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('email', 'foto', 'nome')
 
 
-class LoginSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('email', 'password')
-        extra_kwargs = {'password': {'write_only': True}, 'email': {'required': True}}
+class LoginSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=60, write_only=True)
+    email = serializers.CharField(max_length=254)
 
     def create(self, validated_data):
-        email = validated_data['email']
-        username = email if len(email) < 150 else email[:149]
-        user = User(
-            email=email,
-            username=username
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+        data = {'email': '', 'password': ''}
+        for key in validated_data:
+            data[key] = validated_data[key]
+        return data
+
+    def update(self, instance, validated_data):
+        instance['email'] = validated_data.get('email', instance['emai'])
+        instance['password'] = validated_data.get('password', instance['password'])
+        return instance
