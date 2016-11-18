@@ -85,7 +85,7 @@ def curtida_crete_signal(sender, **kwargs):
     curtida = kwargs['instance']
     serializer = PostExportSerializer(curtida.post)
     data = serializer.data
-    update_model(sender.__name__.lower(), data)
+    update_model('post', data)
 
 
 @receiver(post_delete, sender=Curtida)
@@ -93,4 +93,4 @@ def curtida_delete_signal(sender, **kwargs):
     curtida = kwargs['instance']
     serializer = PostExportSerializer(curtida.post)
     data = serializer.data
-    update_model(sender.__name__.lower(), data)
+    update_model('post', data)

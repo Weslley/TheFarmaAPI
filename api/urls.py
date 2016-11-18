@@ -11,14 +11,15 @@ from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
 from api.views.tabela_preco import TabelaPrecoList
-from api.views.user import Login
+from api.views.user import Login, Logout
 
 urlpatterns = [
     # Raiz
     url(r'^$', HomeApiView.as_view(), name='home-api'),
 
     # Login token
-    url(r'^login/', Login.as_view(), name='login'),
+    url(r'^login/$', Login.as_view(), name='login'),
+    url(r'^logout/$', Logout.as_view(), name='logout'),
 
     # Farmacias
     url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-list'),

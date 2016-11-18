@@ -28,11 +28,11 @@ class CurtirView(IsAuthenticatedMixin):
         try:
             post = Post.objects.get(id=id)
         except Post.DoesNotExist:
-            return Response({'detail': 'Post não encontrado'}, status=status.HTTP_200_OK)
+            return Response({'detail': 'Post não encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
         curtida, create = Curtida.objects.get_or_create(post=post, usuario=request.user)
 
         if not create:
             curtida.delete()
 
-        return Response({'data': id})
+        return Response({'curtida': create}, status=status.HTTP_200_OK)
