@@ -10,7 +10,8 @@ def generate_filename(self, filename):
 
 class Post(models.Model):
     titulo = models.CharField(max_length=60)
-    imagem = models.ImageField(upload_to=generate_filename, blank=True, null=True)
+    # imagem = models.ImageField(upload_to=generate_filename, blank=True, null=True)
+    imagem = models.URLField(blank=True, null=True)
     video = models.URLField(blank=True, null=True)
     conteudo = models.TextField(blank=True, null=True)
     url_referencia = models.URLField(blank=True, null=True)
