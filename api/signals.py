@@ -72,7 +72,7 @@ def update_model(model_name, data):
 def post_update_signal(sender, **kwargs):
     serializer = PostExportSerializer(kwargs['instance'])
     data = serializer.data
-    data['usuario']['foto'] = 'http://publicdomainvectors.org/photos/1389952697.png'
+    data['usuario']['foto'] = ''
     update_model(sender.__name__.lower(), data)
 
 
