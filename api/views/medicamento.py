@@ -6,10 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.filters import MedicamentoFilter, OrderingFilter
+from api.mixins.base import SyncApiMixin
 from api.models.medicamento import Medicamento
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.pagination import SmallResultsSetPagination, StandardResultsSetPagination
+from api.pagination import SmallResultsSetPagination, StandardResultsSetPagination, LargeResultsSetPagination
 from api.serializers.medicamento import *
 
 
@@ -24,6 +25,12 @@ class MedicamentoList(generics.ListAPIView):
     filter_class = MedicamentoFilter
     ordering_fields = ('nome', '-nome')
     ordering = ('nome',)
+
+
+class MedicamentoSync(generics.ListAPIView, SyncApiMixin):
+    queryset = Medicamento.objects.all()
+    serializer_class = MedicamentoExportSerializer
+    pagination_class = LargeResultsSetPagination
 
 
 class MedicamentoRetrieve(generics.RetrieveAPIView):

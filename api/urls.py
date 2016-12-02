@@ -38,24 +38,29 @@ urlpatterns = [
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-list'),
     url(r'^medicamentos/(?P<id>[0-9]+)/$', MedicamentoRetrieve.as_view(), name='medicamento-view'),
     url(r'^medicamentos_export/$', MedicamentoExport.as_view(), name='medicamento-export'),
+    url(r'^medicamentos/sync/$', MedicamentoSync.as_view(), name='medicamento-sync'),
 
     # Apresetação
     url(r'^apresentacoes/(?P<id>[0-9]+)/$', ApresentacaoRetrieve.as_view(), name='apresentacao-view'),
     url(r'^apresentacoes/$', ApresentacaoList.as_view(), name='apresentacao-list'),
     url(r'^apresentacoes_export/$', ApresentacaoExport.as_view(), name='apresentacao-export'),
     url(r'^apresentacoes/(?P<id>[0-9]+)/rank/$', RankingApresentacao.as_view(), name='apresentacao-ranking'),
+    url(r'^apresentacoes/sync/$', ApresentacaoSync.as_view(), name='apresentacao-sync'),
 
     # Principios ativos
     url(r'^principios_ativos/$', PrincipioAtivoList.as_view(), name='principio_ativo-list'),
     url(r'^principios_ativos_export/$', PrincipioAtivoExport.as_view(), name='principio_ativo-export'),
+    url(r'^principios_ativos/sync/$', PrincipioAtivoSync.as_view(), name='principio_ativo-sync'),
 
     # Laboratorios
     url(r'^laboratorios/$', LaboratorioList.as_view(), name='laboratorio-list'),
     url(r'^laboratorios_export/$', LaboratorioExport.as_view(), name='laboratorio-export'),
+    url(r'^laboratorios/sync/$', LaboratorioSync.as_view(), name='laboratorio-sync'),
 
     # Tabelas de preços
     url(r'^tabela_precos/$', TabelaPrecoList.as_view(), name='tabela_preco-list'),
     url(r'^tabela_precos_export/$', TabelaPrecoExport.as_view(), name='tabela_preco-export'),
+    url(r'^tabela_precos/sync/$', TabelaPrecoSync.as_view(), name='tabela_preco-sync'),
 
     # Post
     url(r'^posts/$', PostExportList.as_view(), name='post-list'),

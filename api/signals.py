@@ -66,11 +66,6 @@ def update_model(model_name, data):
 #     update_model(sender.__name__.lower(), data)
 #
 #
-# @receiver(post_save, sender=Laboratorio)
-# def laboratorio_update_signal(sender, **kwargs):
-#     serializer = LaboratorioSerializer(kwargs['instance'])
-#     data = serializer.data
-#     update_model(sender.__name__.lower(), data)
 
 
 @receiver(post_save, sender=Post)

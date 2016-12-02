@@ -2,8 +2,10 @@ from rest_framework import authentication
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from api.models.atualizacao import Atualizacao
 
 
 class IsAuthenticatedMixin(APIView):
@@ -51,4 +53,11 @@ class LogoutMixin(CustomJSONAPIView):
         return Response({'detail': 'Logout realizado com sucesso'}, status=status.HTTP_200_OK)
 
 
+class SyncApiMixin(GenericAPIView):
 
+    def get_queryset(self):
+        ultima_atualizacao = Atualizacao.objects.last()
+        if ultima_atualizacao:
+            return self.queryset.filter(data_atualizacao=ultima_atualizacao.data)
+        else:
+            return self.queryset.none()

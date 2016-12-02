@@ -6,8 +6,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.mixins.base import SyncApiMixin
 from api.models.apresentacao import Apresentacao
-from api.pagination import SmallResultsSetPagination
+from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
 from api.serializers.apresentacao import *
 
 
@@ -40,6 +41,12 @@ class RankingApresentacao(APIView):
     """
     def post(self, request, id, format=None):
         return Response({'detail': 'sucesso'}, status=status.HTTP_200_OK)
+
+
+class ApresentacaoSync(generics.ListAPIView, SyncApiMixin):
+    queryset = Apresentacao.objects.all()
+    serializer_class = ApresentacaoExportSerializer
+    pagination_class = LargeResultsSetPagination
 
 
 class ApresentacaoExport(APIView):
