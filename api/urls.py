@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import url
+
+from api.views.atualizacao import UltimaAtualizacao
 from api.views.bairro import BairroList
 from api.views.medicamento import *
 from api.views.laboratorio import *
@@ -16,6 +18,7 @@ from api.views.user import Login, Logout, LoginFacebook
 urlpatterns = [
     # Raiz
     url(r'^$', HomeApiView.as_view(), name='home-api'),
+    url(r'^ultima_atualizacao/$', UltimaAtualizacao.as_view(), name='ultima-atualizacoa-api'),
 
     # Login token
     url(r'^login/$', Login.as_view(), name='login'),

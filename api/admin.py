@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 
+from api.models.atualizacao import Atualizacao
 from api.models.curtida import Curtida
 from api.models.perfil import Perfil
 from api.models.post import Post
@@ -182,4 +183,4 @@ admin.site.register(TabelaPreco)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Perfil)
 admin.site.register(Curtida)
-
+admin.site.register(Atualizacao)
