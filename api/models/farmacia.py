@@ -13,7 +13,7 @@ class Farmacia(models.Model):
     logo = models.ImageField(upload_to='farmacias')
     endereco = models.OneToOneField(Endereco)
     data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)
-    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', blank=True, null=True)
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     class Meta:
         verbose_name = 'Farmácia'

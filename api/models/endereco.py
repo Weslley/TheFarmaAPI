@@ -10,6 +10,7 @@ class Endereco(models.Model):
     complemento = models.CharField(max_length=10, null=True, blank=True)
     cidade = models.ForeignKey(Cidade)
     bairro = models.ForeignKey(Bairro)
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     class Meta:
         verbose_name = 'Endereço'

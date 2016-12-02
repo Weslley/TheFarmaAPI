@@ -10,6 +10,7 @@ class RepresentanteLegal(models.Model):
     telefone = models.CharField(max_length=11)
     endereco = models.OneToOneField(Endereco)
     farmacia = models.ForeignKey(Farmacia, related_name='representantes')
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     class Meta:
         verbose_name = 'Representante legal'

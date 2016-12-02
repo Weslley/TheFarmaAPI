@@ -25,8 +25,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # conectando ao banco
         DATABASE_URL = options['sqlite_path'][0]
-        # export_principios(DATABASE_URL)
-        # export_laboratorios()
+        export_principios(DATABASE_URL)
+        export_laboratorios()
 
         conn = sqlite3.connect(DATABASE_URL)
         cursor = conn.cursor()

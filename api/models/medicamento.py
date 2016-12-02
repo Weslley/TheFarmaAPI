@@ -10,6 +10,7 @@ class Medicamento(models.Model):
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Laboratorio)
     tipo = models.IntegerField(choices=tipo_medicamento.CHOICES)
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.principio_ativo)
