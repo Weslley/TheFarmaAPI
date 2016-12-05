@@ -4,6 +4,8 @@ from api.models.uf import Uf
 
 
 class UfSerializer(serializers.ModelSerializer):
+    data_atualizacao = serializers.DateTimeField(format='%s')
+
     class Meta:
         model = Uf
         fields = '__all__'

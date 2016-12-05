@@ -10,6 +10,8 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
 
 
 class FarmaciaSerializer(serializers.ModelSerializer):
+    data_atualizacao = serializers.DateTimeField(format='%s')
+
     class Meta:
         model = Farmacia
         fields = '__all__'

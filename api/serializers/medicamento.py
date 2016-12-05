@@ -5,6 +5,7 @@ from api.serializers.apresentacao import ApresentacaoListSerializer
 
 class MedicamentoSerializer(serializers.ModelSerializer):
     apresentacoes = ApresentacaoListSerializer(many=True)
+    data_atualizacao = serializers.DateTimeField(format='%s')
 
     class Meta:
         model = Medicamento
@@ -19,6 +20,7 @@ class MedicamentoListSerializer(serializers.ModelSerializer):
 
 class MedicamentoExportSerializer(serializers.ModelSerializer):
     apresentacoes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='id')
+    data_atualizacao = serializers.DateTimeField(format='%s')
 
     class Meta:
         model = Medicamento

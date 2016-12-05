@@ -5,6 +5,7 @@ from api.serializers.cidade import CidadeBasicSerializer
 
 class BairroListSerializer(serializers.ModelSerializer):
     cidade = CidadeBasicSerializer()
+    data_atualizacao = serializers.DateTimeField(format='%s')
 
     class Meta:
         model = Bairro

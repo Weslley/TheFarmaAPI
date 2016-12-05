@@ -7,6 +7,7 @@ from api.serializers.user import UserSerializer
 class PostExportSerializer(serializers.ModelSerializer):
     usuario = UserSerializer()
     curtidas = serializers.IntegerField(source='likes')
+    data_atualizacao = serializers.DateTimeField(format='%s')
 
     class Meta:
         model = Post
