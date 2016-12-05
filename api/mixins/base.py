@@ -6,6 +6,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.models.atualizacao import Atualizacao
+from datetime import datetime
 
 
 class IsAuthenticatedMixin(APIView):
@@ -54,10 +55,12 @@ class LogoutMixin(CustomJSONAPIView):
 
 
 class SyncApiMixin(GenericAPIView):
+    lookup_url_kwarg = 'data'
 
     def get_queryset(self):
-        ultima_atualizacao = Atualizacao.objects.last()
+        long_data = self.kwargs['data']
+        ultima_atualizacao = datetime.fromtimestamp(float(long_data))
         if ultima_atualizacao:
-            return self.queryset.filter(data_atualizacao=ultima_atualizacao.data)
+            return self.queryset.filter(data_atualizacao__gte=ultima_atualizacao)
         else:
             return self.queryset.none()
