@@ -34,15 +34,28 @@ class LoginSerializer(serializers.Serializer):
         return instance
 
 
-class LoginFacebookSerializer(serializers.Serializer):
-    facebook_id = serializers.CharField(max_length=255, write_only=True)
+# class LoginFacebookSerializer(serializers.Serializer):
+#     facebook_id = serializers.CharField(max_length=255, write_only=True)
+#
+#     def create(self, validated_data):
+#         data = {'facebook_id': ''}
+#         for key in validated_data:
+#             data[key] = validated_data[key]
+#         return data
+#
+#     def update(self, instance, validated_data):
+#         instance['facebook_id'] = validated_data.get('facebook_id', instance['facebook_id'])
+#         return instance
 
-    def create(self, validated_data):
-        data = {'facebook_id': ''}
-        for key in validated_data:
-            data[key] = validated_data[key]
-        return data
+class LoginFacebookSerializer(serializers.ModelSerializer):
+    nome = serializers.CharField(source='first_name')
+    sobrenome = serializers.CharField(source='last_name')
+    facebook_id = serializers.CharField(required=True, source='perfil.facebook_id')
+    email = serializers.EmailField(required=True)
+    data_nascimento = serializers.DateField(source='perfil.data_nascimento')
+    sexo = serializers.CharField(max_length=1, source='perfil.sexo')
+    foto = serializers.URLField(source='perfil.foto')
 
-    def update(self, instance, validated_data):
-        instance['facebook_id'] = validated_data.get('facebook_id', instance['facebook_id'])
-        return instance
+    class Meta:
+        model = User
+        fields = ('email', )
