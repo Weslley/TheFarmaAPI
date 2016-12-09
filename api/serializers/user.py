@@ -49,13 +49,13 @@ class LoginSerializer(serializers.Serializer):
 
 class LoginFacebookSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='first_name')
-    sobrenome = serializers.CharField(source='last_name')
+    sobrenome = serializers.CharField(source='last_name', required=False)
     facebook_id = serializers.CharField(required=True, source='perfil.facebook_id')
     email = serializers.EmailField(required=True)
-    data_nascimento = serializers.DateField(source='perfil.data_nascimento')
-    sexo = serializers.CharField(max_length=1, source='perfil.sexo')
-    foto = serializers.URLField(source='perfil.foto')
+    data_nascimento = serializers.DateField(source='perfil.data_nascimento', required=False)
+    sexo = serializers.CharField(max_length=1, source='perfil.sexo', required=False)
+    foto = serializers.URLField(source='perfil.foto', required=False)
 
     class Meta:
         model = User
-        fields = ('email', )
+        fields = ('nome', 'sobrenome', 'facebook_id', 'data_nascimento', 'email', 'foto', 'sexo')

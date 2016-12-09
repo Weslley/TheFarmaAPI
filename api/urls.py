@@ -13,7 +13,7 @@ from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
 from api.views.tabela_preco import *
-from api.views.user import Login, Logout, LoginFacebook
+from api.views.user import Login, Logout, LoginFacebook, TesteLogin
 
 urlpatterns = [
     # Raiz
@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^ultima_atualizacao/$', UltimaAtualizacao.as_view(), name='ultima-atualizacoa-api'),
 
     # Login token
-    url(r'^login/$', Login.as_view(), name='login'),
+    url(r'^login/$', TesteLogin.as_view(), name='login'),
     url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
 

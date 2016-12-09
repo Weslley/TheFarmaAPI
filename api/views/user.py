@@ -87,3 +87,19 @@ class Logout(IsAuthenticatedMixin, LogoutMixin):
     """
 
     pass
+
+
+class TesteLogin(generics.CreateAPIView):
+    serializer_class = LoginFacebookSerializer
+    queryset = User.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        try:
+            usuario = User.objects.get(perfil__facebook_id=data['facebook_id'])
+            serializer = self.get_serializer(usuario)
+        except User.DoesNotExist:
+            pass # cria o usuario
+        return Response(data, status=status.HTTP_201_CREATED)
