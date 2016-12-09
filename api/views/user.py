@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.mixins.base import CustomJSONAPIView, LogoutMixin, IsAuthenticatedMixin
+from api.models.perfil import Perfil
 from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer
 
 
@@ -100,6 +101,38 @@ class TesteLogin(generics.CreateAPIView):
         try:
             usuario = User.objects.get(perfil__facebook_id=data['facebook_id'])
             serializer = self.get_serializer(usuario)
+            data = dict(serializer.data)
+            token, create = Token.objects.get_or_create(user=usuario)
+
+            # caso esteja fazendo a requisição do login novamente, reseta o token
+            if not create:
+                token.delete()
+                token = Token.objects.create(user=usuario)
+
+            data['token'] = token.key
         except User.DoesNotExist:
-            pass # cria o usuario
+            usuario = User.objects.create(
+                first_name=data['nome'],
+                last_name=data['sobrenome'] if 'sobrenome' in data else '',
+                email=data['email'],
+                username=data['facebook_id']
+            )
+            usuario.set_password(data['facebook_id'])
+            usuario.save()
+            perfil = Perfil()
+            perfil.facebook_id = data['facebook_id']
+            perfil.sexo = data['sexo'] if 'sexo' in data else ''
+            perfil.usuario = usuario
+            perfil.save()
+            serializer = self.get_serializer(usuario)
+            data = dict(serializer.data)
+            token, create = Token.objects.get_or_create(user=usuario)
+
+            # caso esteja fazendo a requisição do login novamente, reseta o token
+            if not create:
+                token.delete()
+                token = Token.objects.create(user=usuario)
+
+            data['token'] = token.key
+
         return Response(data, status=status.HTTP_201_CREATED)
