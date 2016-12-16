@@ -62,6 +62,7 @@ class Command(BaseCommand):
 
                 # Gerando os medicamentos
                 for med_temp in medicamentos_temporarios:
+                    print('Gerando medicamento {}'.format(med_temp['descricao']))
                     med_temp = MedicamentoApExport.objects.filter(
                         laboratorio_id=med_temp['laboratorio_id'],
                         descricao=med_temp['descricao'],
@@ -76,6 +77,7 @@ class Command(BaseCommand):
 
                 # Gerando as apresentaçãoes
                 for med in medicamentos:
+                    print('Gerando apresentações do medicamento {}'.format(med.nome))
                     apresentacoes = MedicamentoApExport.objects.filter(
                         laboratorio_id=med.laboratorio_id,
                         descricao=med.nome,
