@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from api.management.commands.medicamento_export import ApresentacaoExport
 from api.models.laboratorio import Laboratorio
+from api.models.principio_ativo import PrincipioAtivo
 
 TIPO_LABORATORIO = 1
 TIPO_NAO_USADO2 = 2
@@ -22,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         laboratorios = {}
         principios_ativos = {}
-        with open(str(options['file'][0]), 'rb') as arq:
+        with open(str(options['file'][0]), 'r', encoding="ISO-8859-1") as arq:
             with transaction.atomic():
                 lines = arq.readlines()
                 cont = 0
@@ -31,20 +33,43 @@ class Command(BaseCommand):
                     cont += 1
                     if tipo == TIPO_LABORATORIO:
                         lab = add_laboratorio(line)
-                        laboratorios[cont] = lab
+                        laboratorios[lab.id] = lab
                     elif tipo == TIPO_PRINCIPIO_ATIVO:
                         principio = add_principio_ativo(line)
-                        principios_ativos[cont] = principio
+                        principios_ativos[principio.id] = principio
+                    elif tipo == TIPO_MEDICAMENTO:
+                        print(line[17:21])
 
                 print('Concluido, {} laboratorios e {} principios ativos'.format(len(laboratorios), len(principios_ativos)))
 
 
 def add_laboratorio(line):
-    return Laboratorio.objects.create(
-        id=line[2:5],
-
-    )
+    try:
+        lab = Laboratorio.objects.get(id=int(line[2:5]))
+        lab.nome = line[5:25]
+        lab.razao_social = line[25:65]
+        lab.save()
+        return lab
+    except Laboratorio.DoesNotExist:
+        return Laboratorio.objects.create(
+            id=int(line[2:5]),
+            nome=line[5:25],
+            razao_social=line[25:65]
+        )
 
 
 def add_principio_ativo(line):
-    return line
+    try:
+        principio = PrincipioAtivo.objects.get(id=int(line[2:7]))
+        principio.nome = line[7:27]
+        principio.save()
+        return principio
+    except PrincipioAtivo.DoesNotExist:
+        return PrincipioAtivo.objects.create(
+            id=int(line[2:7]),
+            nome=line[7:27]
+        )
+
+
+def add_medicamento(line, laboratorios, principios):
+    return ApresentacaoExport(line, laboratorios, principios)
