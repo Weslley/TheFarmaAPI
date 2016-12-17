@@ -62,7 +62,7 @@ class Command(BaseCommand):
 
                 # Gerando os medicamentos
                 for med_temp in medicamentos_temporarios:
-                    print('Gerando medicamento {}'.format(med_temp['descricao']))
+                    print('Gerando medicamento')
                     med_temp = MedicamentoApExport.objects.filter(
                         laboratorio_id=med_temp['laboratorio_id'],
                         descricao=med_temp['descricao'],
@@ -77,7 +77,7 @@ class Command(BaseCommand):
 
                 # Gerando as apresentaçãoes
                 for med in medicamentos:
-                    print('Gerando apresentações do medicamento {}'.format(med.nome))
+                    print('Gerando apresentacoes do medicamento {}'.format(med.id))
                     apresentacoes = MedicamentoApExport.objects.filter(
                         laboratorio_id=med.laboratorio_id,
                         descricao=med.nome,
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                             for uf in ufs:
                                 tabela.ufs.add(uf)
 
-                print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentações\n{} tabelas de preço'.format(
+                print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentacoes\n{} tabelas de preco'.format(
                     len(laboratorios),
                     len(principios_ativos),
                     Medicamento.objects.count(),
