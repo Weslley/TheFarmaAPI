@@ -198,6 +198,9 @@ def add_medicamento_temp(line):
     :param line:
     :return:
     """
+    if line[71:106].strip().upper() == 'FEMINA':
+        print('FEMINA')
+        print(Decimal(line[215:223]) / 100)
     try:
         return MedicamentoApExport.objects.get(id=int(line[2:8] if len(line[2:8].strip()) else 0))
     except MedicamentoApExport.DoesNotExist:
