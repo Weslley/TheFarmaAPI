@@ -1,0 +1,11 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+
+{% block conteudo %}
+{{ view.as_table }}
+{% endblock %}
+
+{% block js %}
+{{ view.as_statics }}
+{% endblock %}

@@ -18,6 +18,7 @@ from rest_framework import urls as drf_urls
 from django.conf.urls import url, include
 from django.contrib import admin
 from api import urls as api_urls
+from core import  urls as core_urls
 from rest_framework_docs import urls as rest_framework_docs_urls
 from django.conf import settings
 
@@ -25,5 +26,6 @@ urlpatterns = [
     url(r'^a/', include(api_urls)),
     url(r'^a/docs/', include(rest_framework_docs_urls)),
     url(r'^admin/', admin.site.urls),
+    url(r'^admin2/', include(core_urls)),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

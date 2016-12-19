@@ -21,7 +21,7 @@ class Instituicao(models.Model):
 
 class UsuarioInstituicao(models.Model):
     instituicao = models.ForeignKey(Instituicao, related_name='usuarios')
-    user = models.ForeignKey(User, related_name='instituicao')
+    user = models.OneToOneField(User, related_name='user_instituicao')
 
     class Meta:
         unique_together = ('instituicao', 'user')
