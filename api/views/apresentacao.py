@@ -52,5 +52,3 @@ class ApresentacaoSync(generics.ListAPIView, SyncApiMixin):
 class ApresentacaoExport(generics.ListAPIView):
     queryset = Apresentacao.objects.all()
     serializer_class = ApresentacaoExportSerializer
-
-

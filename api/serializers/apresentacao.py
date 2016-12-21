@@ -19,6 +19,7 @@ class ApresentacaoSerializer(serializers.ModelSerializer):
 
 class ApresentacaoExportSerializer(serializers.ModelSerializer):
     tabelas = serializers.SlugRelatedField(many=True, read_only=True, slug_field='id')
+    data_atualizacao = serializers.DateTimeField(format='%s')
 
     class Meta:
         model = Apresentacao
