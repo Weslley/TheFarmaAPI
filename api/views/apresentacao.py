@@ -49,18 +49,8 @@ class ApresentacaoSync(generics.ListAPIView, SyncApiMixin):
     pagination_class = LargeResultsSetPagination
 
 
-class ApresentacaoExport(APIView):
-    def get(self, request, format=None):
-        try:
-            firebase = pyrebase.initialize_app(settings.PYREBASE_CONFIG)
-            auth = firebase.auth()
-            user = auth.current_user
-            db = firebase.database()
-            data = db.child('apresentacoes').get()
-            resultado = [pyre.item[1] for pyre in data.pyres if pyre]
-            return Response(resultado)
-        except Exception as err:
-            print(err)
-            return Response({'detail': 'Erro ao carregar os dados'})
+class ApresentacaoExport(generics.ListAPIView):
+    queryset = Apresentacao.objects.all()
+    serializer_class = ApresentacaoExportSerializer
 
 

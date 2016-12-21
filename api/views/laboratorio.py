@@ -23,15 +23,6 @@ class LaboratorioSync(generics.ListAPIView, SyncApiMixin):
     pagination_class = LargeResultsSetPagination
 
 
-class LaboratorioExport(APIView):
-    def get(self, request, format=None):
-        try:
-            firebase = pyrebase.initialize_app(settings.PYREBASE_CONFIG)
-            auth = firebase.auth()
-            user = auth.current_user
-            db = firebase.database()
-            data = db.child('laboratorios').get()
-            resultado = [pyre for pyre in data.pyres if pyre]
-            return Response(resultado)
-        except Exception as err:
-            return Response({'detail': 'Erro ao carregar os dados - {}'.format(str(err))})
+class LaboratorioExport(generics.ListAPIView):
+    queryset = Laboratorio.objects.all()
+    serializer_class = LaboratorioSerializer

@@ -44,16 +44,6 @@ class MedicamentoRetrieve(generics.RetrieveAPIView):
             return Medicamento.objects.none()
 
 
-class MedicamentoExport(APIView):
-    def get(self, request, format=None):
-        try:
-            firebase = pyrebase.initialize_app(settings.PYREBASE_CONFIG)
-            auth = firebase.auth()
-            user = auth.current_user
-            db = firebase.database()
-            data = db.child('medicamentos').get()
-            resultado = [pyre.item[1] for pyre in data.pyres if pyre]
-            return Response(resultado)
-        except Exception as err:
-            print(err)
-            return Response({'detail': 'Erro ao carregar os dados'})
+class MedicamentoExport(generics.ListAPIView):
+    queryset = Medicamento.objects.all()
+    serializer_class = MedicamentoExportSerializer
