@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from api.mixins.base import SyncApiMixin
 from api.models.atualizacao import Atualizacao
 from api.models.tabela_preco import TabelaPreco
-from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
+from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination, ExtraLargeResultsSetPagination
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 
 
@@ -20,6 +20,7 @@ class TabelaPrecoList(generics.ListAPIView):
 class TabelaPrecoExport(generics.ListAPIView):
     queryset = TabelaPreco.objects.all()
     serializer_class = TabelaPrecoSerializer
+    pagination_class = ExtraLargeResultsSetPagination
 
 
 class TabelaPrecoSync(generics.ListAPIView, SyncApiMixin):
