@@ -3,9 +3,84 @@
 
 
 {% block conteudo %}
-{{ view.as_table }}
+    <style type="text/css">
+        #am_add_button {
+            color: #999999;
+        }
+        .card-header .input-group .input-group-btn button {
+            height: 44px !important;
+            border-radius: 30px !important;
+            font-size: 12px !important;
+            line-height: 1em !important;
+            padding: 12px 12px !important;
+            margin-top: 0 !important;
+            margin-bottom: -20px !important;
+        }
+
+
+        .card-header input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+            color:    #FFF !important;
+        }
+        .card-header input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+           color:    #FFF !important;
+           opacity:  1;
+        }
+        .card-header input::-moz-placeholder { /* Mozilla Firefox 19+ */
+           color:    #FFF !important;
+           opacity:  1;
+        }
+        .card-header input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+           color:    #FFF !important;
+        }
+    </style>
+
+    <div class="card">
+        {{ view.as_table }}
+    </div>
+
 {% endblock %}
 
 {% block js %}
+<script type="text/javascript">
+    function translate_instituicao(data){
+        if (data == '')
+            return '<span style="color: green; font-weight: 600;">TheFarma</span>';
+        return data;
+    }
+
+    function translate_datetime(data){
+        var data = new Date(data);
+        var hora = data.getHours() + 3;
+        data.setHours(hora);
+        return data.toLocaleString();
+    }
+</script>
 {{ view.as_statics }}
+<script type="text/javascript">
+    (function () {
+        $('.card-header').attr('data-background-color', 'green')
+        $sidebar = $('.sidebar');
+        $full_page = $('.full-page');
+        $sidebar_responsive = $('body > .navbar-collapse');
+        $full_page_background = $('.full-page-background');
+
+        var new_color = 'green';
+
+        if($sidebar.length != 0){
+            $sidebar.attr('data-color',new_color);
+        }
+
+        if($full_page.length != 0){
+            $full_page.attr('data-color',new_color);
+        }
+
+        if($sidebar_responsive.length != 0){
+            $sidebar_responsive.attr('data-color',new_color);
+        }
+
+        $('.card-header .input-group-btn button').addClass('btn btn-white btn-round btn-just-icon');
+        $('#am_add_button').removeClass('btn-primary')
+        $('#am_add_button').addClass('btn-white')
+    })();
+</script>
 {% endblock %}
