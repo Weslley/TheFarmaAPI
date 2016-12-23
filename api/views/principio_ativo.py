@@ -23,16 +23,6 @@ class PrincipioAtivoSync(generics.ListAPIView, SyncApiMixin):
     pagination_class = LargeResultsSetPagination
 
 
-class PrincipioAtivoExport(APIView):
-    def get(self, request, format=None):
-        try:
-            firebase = pyrebase.initialize_app(settings.PYREBASE_CONFIG)
-            auth = firebase.auth()
-            user = auth.current_user
-            db = firebase.database()
-            data = db.child('principios_ativos').get()
-            resultado = [pyre for pyre in data.pyres if pyre]
-            return Response(resultado)
-        except Exception as err:
-            print(err)
-            return Response({'detail': 'Erro ao carregar os dados'})
+class PrincipioAtivoExport(generics.ListAPIView):
+    queryset = PrincipioAtivo.objects.all()
+    serializer_class = PrincipioAtivoSerializer
