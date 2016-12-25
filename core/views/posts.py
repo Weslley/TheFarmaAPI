@@ -21,3 +21,12 @@ class PostList(ListMixin):
         {'lookup': 'usuario__first_name', 'name': 'Usuário'},
         {'lookup': 'usuario__user_instituicao__instituicao__nome_fantasia', 'name': 'Instituição', 'js_function': 'translate_instituicao'}
     ]
+
+    def get_queryset(self):
+        queryset = super(PostList, self).get_queryset()
+        if not self.request.user.is_superuser:
+            instituicao = self.request.user.user_instituicao.instituicao
+            queryset = queryset.filter(
+                usuario__user_instituicao__instituicao=instituicao
+            )
+        return queryset
