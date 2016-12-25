@@ -143,7 +143,37 @@
 
 	    <div class="main-panel">
 
-            {% include 'components/menu_superior.html' %}
+<nav class="navbar navbar-transparent navbar-absolute">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand">
+                {% block header %}
+
+                {% endblock header %}
+            </div>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
+                       <i class="material-icons">person</i>
+                       <p class="hidden-lg hidden-md">Profile</p>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Perfil</a></li>
+                        <li><a href="#">Sair</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 			<div class="content">
 				<div class="container-fluid">
