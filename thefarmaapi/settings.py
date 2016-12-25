@@ -171,4 +171,4 @@ PYREBASE_CONFIG = {
 
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/admin2/posts/'
+LOGIN_REDIRECT_URL = '/'

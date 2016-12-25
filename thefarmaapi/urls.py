@@ -29,6 +29,6 @@ urlpatterns = [
     url(r'^logout/', auth_views.logout_then_login, {'login_url': '/login'}, name='logout'),
     url(r'^a/docs/', include(rest_framework_docs_urls)),
     url(r'^admin/', admin.site.urls),
-    url(r'^admin2/', include(core_urls)),
+    url(r'^$', include(core_urls)),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
