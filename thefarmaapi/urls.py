@@ -18,12 +18,15 @@ from rest_framework import urls as drf_urls
 from django.conf.urls import url, include
 from django.contrib import admin
 from api import urls as api_urls
-from core import  urls as core_urls
+from core import urls as core_urls
+import django.contrib.auth.views as auth_views
 from rest_framework_docs import urls as rest_framework_docs_urls
 from django.conf import settings
 
 urlpatterns = [
     url(r'^a/', include(api_urls)),
+    url(r'^login/', auth_views.login, name='login'),
+    url(r'^logout/', auth_views.logout_then_login, {'login_url': '/login'}, name='logout'),
     url(r'^a/docs/', include(rest_framework_docs_urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^admin2/', include(core_urls)),

@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_docs',
     'crispy_forms',
-    'awesome_mixins'
+    'awesome_mixins',
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -167,3 +168,7 @@ PYREBASE_CONFIG = {
    "storageBucket": config('DB_FIREBASE_STORAGE_BUCKET'),
    "serviceAccount": config('DB_FIREBASE_SERVICE_ACCOUNT')
 }
+
+LOGIN_URL = '/login/'
+LOGOUT_URL = '/logout/'
+LOGIN_REDIRECT_URL = '/admin2/posts/'
