@@ -1,7 +1,9 @@
-TIPO_1 = 0
-TIPO_2 = 1
+NOTICIA = 0
+PATROCINADO = 1
+AVISO = 2
 
 CHOICES = (
-    (TIPO_1, 'TIPO 1'),
-    (TIPO_2, 'TIPO 2'),
+    (NOTICIA, 'NOTÍCIA'),
+    (PATROCINADO, 'PATROCINADO'),
+    (AVISO, 'AVISO')
 )

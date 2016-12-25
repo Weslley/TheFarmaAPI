@@ -16,7 +16,7 @@ class Post(models.Model):
     url_referencia = models.URLField(blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
-    tipo = models.IntegerField(choices=tipo_post.CHOICES, default=0)
+    tipo = models.IntegerField(choices=tipo_post.CHOICES, default=tipo_post.NOTICIA)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):

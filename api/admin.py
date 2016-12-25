@@ -17,6 +17,7 @@ from api.models.farmacia import Farmacia
 from api.models.laboratorio import Laboratorio
 from api.models.medicamento import Medicamento
 from api.models.principio_ativo import PrincipioAtivo
+from api.models.instituicao import Instituicao, UsuarioInstituicao
 
 
 # class FarmaciaAdmin(admin.ModelAdmin):
@@ -169,6 +170,7 @@ class PostAdmin(admin.ModelAdmin):
         obj.usuario = request.user
         obj.save()
 
+
 admin.site.register(Farmacia, FarmaciaAdmin)
 admin.site.register(Medicamento)
 admin.site.register(PrincipioAtivo)
@@ -184,3 +186,5 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(Perfil)
 admin.site.register(Curtida)
 admin.site.register(Atualizacao)
+admin.site.register(Instituicao)
+admin.site.register(UsuarioInstituicao)
