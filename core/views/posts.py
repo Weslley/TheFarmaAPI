@@ -1,9 +1,9 @@
 from awesome_mixins.mixins.list import ListMixin
-
+from core.views.mixins import AdminBaseMixin
 from api.models.post import Post
 
 
-class PostList(ListMixin):
+class PostList(ListMixin, AdminBaseMixin):
     model = Post
     queryset = Post.objects.all()
     paginate_by = 2
