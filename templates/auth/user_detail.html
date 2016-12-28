@@ -1,0 +1,87 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+  Perfil
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header" data-background-color="purple">
+                    <h4 class="title">Visualizando Perfil</h4>
+                </div>
+                <div class="card-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Instituição</label>
+                                <input type="text" class="form-control" disabled value="{{ user.user_instituicao.instituicao.nome_fantasia }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Email</label>
+                                <input type="email" class="form-control" disabled value="{{ user.email }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Nome</label>
+                                <input type="text" class="form-control" disabled value="{{ user.first_name }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Sobrenome</label>
+                                <input type="text" class="form-control" disabled value="{{ user.last_name }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Data de nascimento</label>
+                                <input type="text" class="form-control" disabled value="{{ user.perfil.data_nascimento }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="#" class="btn btn-primary pull-right">Editar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-profile">
+                <div class="card-avatar">
+                    <img class="img" src="{% static "img/thefarma.png" %}" />
+                </div>
+
+                <div class="content">
+                    {% if user.is_superuser %}
+                        <h6 class="category text-gray">ADMINISTRADOR</h6>
+                    {% endif %}
+                    <h4 class="card-title">{{ user.get_full_name }}</h4>
+                    <p class="card-content">{{ user.perfil.sobre }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+    (function () {
+        $('.active').removeClass('active');
+        $('#menu_perfil').addClass('active');
+    })();
+    </script>
+{% endblock js %}
+

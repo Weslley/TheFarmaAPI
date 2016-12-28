@@ -1,0 +1,27 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+  Posts
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="card">
+        <form method="post" action="">{% csrf_token %}
+            {{ form.as_p}}
+            <input type="submit" name="Salvar">
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+    (function () {
+        $('.active').removeClass('active');
+        $('#menu_post').addClass('active');
+    })();
+    </script>
+{% endblock js %}
+

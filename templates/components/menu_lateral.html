@@ -15,33 +15,33 @@
 
     <div class="sidebar-wrapper">
         <ul class="nav">
-            <li class="active">
+            <li id="menu_dashboard" class="active">
                 <a href="{% url 'home' %}">
                     <i class="material-icons">dashboard</i>
                     <p>Dashboard</p>
                 </a>
             </li>
-            <li>
-                <a href="user.html">
+            <li id="menu_perfil">
+                <a href="{% url 'perfil-view' user.id %}">
                     <i class="material-icons">person</i>
                     <p>Perfil</p>
                 </a>
             </li>
             {% if user.is_superuser %}
-                <li>
+                <li id="menu_instituicao">
                     <a href="user.html">
                         <i class="material-icons">domain</i>
                         <p>Instituições</p>
                     </a>
                 </li>
-                <li>
+                <li id="menu_usuario">
                     <a href="user.html">
                         <i class="material-icons">people</i>
                         <p>Usuários</p>
                     </a>
                 </li>
             {% endif %}
-            <li>
+            <li id="menu_post">
                 <a href="{% url 'post-admin-list' %}">
                     <i class="material-icons">comment</i>
                     <p>Posts</p>

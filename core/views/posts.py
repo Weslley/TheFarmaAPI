@@ -1,18 +1,22 @@
 from awesome_mixins.mixins.list import ListMixin
 from core.views.mixins import AdminBaseMixin
 from api.models.post import Post
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
 
 
 class PostList(ListMixin, AdminBaseMixin):
     model = Post
     queryset = Post.objects.all()
-    paginate_by = 2
+    paginate_by = 10
     search_default = ('titulo', '-data_atualizacao', 'Titulo')
     css_table = 'table'
     css_div_header = 'card-header'
     css_div_body = 'card-content table-responsive'
     css_div_footer = ''
     css_pagination = 'pagination pagination-success'
+    add_button_url = 'adicionar'
+    add_button_name = 'Adicionar'
     columns = [
         {'lookup': 'titulo', 'name': 'Titulo'},
         {'lookup': 'tipo', 'name': 'Tipo', 'js_function': 'translate_tipo'},
@@ -30,3 +34,9 @@ class PostList(ListMixin, AdminBaseMixin):
                 usuario__user_instituicao__instituicao=instituicao
             )
         return queryset
+
+
+class PostCreate(CreateView):
+    model = Post
+    fields = ('titulo', 'conteudo', 'tipo', 'imagem', 'video', 'url_referencia')
+    success_url = reverse_lazy('post-admin-list')

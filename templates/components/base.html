@@ -166,7 +166,7 @@
                        <p class="hidden-lg hidden-md">Profile</p>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">Perfil</a></li>
+                        <li><a href="{% url 'perfil-view' user.id %}">Perfil</a></li>
                         <li><a href="{% url 'logout' %}">Sair</a></li>
                     </ul>
                 </li>
@@ -177,9 +177,9 @@
 
 			<div class="content">
 				<div class="container-fluid">
-                    {% block conteudo %}
+          {% block conteudo %}
 
-                    {% endblock %}
+          {% endblock %}
 				</div>
 			</div>
 
