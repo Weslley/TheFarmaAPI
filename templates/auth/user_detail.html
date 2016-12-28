@@ -18,7 +18,7 @@
                         <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Instituição</label>
-                                <input type="text" class="form-control" disabled value="{{ user.user_instituicao.instituicao.nome_fantasia }}">
+                                <input type="text" class="form-control" disabled value="{% if user.is_superuser %}TheFarma{% else %}{{ user.user_instituicao.instituicao.nome_fantasia }}{% endif %}">
                             </div>
                         </div>
                         <div class="col-md-6">
