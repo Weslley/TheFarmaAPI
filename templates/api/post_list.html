@@ -6,109 +6,6 @@
 {% endblock header %}
 
 {% block conteudo %}
-    <style type="text/css">
-        #am_add_button {
-            color: #999999;
-        }
-        .card-header .input-group .input-group-btn button {
-            height: 44px !important;
-            border-radius: 30px !important;
-            font-size: 12px !important;
-            line-height: 1em !important;
-            padding: 12px 12px !important;
-            margin-top: 0 !important;
-            margin-bottom: -20px !important;
-        }
-
-
-        .card-header input::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-            color:    #FFF !important;
-        }
-        .card-header input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-           color:    #FFF !important;
-           opacity:  1;
-        }
-        .card-header input::-moz-placeholder { /* Mozilla Firefox 19+ */
-           color:    #FFF !important;
-           opacity:  1;
-        }
-        .card-header input:-ms-input-placeholder { /* Internet Explorer 10-11 */
-           color:    #FFF !important;
-        }
-
-    .pagination {
-        margin-left: 1em !important;
-    }
-
-.pagination > li > a,
-.pagination > li > span {
-  border: 0;
-  border-radius: 30px !important;
-  transition: all .3s;
-  padding: 0px 11px;
-  margin: 0 3px;
-  min-width: 30px;
-  height: 30px;
-  line-height: 30px;
-  color: #999999;
-  font-weight: 400;
-  font-size: 12px;
-  text-transform: uppercase;
-  background: transparent;
-}
-.pagination > li > a:hover, .pagination > li > a:focus,
-.pagination > li > span:hover,
-.pagination > li > span:focus {
-  color: #999999;
-}
-.pagination > .active > a,
-.pagination > .active > span {
-  color: #999999;
-}
-.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover,
-.pagination > .active > span,
-.pagination > .active > span:focus,
-.pagination > .active > span:hover {
-  background-color: #9c27b0;
-  border-color: #9c27b0;
-  color: #FFFFFF;
-  box-shadow: 0 4px 5px 0 rgba(156, 39, 176, 0.14), 0 1px 10px 0 rgba(156, 39, 176, 0.12), 0 2px 4px -1px rgba(156, 39, 176, 0.2);
-}
-.pagination.pagination-info > .active > a, .pagination.pagination-info > .active > a:focus, .pagination.pagination-info > .active > a:hover,
-.pagination.pagination-info > .active > span,
-.pagination.pagination-info > .active > span:focus,
-.pagination.pagination-info > .active > span:hover {
-  background-color: #03a9f4;
-  border-color: #03a9f4;
-  box-shadow: 0 4px 5px 0 rgba(3, 169, 244, 0.14), 0 1px 10px 0 rgba(3, 169, 244, 0.12), 0 2px 4px -1px rgba(3, 169, 244, 0.2);
-}
-.pagination.pagination-success > .active > a, .pagination.pagination-success > .active > a:focus, .pagination.pagination-success > .active > a:hover,
-.pagination.pagination-success > .active > span,
-.pagination.pagination-success > .active > span:focus,
-.pagination.pagination-success > .active > span:hover {
-  background-color: #4caf50;
-  border-color: #4caf50;
-  box-shadow: 0 4px 5px 0 rgba(76, 175, 80, 0.14), 0 1px 10px 0 rgba(76, 175, 80, 0.12), 0 2px 4px -1px rgba(76, 175, 80, 0.2);
-}
-.pagination.pagination-warning > .active > a, .pagination.pagination-warning > .active > a:focus, .pagination.pagination-warning > .active > a:hover,
-.pagination.pagination-warning > .active > span,
-.pagination.pagination-warning > .active > span:focus,
-.pagination.pagination-warning > .active > span:hover {
-  background-color: #fbc02d;
-  border-color: #fbc02d;
-  box-shadow: 0 4px 5px 0 rgba(251, 192, 45, 0.14), 0 1px 10px 0 rgba(251, 192, 45, 0.12), 0 2px 4px -1px rgba(251, 192, 45, 0.2);
-}
-.pagination.pagination-danger > .active > a, .pagination.pagination-danger > .active > a:focus, .pagination.pagination-danger > .active > a:hover,
-.pagination.pagination-danger > .active > span,
-.pagination.pagination-danger > .active > span:focus,
-.pagination.pagination-danger > .active > span:hover {
-  background-color: #f44336;
-  border-color: #f44336;
-  box-shadow: 0 4px 5px 0 rgba(244, 67, 54, 0.14), 0 1px 10px 0 rgba(244, 67, 54, 0.12), 0 2px 4px -1px rgba(244, 67, 54, 0.2);
-}
-
-
-    </style>
 
     <div class="card">
         {{ view.as_table }}
@@ -140,27 +37,6 @@
 {{ view.as_statics }}
 <script type="text/javascript">
     (function () {
-        $('.card-header').attr('data-background-color', 'green')
-        $sidebar = $('.sidebar');
-        $full_page = $('.full-page');
-        $sidebar_responsive = $('body > .navbar-collapse');
-        $full_page_background = $('.full-page-background');
-
-        var new_color = 'green';
-
-        if($sidebar.length != 0){
-            $sidebar.attr('data-color',new_color);
-        }
-
-        if($full_page.length != 0){
-            $full_page.attr('data-color',new_color);
-        }
-
-        if($sidebar_responsive.length != 0){
-            $sidebar_responsive.attr('data-color',new_color);
-        }
-
-        $('.card-header .input-group-btn button').addClass('btn btn-white btn-round btn-just-icon');
         $('#am_add_button').removeClass('btn-primary');
         $('#am_add_button').addClass('btn-white');
     })();
