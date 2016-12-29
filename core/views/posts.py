@@ -3,6 +3,7 @@ from core.views.mixins import AdminBaseMixin
 from api.models.post import Post
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
+from api.utils import tipo_post
 
 
 class PostList(ListMixin, AdminBaseMixin):
@@ -40,3 +41,11 @@ class PostCreate(CreateView):
     model = Post
     fields = ('titulo', 'conteudo', 'tipo', 'imagem', 'video', 'url_referencia')
     success_url = reverse_lazy('post-admin-list')
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.usuario = self.request.user
+        if not self.request.user.is_superuser:
+            instance.tipo = tipo_post.PATROCINADO
+        instance.save()
+        return super(PostCreate, self).form_valid(form)

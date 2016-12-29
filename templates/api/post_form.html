@@ -1,5 +1,6 @@
 {% extends 'components/base.html' %}
 {% load staticfiles %}
+{% load helper %}
 
 {% block header %}
   Posts
@@ -7,20 +8,166 @@
 
 {% block conteudo %}
 
-    <div class="card">
-        <form method="post" action="">{% csrf_token %}
-            {{ form.as_p}}
-            <input type="submit" name="Salvar">
+<style type="text/css">
+    .file_input {
+    background: linear-gradient(60deg, #12A298, #44BABB);
+    padding: 10px;
+    border-radius: 50%;
+    color: whitesmoke;
+    float: left;
+    margin-right: 10px;
+}
+</style>
+
+    <div class="row">
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Adicionando Post</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.titulo.label }}</label>
+                                    {{ form.titulo|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.conteudo.label }}</label>
+                                    {{ form.conteudo|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            {% if user.is_superuser %}
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.tipo.label }}</label>
+                                        {{ form.tipo|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                            {% else %}
+                                <div class="col-md-3 hidden">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.tipo.label }}</label>
+                                        {{ form.tipo|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                            {% endif %}
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.url_referencia.label }}</label>
+                                    {{ form.url_referencia|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header" data-background-color="green">
+                        <h4 class="title">Imagem e Vídeo</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <i class="material-icons file_input">file_upload</i>
+                                    <label style="margin-top: 12px;">{{ form.imagem.label }}</label>
+                                    {{ form.imagem }}
+                                    <div class="clearfix"></div>
+                                    <img id="id_thumbnail_imagem" style="margin-top: 10px;" src="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label>URL {{ form.video.label }}</label>
+                                    {{ form.video|addclass:"form-control" }}
+                                    <img id="id_thumbnail_youtube" class="hidden" src="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
+
 
 {% endblock %}
 
 {% block js %}
     <script type="text/javascript">
+
+
+    function load_youtube_thumbnail(){
+        var url = $(this).val();
+        if (url != null && url != ''){
+            try{
+                var code = url.replace('https://www.youtube.com/watch?v=', '');
+                $('#id_thumbnail_youtube').attr('src', 'http://img.youtube.com/vi/'+ code +'/hqdefault.jpg');
+                $('#id_thumbnail_youtube').removeClass("hidden");
+            }catch(err){
+                $('#id_thumbnail_youtube').attr('src', '');
+                $('#id_thumbnail_youtube').removeClass("hidden");
+                $('#id_thumbnail_youtube').addClass("hidden");
+            }
+        }else{
+            $('#id_thumbnail_youtube').attr('src', '');
+            $('#id_thumbnail_youtube').removeClass("hidden");
+            $('#id_thumbnail_youtube').addClass("hidden");
+        }
+    }
+
     (function () {
+        $("#id_tipo option[value=1]").remove()
         $('.active').removeClass('active');
         $('#menu_post').addClass('active');
+        $('#id_video').on('blur', load_youtube_thumbnail);
+
+
+document.getElementById('id_imagem').onchange = function (evt) {
+    var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+
+    // FileReader support
+    if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById('id_thumbnail_imagem').src = fr.result;
+        }
+        fr.readAsDataURL(files[0]);
+    }
+
+    // Not supported
+    else {
+        // fallback -- perhaps submit the input to an iframe and temporarily store
+        // them on the server until the user's session ends.
+    }
+}
+
     })();
     </script>
 {% endblock js %}
