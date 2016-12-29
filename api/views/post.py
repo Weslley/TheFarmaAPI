@@ -36,3 +36,12 @@ class CurtirView(IsAuthenticatedMixin):
             curtida.delete()
 
         return Response({'curtida': create}, status=status.HTTP_200_OK)
+
+
+class PostsCurtidosView(IsAuthenticatedMixin):
+    """
+    Retorna os ids dos posts curtidos
+    """
+    def get(self, request, format=None):
+        data = [like.post_id for like in Curtida.objects.filter(usuario=request.user)]
+        return Response({'posts': data}, status=status.HTTP_200_OK)
