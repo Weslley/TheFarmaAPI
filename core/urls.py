@@ -10,6 +10,7 @@ urlpatterns = [
     # Post
     url(r'^posts/$', PostList.as_view(), name='post-admin-list'),
     url(r'^posts/adicionar/$', PostCreate.as_view(), name='post-admin-add'),
+    url(r'^posts/(?P<id>[0-9]+)/$', PostDetail.as_view(), name='post-admin-view'),
 
     # Usuario
     url(r'^perfil/(?P<id>[0-9]+)/$', PerfilView.as_view(), name='perfil-view'),
