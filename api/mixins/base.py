@@ -59,7 +59,7 @@ class SyncApiMixin(GenericAPIView):
 
     def get_queryset(self):
         long_data = self.kwargs['data']
-        ultima_atualizacao = datetime.fromtimestamp(float(long_data))
+        ultima_atualizacao = datetime.fromtimestamp(float(long_data) / 1000.0)
         if ultima_atualizacao:
             return self.queryset.filter(data_atualizacao__gte=ultima_atualizacao)
         else:
