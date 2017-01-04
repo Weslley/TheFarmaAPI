@@ -29,7 +29,7 @@
             </li>
             {% if user.is_superuser %}
                 <li id="menu_instituicao">
-                    <a href="user.html">
+                    <a href="{% url 'instituicao-admin-list' %}">
                         <i class="material-icons">domain</i>
                         <p>Instituições</p>
                     </a>

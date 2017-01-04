@@ -6,7 +6,7 @@ class Instituicao(models.Model):
     razao_social = models.CharField(max_length=120)
     nome_fantasia = models.CharField(max_length=70)
     cpf_cnpj = models.CharField(verbose_name='CPF/CNPJ', max_length=14)
-    site = models.URLField()
+    site = models.URLField(default='http://')
     logo = models.ImageField(upload_to='instituicoes')
     telefone = models.CharField(max_length=11)
     data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)

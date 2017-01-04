@@ -1,7 +1,7 @@
 from awesome_mixins.mixins.list import ListMixin
 from core.views.mixins import AdminBaseMixin
 from api.models.post import Post
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy
 from api.utils import tipo_post
 
@@ -49,6 +49,12 @@ class PostCreate(CreateView, AdminBaseMixin):
             instance.tipo = tipo_post.PATROCINADO
         instance.save()
         return super(PostCreate, self).form_valid(form)
+
+
+class PostUpdate(UpdateView, AdminBaseMixin):
+    model = Post
+    fields = ('titulo', 'conteudo', 'imagem', 'video', 'url_referencia')
+    success_url = reverse_lazy('post-admin-list')
 
 
 class PostDetail(DetailView, AdminBaseMixin):
