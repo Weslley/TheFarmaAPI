@@ -47,6 +47,14 @@
                     <p>Posts</p>
                 </a>
             </li>
+            {% if user.is_superuser %}
+                <li id="menu_medicamento">
+                    <a href="{% url 'medicamento-admin-list' %}">
+                        <i class="material-icons">local_hospital</i>
+                        <p>Medicamentos</p>
+                    </a>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </div>
