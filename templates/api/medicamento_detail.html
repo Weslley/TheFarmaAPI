@@ -1,0 +1,68 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block header %}
+  Medicamentos
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" data-background-color="purple">
+                    <h4 class="title">Visualizando Medicamento</h4>
+                </div>
+                <div class="card-content">
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Nome</label>
+                                <input type="text" class="form-control" disabled value="{{ medicamento.nome }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Tipo</label>
+                                <input type="text" class="form-control" disabled value="{% if medicamento.tipo == 1 %}SIMILAR{% elif medicamento.tipo == 2 %}ÉTICO{% else %}GENÉRICO{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Principio ativo</label>
+                                <input type="text" class="form-control" disabled value="{{ medicamento.principio_ativo }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Laboratório</label>
+                                <input type="text" class="form-control" disabled value="{{ medicamento.laboratorio }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'medicamento-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                    <a href="{% url 'medicamento-admin-update' medicamento.id %}" class="btn btn-primary pull-right">Editar</a>
+                    <div class="clearfix"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.active').removeClass('active');
+            $('#menu_medicamento').addClass('active');
+        });
+    </script>
+{% endblock js %}

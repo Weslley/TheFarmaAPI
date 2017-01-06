@@ -15,7 +15,6 @@ class PostList(ListMixin, AdminBaseMixin):
     css_div_header = 'card-header'
     css_div_body = 'card-content table-responsive'
     css_div_footer = ''
-    css_pagination = 'pagination pagination-success'
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
     columns = [
