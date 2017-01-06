@@ -26,7 +26,7 @@
                         <div class="col-md-4">
                             <div class="form-group label-floating">
                                 <label class="control-label">Tipo</label>
-                                <input type="text" class="form-control" disabled value="{{ medicamento.tipo }}">
+                                <input type="text" class="form-control" disabled value="{% if medicamento.tipo == 1 %}SIMILAR{% elif medicamento.tipo == 2 %}ÉTICO{% else %}GENÉRICO{% endif %}">
                             </div>
                         </div>
                     </div>
