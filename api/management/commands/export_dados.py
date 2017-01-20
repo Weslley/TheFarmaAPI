@@ -72,7 +72,7 @@ class Command(BaseCommand):
                         principio_ativo_id=med_temp.principioAtivo_id,
                         laboratorio_id=med_temp.laboratorio_id,
                         nome=med_temp.descricao,
-                        tipo=tipo_medicamento.GENERICO if med_temp.generico else tipo_medicamento.ETICO # consultar com o gabriel
+                        tipo=tipo_medicamento.GENERICO if med_temp.generico else tipo_medicamento.ETICO  # consultar com o gabriel
                     ))
 
                 # Gerando as apresentaçãoes
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                     )
                     for ap in apresentacoes:
                         apresentacao = Apresentacao.objects.create(
-                            codigo_barras=0,  # Perguntar para o gabriel qual codigo de barras colocar
+                            codigo_barras=ap.codbarras if ap.codbarras != '' else None,  # Perguntar para o gabriel qual codigo de barras colocar
                             nome=ap.apresentacao,
                             registro_ms=ap.registroMS,
                             medicamento=med
