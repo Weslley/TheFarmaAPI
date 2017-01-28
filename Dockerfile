@@ -1,4 +1,4 @@
-FROM alpine/py3
+FROM python:3.5-alpine
 
 MAINTAINER Lucas Cardoso <mr.lucascardoso@gmail.com>
 
@@ -10,6 +10,8 @@ WORKDIR /thefarmaapi
 
 EXPOSE 8000
 
-VOLUME [""]
+# VOLUME [""]
+
+RUN apk add post
 
 RUN pip install -r requirements.txt

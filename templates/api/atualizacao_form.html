@@ -1,0 +1,72 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block header %}
+  Atualização
+{% endblock header %}
+
+{% block conteudo %}
+
+<style type="text/css">
+    .form-group input[type=file]{
+        opacity: 1 !important;
+    }
+
+    .form-group.has-error input{
+        border-color: #dd4b39;
+        box-shadow: none;
+    }
+
+    .help-block{
+        color: #dd4b39 !important;
+        display: block !important;
+        position: initial !important;
+        font-size: 12px !important;
+    }
+</style>
+
+    <div class="row">
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Adicionando atualização</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>{{ form.arquivo.label }}</label>
+                                    {{ form.arquivo }}
+                                    <span class="help-block">
+                                        {% for error in form.arquivo.errors %}
+                                            {{ error|escape }}
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'medicamento-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                        <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('.active').removeClass('active');
+            $('#menu_medicamento').addClass('active');
+        });
+    </script>
+{% endblock js %}

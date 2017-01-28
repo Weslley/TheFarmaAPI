@@ -1,0 +1,107 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+  Atualizações
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="card">
+        {{ view.as_table }}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        function translate_datetime(data){
+            var data = new Date(data);
+            var hora = data.getHours() + 3;
+            data.setHours(hora);
+            return data.toLocaleString();
+        }
+    </script>
+    {{ view.as_statics }}
+
+    <script type='text/javascript' src='{% static 'plugins/please-wait/please-wait.min.js' %}'></script>
+    <script type='text/javascript'>
+        function start_load(iniMessage){
+            try {
+                if(window.loading_screen.finishing){
+                    window.loading_screen = window.pleaseWait({
+                        logo: '{% static 'img/please-wait-logo.png' %}',
+                        backgroundColor: '#44BABB',
+                        loadingHtml: '<p class="loading-message">'+ iniMessage +'</p><div class="sk-spinner sk-spinner-wave"><div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div></div>'
+                    });
+                }
+            }
+            catch(err) {
+                window.loading_screen = window.pleaseWait({
+                    logo: '{% static 'img/please-wait-logo.png' %}',
+                    backgroundColor: '#44BABB',
+                    loadingHtml: '<p class="loading-message">'+ iniMessage +'</p><div class="sk-spinner sk-spinner-wave"><div class="sk-rect1"></div><div class="sk-rect2"></div><div class="sk-rect3"></div><div class="sk-rect4"></div><div class="sk-rect5"></div></div>'
+                });
+            }
+        }
+
+        function stop_load(){
+            window.loading_screen.finish();
+            AmSearch();
+        }
+
+        function update_message(message){
+            try {
+                if(!window.loading_screen.finishing){
+                   $('.loading-message').html(message);
+                }else{
+                    start_load(message);
+                }
+            }
+            catch(err) {
+                start_load(message);
+            }
+        }
+    </script>
+
+    <script src="https://js.pusher.com/3.2/pusher.min.js"></script>
+    <script>
+        var pusher = new Pusher('2e48b48ce3b0da0fa501', {
+          encrypted: true
+        });
+
+        var channel = pusher.subscribe('{{ request.session.session_key }}');
+        channel.bind('update_message', function(data) {
+          update_message(data.mensagem);
+        });
+
+        channel.bind('stop_load', function(data) {
+          stop_load();
+        });
+    </script>
+
+    <script type="text/javascript">
+        (function () {
+            $('#am_add_button').removeClass('btn-primary');
+            $('#am_add_button').addClass('btn-white');
+            $('.active').removeClass('active');
+            $('#menu_medicamento').addClass('active');
+        })();
+        $(window).on('load', function () {
+            $('.pagination').addClass('pagination-success');
+        });
+    </script>
+{% endblock %}
+
+{% block css %}
+    <link rel='stylesheet' href='{% static 'plugins/please-wait/please-wait.css' %}'>
+    <link rel='stylesheet' href='{% static 'css/spinners.css' %}'>
+    <style>
+        .loading-message {
+            color: white;
+            font-size: 18pt;
+            margin-top: -240px;
+
+        }
+    </style>
+{% endblock css %}

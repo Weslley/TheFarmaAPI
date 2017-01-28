@@ -2,13 +2,15 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from datetime import date
 from decimal import Decimal
-
+from misc.pusher_message import Message
 from api.models.apresentacao import Apresentacao
 from api.models.laboratorio import Laboratorio
 from api.models.medicamento import MedicamentoApExport, Medicamento
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
+from datetime import datetime
+import time
 from api.utils import tipo_medicamento
 
 TIPO_LABORATORIO = 1
@@ -28,12 +30,24 @@ class Command(BaseCommand):
         parser.add_argument('file', nargs='+', type=str)
 
     def handle(self, *args, **options):
-        laboratorios = {}
-        principios_ativos = {}
-        medicamentos_dict = {}
-        medicamentos = []
-        with open(str(options['file'][0]), 'r', encoding="ISO-8859-1") as arq:
+        path = str(options['file'][0])
+        update_dados_medicamentos(path)
+
+
+def update_dados_medicamentos(path, channel=None):
+    pusher_conn = Message(channel) if channel else None
+    laboratorios = {}
+    principios_ativos = {}
+    medicamentos_dict = {}
+    medicamentos = []
+    set_message(pusher_conn, 'update_message', '')
+    time.sleep(1.5)
+    set_message(pusher_conn, 'update_message', 'Inicializando dados do arquivo')
+    try:
+        with open(path, 'r', encoding="ISO-8859-1") as arq:
             with transaction.atomic():
+                # Apagando todos os temporarios
+                MedicamentoApExport.objects.all().delete()
                 lines = arq.readlines()
                 cont = 0
                 for line in lines:
@@ -49,102 +63,56 @@ class Command(BaseCommand):
                         med = add_medicamento_temp(line)
                         medicamentos_dict[med.id] = med
 
-                medicamentos_temporarios = MedicamentoApExport.objects.values(
+                medicamentos_temporarios = MedicamentoApExport.objects.exclude(codbarras='').values(
                     'laboratorio_id',
                     'descricao',
                     'principioAtivo_id'
                 ).distinct()
 
-                # Apagando dados anteriores
-                TabelaPreco.objects.all().delete()
-                Apresentacao.objects.all().delete()
-                Medicamento.objects.all().delete()
-
                 # Gerando os medicamentos
+                MAX_MED = medicamentos_temporarios.count()
+                set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.')
+                time.sleep(2)
+                cont = 0
                 for med_temp in medicamentos_temporarios:
-                    print('Gerando medicamento')
+
                     med_temp = MedicamentoApExport.objects.filter(
                         laboratorio_id=med_temp['laboratorio_id'],
                         descricao=med_temp['descricao'],
                         principioAtivo_id=med_temp['principioAtivo_id']
                     ).first()
-                    medicamentos.append(Medicamento.objects.create(
-                        principio_ativo_id=med_temp.principioAtivo_id,
-                        laboratorio_id=med_temp.laboratorio_id,
-                        nome=med_temp.descricao,
-                        tipo=tipo_medicamento.GENERICO if med_temp.generico else tipo_medicamento.ETICO  # consultar com o gabriel
-                    ))
+
+                    medicamentos.append(get_or_create_medicamento(med_temp))
+                    percent = int((50 / MAX_MED) * cont)
+                    cont += 1
+                    set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.<br/>{}%'.format(percent))
 
                 # Gerando as apresentaçãoes
+                MAX_MED = len(medicamentos)
+                set_message(pusher_conn, 'update_message', 'Atualizando apresentações.<br/>{}%'.format(percent))
+                cont = 0
                 for med in medicamentos:
-                    print('Gerando apresentacoes do medicamento {}'.format(med.id))
                     apresentacoes = MedicamentoApExport.objects.filter(
                         laboratorio_id=med.laboratorio_id,
                         descricao=med.nome,
                         principioAtivo_id=med.principio_ativo_id
-                    )
+                    ).exclude(codbarras='')
+
                     for ap in apresentacoes:
-                        apresentacao = Apresentacao.objects.create(
-                            codigo_barras=ap.codbarras if ap.codbarras != '' else None,  # Perguntar para o gabriel qual codigo de barras colocar
-                            nome=ap.apresentacao,
-                            registro_ms=ap.registroMS,
-                            medicamento=med
-                        )
-                        # gerando as tabelas de precos
-                        tabelas = [
-                            # Tabela 12
-                            TabelaPreco.objects.create(
-                                icms=12,
-                                pmc=ap.pmc12,
-                                pmf=ap.pmf12,
-                                data_vigencia=ap.dataVigencia,
-                                apresentacao=apresentacao,
-                            ),
-                            # Tabela 17
-                            TabelaPreco.objects.create(
-                                icms=17,
-                                pmc=ap.pmc17,
-                                pmf=ap.pmf17,
-                                data_vigencia=ap.dataVigencia,
-                                apresentacao=apresentacao,
-                            ),
-                            # Tabela 18
-                            TabelaPreco.objects.create(
-                                icms=18,
-                                pmc=ap.pmc18,
-                                pmf=ap.pmf18,
-                                data_vigencia=ap.dataVigencia,
-                                apresentacao=apresentacao,
-                            ),
-                            # Tabela 19
-                            TabelaPreco.objects.create(
-                                icms=19,
-                                pmc=ap.pmc19,
-                                pmf=ap.pmf19,
-                                data_vigencia=ap.dataVigencia,
-                                apresentacao=apresentacao,
-                            )
-                        ]
+                        apresentacao = get_or_create_apresentacao(ap, med)
+                        if apresentacao:
+                            print('Atualizando medicamento {}'.format(med.id))
+                            tabelas = atualizando_tabelas(ap, apresentacao)
+                            update_regioes(tabelas)
 
-                        for tabela in tabelas:
-                            siglas = []
-                            if tabela.icms == 0:
-                                pass
-                            elif tabela.icms == 12:
-                                pass
-                            elif tabela.icms == 17:
-                                siglas = ['AC', 'AL', 'CE', 'DF', 'ES', 'GO', 'MT', 'MS', 'PA', 'PI', 'RR', 'SC']
-                            elif tabela.icms == 17.5:
-                                siglas = ['RO', ]
-                            elif tabela.icms == 18:
-                                siglas = ['AM', 'AP', 'BA', 'MA', 'MG', 'PB', 'PE', 'PR', 'RN', 'RS', 'SE', 'SP', 'TO']
-                            elif tabela.icms == 20:
-                                siglas = ['RJ', ]
+                    med_percent = (50 / MAX_MED) * cont
+                    cont += 1
+                    set_message(pusher_conn, 'update_message', 'Atualizando apresentações.<br/>{}%'.format(percent + med_percent))
 
-                            ufs = Uf.objects.filter(sigla__in=siglas)
-                            for uf in ufs:
-                                tabela.ufs.add(uf)
-
+                time.sleep(1)
+                set_message(pusher_conn, 'update_message', 'Atualização concluida.')
+                time.sleep(2)
+                set_message(pusher_conn, 'stop_load', '')
                 print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentacoes\n{} tabelas de preco'.format(
                     len(laboratorios),
                     len(principios_ativos),
@@ -152,6 +120,147 @@ class Command(BaseCommand):
                     Apresentacao.objects.count(),
                     TabelaPreco.objects.count()
                 ))
+    except Exception as err:
+        print(err)
+        time.sleep(1)
+        set_message(pusher_conn, 'update_message', 'Erro ao realizar atualização.')
+        time.sleep(2)
+        set_message(pusher_conn, 'stop_load', '')
+
+
+
+
+def set_message(conn, method, message):
+    if conn:
+        conn.send(
+            event=method,
+            data={'mensagem': message}
+        )
+
+
+def exist_apresentacao(ap_temp):
+    try:
+        apresentacao = Apresentacao.objects.get(codigo_barras=ap_temp.codbarras)
+        return True, apresentacao
+    except Apresentacao.DoesNotExist:
+        return False, None
+
+
+def get_or_create_apresentacao(ap_temp, medicamento):
+    try:
+        exist, obj = exist_apresentacao(ap_temp)
+        if exist:
+            return obj
+
+        return Apresentacao.objects.create(
+            codigo_barras=ap_temp.codbarras if ap_temp.codbarras != '' else None,  # Perguntar para o gabriel qual codigo de barras colocar
+            nome=ap_temp.apresentacao,
+            registro_ms=ap_temp.registroMS,
+            medicamento=medicamento
+        )
+    except Apresentacao.MultipleObjectsReturned:
+        return None
+
+
+def exist_medicamento(med_temp):
+    try:
+        med = Medicamento.objects.get(
+            principio_ativo_id=med_temp.principioAtivo_id,
+            laboratorio_id=med_temp.laboratorio_id,
+            nome=med_temp.descricao,
+        )
+        return True, med
+    except:
+        return False, None
+
+
+def get_or_create_medicamento(med_temp):
+    exist, obj = exist_medicamento(med_temp)
+    if exist:
+        return obj
+
+    return Medicamento.objects.create(
+        principio_ativo_id=med_temp.principioAtivo_id,
+        laboratorio_id=med_temp.laboratorio_id,
+        nome=med_temp.descricao,
+        tipo=tipo_medicamento.GENERICO if med_temp.generico else tipo_medicamento.ETICO  # consultar com o gabriel
+    )
+
+
+def atualizando_tabelas(ap_temp, apresentacao):
+    tabelas = []
+    # tributações atuais
+    for i in [12, 17, 18, 19]:
+        tabela = get_or_create_tabela_preco(i, ap_temp, apresentacao)
+        atualiza_preco(i, ap_temp, tabela)
+        tabelas.append(tabela)
+    return tabelas
+
+
+def exist_tributacao(perc, apresentacao):
+    try:
+        tabela = TabelaPreco.objects.get(icms=perc, apresentacao=apresentacao)
+        return True, tabela
+    except TabelaPreco.DoesNotExist:
+        return False, None
+
+
+def atualiza_preco(perc, new_tab, old_tab):
+    att = False
+
+    # mudando o PMC
+    if getattr(new_tab, 'pmc%d' % perc) != old_tab.pmc:
+        old_tab.pmc = getattr(new_tab, 'pmc%d' % perc)
+        old_tab.data_atualizacao = datetime.now()
+        att = True
+    # mudando o PMF
+    if getattr(new_tab, 'pmf%d' % perc) != old_tab.pmf:
+        old_tab.pmf = getattr(new_tab, 'pmf%d' % perc)
+        old_tab.data_atualizacao = datetime.now()
+        att = True
+
+    if new_tab.dataVigencia != old_tab.data_vigencia:
+        old_tab.data_vigencia = new_tab.dataVigencia
+        old_tab.data_atualizacao = datetime.now()
+        att = True
+
+    if att:
+        print('Att algum')
+        old_tab.save()
+
+
+def get_or_create_tabela_preco(perc, ap_temp, apresentacao):
+    exist, obj = exist_tributacao(perc, apresentacao)
+    if exist:
+        return obj
+    return TabelaPreco.objects.create(
+        icms=perc,
+        pmc=getattr(ap_temp, 'pmc%d' % perc),
+        pmf=getattr(ap_temp, 'pmf%d' % perc),
+        data_vigencia=ap_temp.dataVigencia,
+        apresentacao=apresentacao,
+    )
+
+
+def update_regioes(tabelas):
+    for tabela in tabelas:
+        siglas = []
+        if tabela.icms == 0:
+            pass
+        elif tabela.icms == 12:
+            pass
+        elif tabela.icms == 17:
+            siglas = ['AC', 'AL', 'CE', 'DF', 'ES', 'GO', 'MT', 'MS', 'PA', 'PI', 'RR', 'SC']
+        elif tabela.icms == 17.5:
+            siglas = ['RO', ]
+        elif tabela.icms == 18:
+            siglas = ['AM', 'AP', 'BA', 'MA', 'MG', 'PB', 'PE', 'PR', 'RN', 'RS', 'SE', 'SP', 'TO']
+        elif tabela.icms == 20:
+            siglas = ['RJ', ]
+
+        ufs = Uf.objects.filter(sigla__in=siglas)
+        for uf in ufs:
+            tabela.ufs.add(uf)
 
 
 def add_laboratorio(line):
@@ -198,9 +307,6 @@ def add_medicamento_temp(line):
     :param line:
     :return:
     """
-    if line[71:106].strip().upper() == 'FEMINA':
-        print('FEMINA')
-        print(Decimal(line[215:223]) / 100)
     try:
         return MedicamentoApExport.objects.get(id=int(line[2:8] if len(line[2:8].strip()) else 0))
     except MedicamentoApExport.DoesNotExist:
