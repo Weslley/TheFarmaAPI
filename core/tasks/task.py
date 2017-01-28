@@ -1,4 +1,4 @@
-from thefarmaapi.celery import app
+from thefarmaapi._celery import app
 from api.management.commands.export_dados import update_dados_medicamentos as update_command
 
 
