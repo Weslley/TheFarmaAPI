@@ -1,0 +1,49 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+  Estoques
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="card">
+        {{ view.as_table }}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        function translate_datetime(data){
+            var data = new Date(data);
+            var hora = data.getHours() + 3;
+            data.setHours(hora);
+            return data.toLocaleString();
+        }
+    </script>
+    {{ view.as_statics }}
+
+    <script type='text/javascript' src='{% static 'plugins/please-wait/please-wait.min.js' %}'></script>
+    <script src="https://js.pusher.com/3.2/pusher.min.js"></script>
+    <script>
+        var pusher = new Pusher('2e48b48ce3b0da0fa501', {
+          encrypted: true
+        });
+
+        var channel = pusher.subscribe('{{ request.session.session_key }}');
+        channel.bind('reload_estoque', function(data) {
+          AmSearch();
+        });
+    </script>
+
+    <script type="text/javascript">
+        (function () {
+            $('.active').removeClass('active');
+            $('#menu_estoque').addClass('active');
+        })();
+        $(window).on('load', function () {
+            $('.pagination').addClass('pagination-success');
+        });
+    </script>
+{% endblock %}

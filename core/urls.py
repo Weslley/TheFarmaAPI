@@ -7,6 +7,7 @@ from core.views.medicamentos import *
 from core.views.usuarios import *
 from core.views.instituicoes import *
 from core.views.atualizacao import *
+from core.views.estoque import *
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
@@ -34,5 +35,6 @@ urlpatterns = [
     url(r'^atualizacoes/$', AtualizacaoList.as_view(), name='atualizacao-admin-list'),
     url(r'^atualizacoes/adicionar/$', AtualizacaoCreate.as_view(), name='atualizacao-admin-add'),
 
-
+    # Estoque
+    url(r'^estoques/$', EstoqueList.as_view(), name='estoque-admin-list'),
 ]
