@@ -107,7 +107,7 @@ def update_dados_medicamentos(path, channel=None):
 
                     med_percent = (50 / MAX_MED) * cont
                     cont += 1
-                    set_message(pusher_conn, 'update_message', 'Atualizando apresentações.<br/>{}%'.format(percent + med_percent))
+                    set_message(pusher_conn, 'update_message', 'Atualizando apresentações.<br/>{}%'.format(int(percent + med_percent)))
 
                 time.sleep(1)
                 set_message(pusher_conn, 'update_message', 'Atualização concluida.')
