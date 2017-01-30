@@ -136,3 +136,31 @@ class TesteLogin(generics.CreateAPIView):
             data['token'] = token.key
 
         return Response(data, status=status.HTTP_201_CREATED)
+
+
+class LoginFarmacia(APIView, CustomJSONAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, format=None):
+        data = self.get_data(request)
+
+        # Autenticando o usuario
+        usuario = authenticate(username=data['email'], password=data['password'])
+
+        # Se o mesmo existir, gero o token
+        if usuario:
+            token, create = Token.objects.get_or_create(user=usuario)
+
+            # caso esteja fazendo a requisição do login novamente, reseta o token
+            if not create:
+                token.delete()
+                token = Token.objects.create(user=usuario)
+
+            data = {
+                'id': usuario.id,
+                'email': usuario.email,
+                'token': token.key
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        return Response({'detail': 'Email ou senha incorretos'}, status=status.HTTP_404_NOT_FOUND)

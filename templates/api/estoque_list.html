@@ -31,7 +31,7 @@
           encrypted: true
         });
 
-        var channel = pusher.subscribe('{{ request.session.session_key }}');
+        var channel = pusher.subscribe('default');
         channel.bind('reload_estoque', function(data) {
           AmSearch();
         });

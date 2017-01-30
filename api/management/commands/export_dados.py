@@ -128,8 +128,6 @@ def update_dados_medicamentos(path, channel=None):
         set_message(pusher_conn, 'stop_load', '')
 
 
-
-
 def set_message(conn, method, message):
     if conn:
         conn.send(

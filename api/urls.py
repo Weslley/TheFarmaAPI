@@ -13,7 +13,8 @@ from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
 from api.views.tabela_preco import *
-from api.views.user import Login, Logout, LoginFacebook, TesteLogin
+from api.views.estoque import *
+from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia
 
 urlpatterns = [
     # Raiz
@@ -24,6 +25,7 @@ urlpatterns = [
     url(r'^login/$', TesteLogin.as_view(), name='login'),
     url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
+    url(r'^login_farmacia/$', LoginFarmacia.as_view(), name='login-farmacia'),
 
     # Farmacias
     url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-list'),
@@ -65,6 +67,9 @@ urlpatterns = [
     # Post
     url(r'^posts/$', PostExportList.as_view(), name='post-list'),
     url(r'^posts/(?P<id>[0-9]+)/like/$', CurtirView.as_view(), name='post-like'),
-    url(r'^posts/likes/$', PostsCurtidosView.as_view(), name='like-list')
+    url(r'^posts/likes/$', PostsCurtidosView.as_view(), name='like-list'),
+
+    # Estoque
+    url(r'^estoques/adicionar/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
 
 ]

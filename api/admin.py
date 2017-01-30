@@ -99,6 +99,7 @@ class FarmaciaAdmin(ReverseModelAdmin):
                 'fields': (
                     ('cnpj', 'nome_fantasia', 'razao_social'),
                     ('telefone', 'cliente_infog2', 'logo'),
+                    ('usuario', ),
                 )
             }
         ),
