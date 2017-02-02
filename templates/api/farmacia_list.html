@@ -1,0 +1,27 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+  Farmacias
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="card">
+        {{ view.as_table }}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    {{ view.as_statics }}
+    <script type="text/javascript">
+        (function () {
+            $('.active').removeClass('active');
+            $('#menu_farmacia').addClass('active');
+        })();
+        $(window).on('load', function () {
+            $('.pagination').addClass('pagination-success');
+        });
+    </script>
+{% endblock %}

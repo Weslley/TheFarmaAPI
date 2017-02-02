@@ -1,0 +1,222 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block header %}
+  Farmacias
+{% endblock header %}
+
+{% block conteudo %}
+
+<style type="text/css">
+    .file_input {
+    background: linear-gradient(60deg, #12A298, #44BABB);
+    padding: 10px;
+    border-radius: 50%;
+    color: whitesmoke;
+    float: left;
+    margin-right: 10px;
+}
+</style>
+
+    <div class="row">
+        <form id="farma_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Dados básicos</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.razao_social.label }}</label>
+                                    {{ form.razao_social|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.nome_fantasia.label }}</label>
+                                    {{ form.nome_fantasia|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.cnpj.label }}</label>
+                                    {{ form.cnpj|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.telefone.label }}</label>
+                                    {{ form.telefone|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group label-floating">
+                                    <i class="material-icons file_input">file_upload</i>
+                                    <label style="margin-top: 12px;">{{ form.logo.label }}</label>
+                                    {{ form.logo }}
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.cliente_infog2.label }}</label>
+                                    {{ form.cliente_infog2 }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Endereço</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.cep.label }}</label>
+                                    {{ form.cep|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.logradouro.label }}</label>
+                                    {{ form.logradouro|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.numero.label }}</label>
+                                    {{ form.numero|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.complemento.label }}</label>
+                                    {{ form.complemento|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.cidade.label }}</label>
+                                    {{ form.cidade|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.bairro.label }}</label>
+                                    <select id="id_bairro" name="bairro" required class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'post-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                        <button onclick="limpar_campos();" type="submit" class="btn btn-primary pull-right">Salvar</button>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/i18n/pt-BR.js"></script>
+    <script type="text/javascript">
+    function get_cidade_id() {
+        return ($("#id_cidade").val() != '' && $("#id_cidade").val() != undefined) ? $("#id_cidade").val() : null;
+    }
+
+    function limpar_campos(argument) {
+        $('#id_cnpj').val($('#id_cnpj').cleanVal());
+        $('#id_telefone').val($('#id_telefone').cleanVal());
+        $('#id_cep').val($('#id_cep').cleanVal());
+    }
+
+    (function () {
+        $('#id_cnpj').attr('maxlength', 18)
+        $('#id_cnpj').mask('00.000.000/0000-00', {reverse: true});
+
+        $('#id_telefone').attr('maxlength', 15)
+        $('#id_telefone').on('focus', function () {
+            $('#id_telefone').mask('00000000000');
+            $(this).attr("maxlength", 11);
+        }).on('blur', function () {
+            if($(this).val().length <= 10){
+                $('#id_telefone').mask('(00) 0000-0000');
+            }else{
+                $('#id_telefone').mask('(00) 00000-0000');
+            }
+        });
+
+        $('#id_cep').attr('maxlength', 9)
+        $('#id_cep').mask('00000-000', {reverse: true})
+
+
+        $('.active').removeClass('active');
+        $('#menu_farmacia').addClass('active');
+
+        $('#id_cidade').select2({
+            allowClear: true,
+            language: "pt-BR"
+        });
+        $("#id_bairro").select2({
+            allowClear: true,
+            language: "pt-BR",
+            ajax: {
+                url: "/bairros/busca/",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    q: params.term, // search term
+                    page: params.page,
+                    id_cidade: get_cidade_id()
+                  };
+                },
+                processResults: function (data, params) {
+                  // parse the results into the format expected by Select2
+                  // since we are using custom formatting functions we do not need to
+                  // alter the remote JSON data, except to indicate that infinite
+                  // scrolling can be used
+                  params.page = params.page || 1;
+
+                  return {
+                    results: data.content.items,
+                  };
+                },
+                cache: false
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 3
+        });
+    })();
+    </script>
+{% endblock js %}
+
+{% block css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+{% endblock css %}
+

@@ -8,6 +8,8 @@ from core.views.usuarios import *
 from core.views.instituicoes import *
 from core.views.atualizacao import *
 from core.views.estoque import *
+from core.views.farmacia import *
+from core.views.bairro import *
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
@@ -37,4 +39,12 @@ urlpatterns = [
 
     # Estoque
     url(r'^estoques/$', EstoqueList.as_view(), name='estoque-admin-list'),
+
+    # Farmacia
+    url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-admin-list'),
+    url(r'^farmacias/adicionar/$', FarmaciaCreate.as_view(), name='farmacia-admin-add'),
+
+    # Bairro
+    # url(r'^bairros/$', busca_bairro_cidade, name='bairro-admin-list'),
+    url(r'^bairros/busca/$', busca_bairro_cidade, name='bairro-admin-busca'),
 ]
