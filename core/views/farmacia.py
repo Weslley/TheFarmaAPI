@@ -1,7 +1,7 @@
 from awesome_mixins.mixins.list import ListMixin
 from core.views.mixins import AdminBaseMixin
 from api.models.farmacia import Farmacia
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView
 from api.models.representante_legal import RepresentanteLegal
 from core.forms import RepresentanteFarmaciaForm, FarmaciaForm
 from django.urls import reverse_lazy
@@ -18,6 +18,7 @@ class FarmaciaList(ListMixin, AdminBaseMixin):
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
     css_div_footer = ''
+    detail_url = '\'+ id + \'/'
     columns = [
         {'lookup': 'razao_social', 'name': 'Razão social'},
         {'lookup': 'nome_fantasia', 'name': 'Nome fantasia'},
@@ -32,7 +33,25 @@ class FarmaciaCreate(CreateView, AdminBaseMixin):
     success_url = reverse_lazy('farmacia-admin-list')
 
 
+class FarmaciaDetail(DetailView, AdminBaseMixin):
+    model = Farmacia
+    pk_url_kwarg = 'id'
+
+
 class RepresentanteCreate(CreateView, AdminBaseMixin):
     model = RepresentanteLegal
     form_class = RepresentanteFarmaciaForm
-    success_url = reverse_lazy('post-admin-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        import pdb; pdb.set_trace()
+        return super(RepresentanteCreate, self).dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        return {'farmacia': 1}
+
+    def get_success_url(self):
+        self.success_url = reverse_lazy('farmacia-admin-view', kwargs={'id': self.object.farmacia.id})
+        from django.utils.encoding import force_text
+        self.success_url = force_text(self.success_url)
+        url = self.success_url.format(**self.object.__dict__)
+        return url

@@ -43,6 +43,8 @@ urlpatterns = [
     # Farmacia
     url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-admin-list'),
     url(r'^farmacias/adicionar/$', FarmaciaCreate.as_view(), name='farmacia-admin-add'),
+    url(r'^farmacias/(?P<id>[0-9]+)/$', FarmaciaDetail.as_view(), name='farmacia-admin-view'),
+    url(r'^farmacias/(?P<id>[0-9]+)/adicionar/representante/$', RepresentanteCreate.as_view(), name='farmacia-admin-add-representante'),
 
     # Bairro
     # url(r'^bairros/$', busca_bairro_cidade, name='bairro-admin-list'),

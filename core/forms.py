@@ -74,10 +74,16 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
     email = forms.EmailField()
     senha = forms.CharField(label='Senha', widget=forms.PasswordInput)
     confirmacao_senha = forms.CharField(label='Confirmação de senha', widget=forms.PasswordInput)
+    cep = forms.CharField(max_length=8, required=False)
+    logradouro = forms.CharField(max_length=80)
+    numero = forms.IntegerField(required=False)
+    complemento = forms.CharField(max_length=100, required=False)
+    cidade = forms.ModelChoiceField(queryset=Cidade.objects.all())
+    bairro = forms.IntegerField(required=True)
 
     class Meta:
         model = RepresentanteLegal
-        exclude = ('usuario', )
+        exclude = ('usuario', 'endereco', 'farmacia')
 
     def clean_confirmacao_senha(self):
         # Check that the two password entries match
@@ -87,7 +93,30 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             raise forms.ValidationError("Senhas incorretas")
         return password2
 
+    def get_endereco(self, commit=True):
+        try:
+            obj = Endereco(
+                cep=self.cleaned_data['cep'],
+                logradouro=self.cleaned_data['logradouro'],
+                numero=self.cleaned_data['numero'],
+                complemento=self.cleaned_data['complemento'],
+                cidade=self.cleaned_data['cidade'],
+                bairro=self.cleaned_data['bairro']
+            )
+
+            if commit:
+                obj.save()
+
+            return obj
+        except Exception as err:
+            print(err)
+            return None
+
+    def get_usuario(self, commit=True):
+        pass
+
     def save(self, commit=True):
         obj = super(RepresentanteFarmaciaForm, self).save(commit=False)
         print(obj)
+        import pdb; pdb.set_trace()
         return self.instance

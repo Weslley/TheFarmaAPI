@@ -1,0 +1,161 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block header %}
+  Farmácia
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" data-background-color="purple">
+                    <h4 class="title">Dados básicos</h4>
+                </div>
+                <div class="card-content">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Razão Social</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.razao_social }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Nome Fantasia</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.nome_fantasia }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group label-floating">
+                                <label class="control-label">CNPJ</label>
+                                <input id="id_cnpj" type="text" class="form-control" disabled value="{{ farmacia.cnpj }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Telefone</label>
+                                <input id="id_telefone" type="text" class="form-control" disabled value="{{ farmacia.telefone }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group label-floating">
+                                <label>Cliente INFOG2 ?</label>
+                                <input type="checkbox" disabled {% if farmacia.cliente_infog2 %}checked{% endif %}>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" data-background-color="purple">
+                    <h4 class="title">Endereço</h4>
+                </div>
+                <div class="card-content">
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group label-floating">
+                                <label class="control-label">CEP</label>
+                                <input id="id_cep" type="text" class="form-control" disabled value="{{ farmacia.endereco.cep }}">
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Logradouro</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.logradouro }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Número</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.numero }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Complemento</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.complemento }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label>Cidade</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.cidade }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group label-floating">
+                                <label>Bairro</label>
+                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.bairro }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'farmacia-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                    <div class="clearfix"></div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" data-background-color="purple">
+                    <h4 class="title" style="float: left; margin-top:15px;">Representantes</h4>
+                    <a href="{% url 'farmacia-admin-add-representante' farmacia.id %}" class="btn btn-white pull-right" style="color: #999999;"><i class="fa fa-plus"></i> Adicionar</a>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="card-content">
+                    {% for representante in representantes %}
+                        <div class="row">
+                            <div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            $('#id_cnpj').mask('00.000.000/0000-00', {reverse: true});
+            $('#id_cep').mask('00000-000', {reverse: true});
+            if($('#id_telefone').val().length <= 10){
+                $('#id_telefone').mask('(00) 0000-0000');
+            }else{
+                $('#id_telefone').mask('(00) 00000-0000');
+            }
+
+            $('.active').removeClass('active');
+            $('#menu_farmacia').addClass('active');
+        });
+    </script>
+{% endblock js %}
