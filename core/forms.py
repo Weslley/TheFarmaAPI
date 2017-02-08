@@ -6,6 +6,8 @@ from api.models.cidade import Cidade
 from api.models.bairro import Bairro
 from api.models.endereco import Endereco
 from django.contrib.auth.models import User
+from django.db import transaction
+
 
 class AtualizacaoForm(forms.ModelForm):
     class Meta:
@@ -37,7 +39,7 @@ class FarmaciaForm(forms.ModelForm):
             try:
                 return Bairro.objects.get(id=bairro_id)
             except Bairro.DoesNotExist:
-                return None
+                raise forms.ValidationError('Bairro não existe.')
         else:
             return None
 
@@ -83,7 +85,7 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
 
     class Meta:
         model = RepresentanteLegal
-        exclude = ('usuario', 'endereco', 'farmacia')
+        exclude = ('usuario', 'endereco')
 
     def clean_confirmacao_senha(self):
         # Check that the two password entries match
@@ -92,6 +94,48 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Senhas incorretas")
         return password2
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).count() > 0:
+            raise forms.ValidationError('Ja existe usuário com este email cadastrado.')
+
+        return email
+
+    def clean_bairro(self):
+        bairro_id = int(self.data['bairro'])
+        if bairro_id:
+            try:
+                return Bairro.objects.get(id=bairro_id)
+            except Bairro.DoesNotExist:
+                raise forms.ValidationError('Bairro não existe.')
+        else:
+            return None
+
+    def get_usuario(self, commit=True):
+        try:
+            farmacia = self.initial['farmacia']
+            username = '{}{}{}'.format(
+                farmacia.id,
+                farmacia.cnpj[:3].rjust(3, '0'),
+                self.cleaned_data['nome']
+            )[:30].ljust(30, '0')
+
+            obj = User(
+                first_name=self.cleaned_data['nome'],
+                last_name=self.cleaned_data['sobrenome'],
+                email=self.cleaned_data['email'],
+                username=username
+            )
+            obj.set_password(self.cleaned_data['senha'])
+
+            if commit:
+                obj.save()
+
+            return obj
+        except Exception as err:
+            print(err)
+            return None
 
     def get_endereco(self, commit=True):
         try:
@@ -112,11 +156,12 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             print(err)
             return None
 
-    def get_usuario(self, commit=True):
-        pass
-
     def save(self, commit=True):
-        obj = super(RepresentanteFarmaciaForm, self).save(commit=False)
-        print(obj)
-        import pdb; pdb.set_trace()
-        return self.instance
+        with transaction.atomic():
+            self.instance = super(RepresentanteFarmaciaForm, self).save(commit=False)
+            self.instance.endereco = self.get_endereco(commit=commit)
+            self.instance.usuario = self.get_usuario(commit=commit)
+            self.instance.farmacia = self.initial['farmacia']
+            if commit:
+                self.instance.save()
+            return self.instance

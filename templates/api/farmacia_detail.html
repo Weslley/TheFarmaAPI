@@ -128,10 +128,19 @@
                 </div>
 
                 <div class="card-content">
-                    {% for representante in representantes %}
+                    {% for representante in farmacia.representantes.all %}
                         <div class="row">
-                            <div>
-
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">Nome</label>
+                                    <input type="text" class="form-control" disabled value="{{ representante }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">Email</label>
+                                    <input type="text" class="form-control" disabled value="{{ representante.usuario.email }}">
+                                </div>
                             </div>
                         </div>
                     {% endfor %}

@@ -5,6 +5,7 @@ from django.views.generic import CreateView, DetailView
 from api.models.representante_legal import RepresentanteLegal
 from core.forms import RepresentanteFarmaciaForm, FarmaciaForm
 from django.urls import reverse_lazy
+import re
 
 
 class FarmaciaList(ListMixin, AdminBaseMixin):
@@ -43,11 +44,19 @@ class RepresentanteCreate(CreateView, AdminBaseMixin):
     form_class = RepresentanteFarmaciaForm
 
     def dispatch(self, request, *args, **kwargs):
-        import pdb; pdb.set_trace()
+        match = re.search('[0-9]+', request.META['PATH_INFO'])
+        if match:
+            farmacia_id = int(match.group())
+            self.farmacia = Farmacia.objects.get(id=farmacia_id)
         return super(RepresentanteCreate, self).dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super(RepresentanteCreate, self).get_context_data(**kwargs)
+        context['farmacia'] = self.farmacia
+        return context
+
     def get_initial(self):
-        return {'farmacia': 1}
+        return {'farmacia': self.farmacia}
 
     def get_success_url(self):
         self.success_url = reverse_lazy('farmacia-admin-view', kwargs={'id': self.object.farmacia.id})
