@@ -4,6 +4,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from misc.pusher_message import Message
+from django.db import transaction
 
 
 class EstoqueCreateUpdate(CreateAPIView):
@@ -16,6 +17,7 @@ class EstoqueCreateUpdate(CreateAPIView):
     estoque = None
 
     def update(self, request, *args, **kwargs):
+
         for key in self.objects.keys():
             setattr(self.estoque, key, self.objects[key])
 
@@ -25,10 +27,11 @@ class EstoqueCreateUpdate(CreateAPIView):
         return Response(request.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        if self.exist_estoque(request):
-            return self.update(request, *args, **kwargs)
-        else:
-            return self.create(request, *args, **kwargs)
+        with transaction.atomic():
+            if self.exist_estoque(request):
+                return self.update(request, *args, **kwargs)
+            else:
+                return self.create(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         self.estoque = Estoque.objects.create(**self.objects)
@@ -44,7 +47,7 @@ class EstoqueCreateUpdate(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.objects = {
             'apresentacao': serializer.validated_data.get('codigo_barras'),
-            'farmacia': request.user.farmacia
+            'farmacia': request.user.representante_farmacia.farmacia
         }
         exist = False
         try:
