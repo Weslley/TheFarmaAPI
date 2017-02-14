@@ -6,26 +6,18 @@ from collections import OrderedDict
 class CustomPageNumberPagination(PageNumberPagination):
 
     def get_paginated_response(self, data):
+        try:
+            num_pages = self.page.paginator.num_pages
+        except:
+            num_pages = 0
+
         return Response(OrderedDict([
             ('count', self.page.paginator.count),
-            ('num_pages', self.page.paginator.num_pages),
+            ('num_pages', num_pages),
             ('next', self.get_next_link()),
             ('previous', self.get_previous_link()),
             ('results', data)
         ]))
-
-    def get_page_size(self, request):
-        if self.page_size_query_param:
-            try:
-                return _positive_int(
-                    request.query_params[self.page_size_query_param],
-                    strict=True,
-                    cutoff=self.max_page_size
-                )
-            except (KeyError, ValueError):
-                pass
-
-        return self.page_size
 
 
 class ExtraLargeResultsSetPagination(CustomPageNumberPagination):
@@ -35,9 +27,9 @@ class ExtraLargeResultsSetPagination(CustomPageNumberPagination):
 
 
 class LargeResultsSetPagination(CustomPageNumberPagination):
-    page_size = 5000
+    page_size = 1000
     page_size_query_param = 'page_size'
-    max_page_size = 1000000
+    max_page_size = 100000
 
 
 class StandardResultsSetPagination(CustomPageNumberPagination):
