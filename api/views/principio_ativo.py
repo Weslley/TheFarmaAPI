@@ -26,3 +26,4 @@ class PrincipioAtivoSync(generics.ListAPIView, SyncApiMixin):
 class PrincipioAtivoExport(generics.ListAPIView):
     queryset = PrincipioAtivo.objects.all()
     serializer_class = PrincipioAtivoSerializer
+    pagination_class = LargeResultsSetPagination

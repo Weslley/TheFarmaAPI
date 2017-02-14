@@ -47,3 +47,5 @@ class MedicamentoRetrieve(generics.RetrieveAPIView):
 class MedicamentoExport(generics.ListAPIView):
     queryset = Medicamento.objects.all()
     serializer_class = MedicamentoExportSerializer
+    pagination_class = LargeResultsSetPagination
+

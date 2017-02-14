@@ -26,3 +26,4 @@ class LaboratorioSync(generics.ListAPIView, SyncApiMixin):
 class LaboratorioExport(generics.ListAPIView):
     queryset = Laboratorio.objects.all()
     serializer_class = LaboratorioSerializer
+    pagination_class = LargeResultsSetPagination

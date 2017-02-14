@@ -20,7 +20,7 @@ class TabelaPrecoList(generics.ListAPIView):
 class TabelaPrecoExport(generics.ListAPIView):
     queryset = TabelaPreco.objects.all()
     serializer_class = TabelaPrecoSerializer
-    pagination_class = ExtraLargeResultsSetPagination
+    pagination_class = LargeResultsSetPagination
 
 
 class TabelaPrecoSync(generics.ListAPIView, SyncApiMixin):
