@@ -1,5 +1,6 @@
 from django.db import models
 from api.utils import ufs
+from datetime import datetime
 
 
 class Uf(models.Model):
@@ -13,3 +14,8 @@ class Uf(models.Model):
 
     def __unicode__(self):
         return self.sigla
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.data_atualizacao = datetime.now()
+        return super(Uf, self).save(force_insert, force_update, using, update_fields)

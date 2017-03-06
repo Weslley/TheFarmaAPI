@@ -10,6 +10,7 @@ from core.views.atualizacao import *
 from core.views.estoque import *
 from core.views.farmacia import *
 from core.views.bairro import *
+from core.views.uf import *
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
@@ -50,4 +51,9 @@ urlpatterns = [
     # Bairro
     # url(r'^bairros/$', busca_bairro_cidade, name='bairro-admin-list'),
     url(r'^bairros/busca/$', busca_bairro_cidade, name='bairro-admin-busca'),
+
+    # Ufs
+    url(r'^ufs/$', UfList.as_view(), name='uf-admin-list'),
+    url(r'^ufs/adicionar/$', UfCreate.as_view(), name='uf-admin-add'),
+    url(r'^ufs/(?P<id>[0-9]+)/$', UfUpdate.as_view(), name='uf-admin-view'),
 ]
