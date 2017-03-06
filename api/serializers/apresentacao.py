@@ -14,7 +14,7 @@ class ApresentacaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('codigo_barras', 'nome', 'registro_ms', 'imagem', 'tabelas')
+        fields = ('codigo_barras', 'nome', 'registro_ms', 'imagem', 'tabelas', 'ativo')
 
 
 class ApresentacaoExportSerializer(serializers.ModelSerializer):

@@ -12,6 +12,11 @@ class UfSerializer(serializers.ModelSerializer):
 
 
 class UfReduzidoSerializer(serializers.ModelSerializer):
+    data_atualizacao = serializers.SerializerMethodField()
+
     class Meta:
         model = Uf
-        fields = ('sigla', )
+        fields = ('sigla', 'icms', 'data_atualizacao')
+
+    def get_data_atualizacao(self, obj):
+        return int(obj.data_atualizacao.timestamp() * 1000)

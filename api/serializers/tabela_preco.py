@@ -4,15 +4,12 @@ from api.serializers.uf import UfReduzidoSerializer
 
 
 class TabelaPrecoSerializer(serializers.ModelSerializer):
-    ufs = serializers.SlugRelatedField(many=True, read_only=True, slug_field='sigla')
     data_atualizacao = serializers.SerializerMethodField()
     data_vigencia = serializers.SerializerMethodField()
 
     class Meta:
         model = TabelaPreco
         fields = '__all__'
-
-    serializers.SerializerMethodField()
 
     def get_data_vigencia(self, obj):
         from datetime import datetime

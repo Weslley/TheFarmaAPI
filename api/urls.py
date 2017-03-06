@@ -14,6 +14,7 @@ from api.views.apresentacao import *
 from api.views.root import HomeApiView
 from api.views.tabela_preco import *
 from api.views.estoque import *
+from api.views.uf import *
 from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia
 
 urlpatterns = [
@@ -64,6 +65,10 @@ urlpatterns = [
     url(r'^tabela_precos_export/$', TabelaPrecoExport.as_view(), name='tabela_preco-export'),
     url(r'^tabela_precos/sync/(?P<data>[0-9]+)/$', TabelaPrecoSync.as_view(), name='tabela_preco-sync'),
 
+    # UFs
+    url(r'^ufs/$', UfList.as_view(), name='uf-list'),
+    url(r'^ufs/sync/(?P<data>[0-9]+)/$', UfSync.as_view(), name='uf-sync'),
+    
     # Post
     url(r'^posts/$', PostExportList.as_view(), name='post-list'),
     url(r'^posts/(?P<id>[0-9]+)/like/$', CurtirView.as_view(), name='post-like'),
