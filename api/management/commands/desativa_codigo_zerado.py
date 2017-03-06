@@ -5,7 +5,6 @@ from django.db.models import Q
 
 
 class Command(BaseCommand):
-    help = 'Comando para exporta dados dos medicamento do Banco para o FIrebase'
     data = {}
 
     def handle(self, *args, **options):

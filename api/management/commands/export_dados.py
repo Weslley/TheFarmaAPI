@@ -251,11 +251,11 @@ def update_regioes(tabelas):
         elif tabela.icms == 12:
             pass
         elif tabela.icms == 17:
-            siglas = ['AC', 'AL', 'CE', 'DF', 'ES', 'GO', 'MT', 'MS', 'PA', 'PI', 'RR', 'SC']
+            siglas = ['AC', 'AL', 'CE', 'DF', 'ES', 'GO', 'MT', 'MS', 'PA', 'RR', 'SC']
         elif tabela.icms == 17.5:
             siglas = ['RO', ]
         elif tabela.icms == 18:
-            siglas = ['AM', 'AP', 'BA', 'MA', 'MG', 'PB', 'PE', 'PR', 'RN', 'RS', 'SE', 'SP', 'TO']
+            siglas = ['AM', 'AP', 'BA', 'MA', 'MG', 'PB', 'PE', 'PR', 'RN', 'RS', 'SE', 'SP', 'TO', 'PI']
         elif tabela.icms == 20:
             siglas = ['RJ', ]
 
