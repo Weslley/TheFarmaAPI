@@ -102,8 +102,7 @@ def update_dados_medicamentos(path, channel=None):
                         apresentacao = get_or_create_apresentacao(ap, med)
                         if apresentacao:
                             print('Atualizando medicamento {}'.format(med.id))
-                            tabelas = atualizando_tabelas(ap, apresentacao)
-                            update_regioes(tabelas)
+                            atualizando_tabelas(ap, apresentacao)
 
                     med_percent = (50 / MAX_MED) * cont
                     cont += 1
@@ -241,27 +240,6 @@ def get_or_create_tabela_preco(perc, ap_temp, apresentacao):
         data_vigencia=ap_temp.dataVigencia,
         apresentacao=apresentacao,
     )
-
-
-def update_regioes(tabelas):
-    for tabela in tabelas:
-        siglas = []
-        if tabela.icms == 0:
-            pass
-        elif tabela.icms == 12:
-            pass
-        elif tabela.icms == 17:
-            siglas = ['AC', 'AL', 'CE', 'DF', 'ES', 'GO', 'MT', 'MS', 'PA', 'RR', 'SC']
-        elif tabela.icms == 17.5:
-            siglas = ['RO', ]
-        elif tabela.icms == 18:
-            siglas = ['AM', 'AP', 'BA', 'MA', 'MG', 'PB', 'PE', 'PR', 'RN', 'RS', 'SE', 'SP', 'TO', 'PI']
-        elif tabela.icms == 20:
-            siglas = ['RJ', ]
-
-        ufs = Uf.objects.filter(sigla__in=siglas)
-        for uf in ufs:
-            tabela.ufs.add(uf)
 
 
 def add_laboratorio(line):
