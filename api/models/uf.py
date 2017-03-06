@@ -5,6 +5,7 @@ from api.utils import ufs
 class Uf(models.Model):
     sigla = models.CharField(max_length=2, choices=ufs.CHOICES, unique=True)
     nome = models.CharField(max_length=20)
+    icms = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     def __str__(self):

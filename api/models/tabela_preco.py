@@ -11,7 +11,6 @@ class TabelaPreco(models.Model):
     data_vigencia = models.DateField(null=True, blank=True)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     apresentacao = models.ForeignKey(Apresentacao, related_name='tabelas')
-    ufs = models.ManyToManyField(Uf, blank=True)
 
     class Meta:
         verbose_name = 'Tabela de preço'
