@@ -150,12 +150,15 @@ def get_or_create_apresentacao(ap_temp, medicamento):
         if exist:
             return obj
 
-        return Apresentacao.objects.create(
-            codigo_barras=ap_temp.codbarras if ap_temp.codbarras != '' else None,  # Perguntar para o gabriel qual codigo de barras colocar
-            nome=ap_temp.apresentacao,
-            registro_ms=ap_temp.registroMS,
-            medicamento=medicamento
-        )
+        if ap_temp.codbarras != '' and ap_temp.codbarras != '0':
+            return Apresentacao.objects.create(
+                codigo_barras=ap_temp.codbarras,
+                nome=ap_temp.apresentacao,
+                registro_ms=ap_temp.registroMS,
+                medicamento=medicamento
+            )
+        else:
+            return None
     except Apresentacao.MultipleObjectsReturned:
         return None
 

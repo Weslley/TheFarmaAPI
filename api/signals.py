@@ -72,7 +72,7 @@
 # def post_update_signal(sender, **kwargs):
 #     serializer = PostExportSerializer(kwargs['instance'])
 #     data = serializer.data
-#     data['usuario']['foto'] = 'https://lh3.googleusercontent.com/-KJjE6-jE9tk/V7TAs9vBmcI/AAAAAAAAABc/A46ILSN3WAkET93TFoepdBldaDFy48mtwCEw/w140-h140-p/ic_launcher.png'
+#     data['usuario']['foto'] = ''
 #     update_model(sender.__name__.lower(), data)
 
 

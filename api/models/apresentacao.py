@@ -10,6 +10,8 @@ class Apresentacao(models.Model):
     imagem = models.ImageField(upload_to='apresentacoes', null=True, blank=True)
     medicamento = models.ForeignKey(Medicamento, related_name='apresentacoes')
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
+    ativo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nome if self.nome else self.medicamento
+
