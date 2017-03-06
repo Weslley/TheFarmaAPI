@@ -1,6 +1,7 @@
 from django import forms
 from api.models.atualizacao import Atualizacao
 from api.models.farmacia import Farmacia
+from api.models.instituicao import UsuarioInstituicao
 from api.models.representante_legal import RepresentanteLegal
 from api.models.cidade import Cidade
 from api.models.bairro import Bairro
@@ -162,6 +163,68 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             self.instance.endereco = self.get_endereco(commit=commit)
             self.instance.usuario = self.get_usuario(commit=commit)
             self.instance.farmacia = self.initial['farmacia']
+            if commit:
+                self.instance.save()
+            return self.instance
+
+
+class UsuarioInstituicaoForm(forms.ModelForm):
+    nome = forms.CharField(max_length=30)
+    sobrenome = forms.CharField(max_length=30, required=False)
+    email = forms.EmailField()
+    senha = forms.CharField(label='Senha', widget=forms.PasswordInput)
+    confirmacao_senha = forms.CharField(label='Confirmação de senha', widget=forms.PasswordInput)
+
+    class Meta:
+        model = UsuarioInstituicao
+        exclude = ('usuario',)
+
+    def clean_confirmacao_senha(self):
+        # Check that the two password entries match
+        password1 = self.cleaned_data.get("senha")
+        password2 = self.cleaned_data.get("confirmacao_senha")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Senhas incorretas")
+        return password2
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).count() > 0:
+            raise forms.ValidationError('Ja existe usuário com este email cadastrado.')
+
+        return email
+
+    def get_usuario(self, commit=True):
+        try:
+            instituicao = self.initial['instituicao']
+            cpf_cnpj = instituicao.cpf_cnpj if instituicao.cpf_cnpj else ''
+            username = '{}{}{}'.format(
+                instituicao.id,
+                cpf_cnpj[:3].rjust(3, '0'),
+                self.cleaned_data['nome']
+            )[:30].ljust(30, '0')
+
+            obj = User(
+                first_name=self.cleaned_data['nome'],
+                last_name=self.cleaned_data['sobrenome'],
+                email=self.cleaned_data['email'],
+                username=username
+            )
+            obj.set_password(self.cleaned_data['senha'])
+
+            if commit:
+                obj.save()
+
+            return obj
+        except Exception as err:
+            print(err)
+            return None
+
+    def save(self, commit=True):
+        with transaction.atomic():
+            self.instance = super(UsuarioInstituicaoForm, self).save(commit=False)
+            self.instance.usuario = self.get_usuario(commit=commit)
+            self.instance.instituicao = self.initial['instituicao']
             if commit:
                 self.instance.save()
             return self.instance

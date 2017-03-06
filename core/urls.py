@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^instituicoes/$', InstituicaoList.as_view(), name='instituicao-admin-list'),
     url(r'^instituicoes/adicionar/$', InstituicaoCreate.as_view(), name='instituicao-admin-add'),
     url(r'^instituicoes/(?P<id>[0-9]+)/$', InstituicaoDetail.as_view(), name='instituicao-admin-view'),
+    url(r'^instituicoes/(?P<id>[0-9]+)/adicionar/usuario/$', UsuarioInstituicaoCreate.as_view(), name='instituicao-admin-add-usuario'),
 
     # Medicamentos
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-admin-list'),
