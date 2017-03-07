@@ -8,10 +8,9 @@ class Apresentacao(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
     registro_ms = models.CharField(max_length=17, null=True, blank=True)
     imagem = models.ImageField(upload_to='apresentacoes', null=True, blank=True)
-    medicamento = models.ForeignKey(Produto, related_name='apresentacoes')
+    produto = models.ForeignKey(Produto, related_name='apresentacoes')
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nome if self.nome else self.medicamento
-
