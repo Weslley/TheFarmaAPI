@@ -3,6 +3,8 @@ from django.db import models
 from api.utils import tipo_produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.laboratorio import Laboratorio
+from api.models.secao import Secao
+from api.models.subsecao import Subsecao
 
 
 class Produto(models.Model):
@@ -10,6 +12,8 @@ class Produto(models.Model):
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Laboratorio)
     tipo = models.IntegerField(choices=tipo_produto.CHOICES)
+    secao = models.ForeignKey(Secao, null=True)
+    subsecao = models.ForeignKey(Subsecao, null=True)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     def __str__(self):
