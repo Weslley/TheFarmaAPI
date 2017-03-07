@@ -12,14 +12,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from api.pagination import SmallResultsSetPagination, StandardResultsSetPagination, LargeResultsSetPagination
 from api.serializers.medicamento import *
-from api.utils import tipo_medicamento
+from api.utils import tipo_produto
 
 
 class MedicamentoList(generics.ListAPIView):
     """
     Listagem dos medicamentos cadastrados
     """
-    queryset = Produto.objects.exclude(tipo=tipo_medicamento.NAO_MEDICAMENTO)
+    queryset = Produto.objects.exclude(tipo=tipo_produto.NAO_MEDICAMENTO)
     serializer_class = MedicamentoSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
@@ -29,7 +29,7 @@ class MedicamentoList(generics.ListAPIView):
 
 
 class MedicamentoSync(generics.ListAPIView, SyncApiMixin):
-    queryset = Produto.objects.exclude(tipo=tipo_medicamento.NAO_MEDICAMENTO)
+    queryset = Produto.objects.exclude(tipo=tipo_produto.NAO_MEDICAMENTO)
     serializer_class = MedicamentoExportSerializer
     pagination_class = LargeResultsSetPagination
 
@@ -46,7 +46,7 @@ class MedicamentoRetrieve(generics.RetrieveAPIView):
 
 
 class MedicamentoExport(generics.ListAPIView):
-    queryset = Produto.objects.exclude(tipo=tipo_medicamento.NAO_MEDICAMENTO)
+    queryset = Produto.objects.exclude(tipo=tipo_produto.NAO_MEDICAMENTO)
     serializer_class = MedicamentoExportSerializer
     pagination_class = LargeResultsSetPagination
 

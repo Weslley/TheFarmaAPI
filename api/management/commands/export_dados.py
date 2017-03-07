@@ -11,7 +11,7 @@ from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
 from datetime import datetime
 import time
-from api.utils import tipo_medicamento
+from api.utils import tipo_produto
 
 TIPO_LABORATORIO = 1
 TIPO_NAO_USADO2 = 2
@@ -183,7 +183,7 @@ def get_or_create_medicamento(med_temp):
         principio_ativo_id=med_temp.principioAtivo_id,
         laboratorio_id=med_temp.laboratorio_id,
         nome=med_temp.descricao,
-        tipo=tipo_medicamento.GENERICO if med_temp.generico else tipo_medicamento.ETICO  # consultar com o gabriel
+        tipo=tipo_produto.GENERICO if med_temp.generico else tipo_produto.ETICO  # consultar com o gabriel
     )
 
 

@@ -1,6 +1,6 @@
 from django.db import models
 
-from api.utils import tipo_medicamento
+from api.utils import tipo_produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.laboratorio import Laboratorio
 
@@ -9,7 +9,7 @@ class Produto(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Laboratorio)
-    tipo = models.IntegerField(choices=tipo_medicamento.CHOICES)
+    tipo = models.IntegerField(choices=tipo_produto.CHOICES)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     def __str__(self):

@@ -4,7 +4,7 @@ from django.conf.urls import url
 
 from api.views.atualizacao import UltimaAtualizacao
 from api.views.bairro import BairroList
-from api.views.medicamento import *
+from api.views.produto import *
 from api.views.laboratorio import *
 from api.views.cidade import *
 from api.views.farmacia import *
