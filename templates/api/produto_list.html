@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block header %}
-  Medicamentos
+  Produtos
 {% endblock header %}
 
 {% block conteudo %}
@@ -34,7 +34,7 @@
             $('#am_add_button').removeClass('btn-primary');
             $('#am_add_button').addClass('btn-white');
             $('.active').removeClass('active');
-            $('#menu_medicamento').addClass('active');
+            $('#menu_produto').addClass('active');
         })();
         $(window).on('load', function () {
             $('.pagination').addClass('pagination-success');

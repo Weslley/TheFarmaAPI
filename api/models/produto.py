@@ -5,7 +5,7 @@ from api.models.principio_ativo import PrincipioAtivo
 from api.models.laboratorio import Laboratorio
 
 
-class Medicamento(models.Model):
+class Produto(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Laboratorio)

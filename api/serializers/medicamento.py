@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models.medicamento import Medicamento
+from api.models.produto import Produto
 from api.serializers.apresentacao import ApresentacaoListSerializer
 
 
@@ -8,7 +8,7 @@ class MedicamentoSerializer(serializers.ModelSerializer):
     data_atualizacao = serializers.SerializerMethodField()
 
     class Meta:
-        model = Medicamento
+        model = Produto
         fields = '__all__'
 
     def get_data_atualizacao(self, obj):
@@ -17,7 +17,7 @@ class MedicamentoSerializer(serializers.ModelSerializer):
 
 class MedicamentoListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Medicamento
+        model = Produto
         fields = ('nome', 'id')
 
 
@@ -26,7 +26,7 @@ class MedicamentoExportSerializer(serializers.ModelSerializer):
     data_atualizacao = serializers.SerializerMethodField()
 
     class Meta:
-        model = Medicamento
+        model = Produto
         fields = '__all__'
 
     def get_data_atualizacao(self, obj):

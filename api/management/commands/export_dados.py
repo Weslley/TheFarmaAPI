@@ -5,7 +5,7 @@ from decimal import Decimal
 from misc.pusher_message import Message
 from api.models.apresentacao import Apresentacao
 from api.models.laboratorio import Laboratorio
-from api.models.medicamento import MedicamentoApExport, Medicamento
+from api.models.produto import MedicamentoApExport, Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
@@ -115,7 +115,7 @@ def update_dados_medicamentos(path, channel=None):
                 print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentacoes\n{} tabelas de preco'.format(
                     len(laboratorios),
                     len(principios_ativos),
-                    Medicamento.objects.count(),
+                    Produto.objects.count(),
                     Apresentacao.objects.count(),
                     TabelaPreco.objects.count()
                 ))
@@ -164,7 +164,7 @@ def get_or_create_apresentacao(ap_temp, medicamento):
 
 def exist_medicamento(med_temp):
     try:
-        med = Medicamento.objects.get(
+        med = Produto.objects.get(
             principio_ativo_id=med_temp.principioAtivo_id,
             laboratorio_id=med_temp.laboratorio_id,
             nome=med_temp.descricao,
@@ -179,7 +179,7 @@ def get_or_create_medicamento(med_temp):
     if exist:
         return obj
 
-    return Medicamento.objects.create(
+    return Produto.objects.create(
         principio_ativo_id=med_temp.principioAtivo_id,
         laboratorio_id=med_temp.laboratorio_id,
         nome=med_temp.descricao,

@@ -1,14 +1,14 @@
 from awesome_mixins.mixins.list import ListMixin
 from core.views.mixins import AdminBaseMixin
-from api.models.medicamento import Medicamento
+from api.models.produto import Produto
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from api.models.atualizacao import Atualizacao
 
 
 class MedicamentoList(ListMixin, AdminBaseMixin):
-    model = Medicamento
-    queryset = Medicamento.objects.all()
+    model = Produto
+    queryset = Produto.objects.all()
     paginate_by = 10
     search_default = ('nome', '-data_atualizacao', 'Nome')
     css_table = 'table'
@@ -29,7 +29,7 @@ class MedicamentoList(ListMixin, AdminBaseMixin):
 
 
 class MedicamentoCreate(CreateView, AdminBaseMixin):
-    model = Medicamento
+    model = Produto
     fields = ('nome', 'principio_ativo', 'laboratorio', 'tipo')
     success_url = reverse_lazy('medicamento-admin-list')
 
@@ -42,7 +42,7 @@ class MedicamentoCreate(CreateView, AdminBaseMixin):
 
 
 class MedicamentoUpdate(UpdateView, AdminBaseMixin):
-    model = Medicamento
+    model = Produto
     fields = ('nome', 'principio_ativo', 'laboratorio', 'tipo')
     success_url = reverse_lazy('medicamento-admin-list')
     pk_url_kwarg = 'id'
@@ -56,10 +56,10 @@ class MedicamentoUpdate(UpdateView, AdminBaseMixin):
 
 
 class MedicamentoDetail(DetailView, AdminBaseMixin):
-    model = Medicamento
+    model = Produto
     pk_url_kwarg = 'id'
 
 
 class MedicamentoDelete(DeleteView, AdminBaseMixin):
-    model = Medicamento
+    model = Produto
     success_url = reverse_lazy('medicamento-admin-list')

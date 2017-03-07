@@ -3,7 +3,7 @@
 {% load helper %}
 
 {% block header %}
-  Medicamentos
+  Produtos
 {% endblock header %}
 
 {% block conteudo %}
@@ -20,13 +20,13 @@
                         <div class="col-md-8">
                             <div class="form-group label-floating">
                                 <label class="control-label">Nome</label>
-                                <input type="text" class="form-control" disabled value="{{ medicamento.nome }}">
+                                <input type="text" class="form-control" disabled value="{{ produto.nome }}">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group label-floating">
                                 <label class="control-label">Tipo</label>
-                                <input type="text" class="form-control" disabled value="{% if medicamento.tipo == 1 %}SIMILAR{% elif medicamento.tipo == 2 %}ÉTICO{% else %}GENÉRICO{% endif %}">
+                                <input type="text" class="form-control" disabled value="{% if produto.tipo == 1 %}SIMILAR{% elif produto.tipo == 2 %}ÉTICO{% else %}GENÉRICO{% endif %}">
                             </div>
                         </div>
                     </div>
@@ -35,19 +35,19 @@
                         <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Principio ativo</label>
-                                <input type="text" class="form-control" disabled value="{{ medicamento.principio_ativo }}">
+                                <input type="text" class="form-control" disabled value="{{ produto.principio_ativo }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Laboratório</label>
-                                <input type="text" class="form-control" disabled value="{{ medicamento.laboratorio }}">
+                                <input type="text" class="form-control" disabled value="{{ produto.laboratorio }}">
                             </div>
                         </div>
                     </div>
 
-                    <a href="{% url 'medicamento-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
-                    <a href="{% url 'medicamento-admin-update' medicamento.id %}" class="btn btn-primary pull-right">Editar</a>
+                    <a href="{% url 'produto-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                    <a href="{% url 'produto-admin-update' produto.id %}" class="btn btn-primary pull-right">Editar</a>
                     <div class="clearfix"></div>
 
                 </div>
@@ -62,7 +62,7 @@
     <script type="text/javascript">
         $(window).on('load', function () {
             $('.active').removeClass('active');
-            $('#menu_medicamento').addClass('active');
+            $('#menu_produto').addClass('active');
         });
     </script>
 {% endblock js %}

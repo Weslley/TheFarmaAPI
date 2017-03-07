@@ -7,7 +7,7 @@ from django.conf import settings
 from api.models.curtida import Curtida
 # from api.models.farmacia import Farmacia
 # from api.models.laboratorio import Laboratorio
-# from api.models.medicamento import Medicamento
+# from api.models.medicamento import Produto
 from api.models.post import Post
 # from api.models.principio_ativo import PrincipioAtivo
 # from api.serializers.cidade import CidadeSerializer
@@ -31,14 +31,14 @@ def update_model(model_name, data):
         print(err)
 
 #
-# @receiver(post_save, sender=Medicamento)
+# @receiver(post_save, sender=Produto)
 # def teste_signal(sender, **kwargs):
 #     serializer = MedicamentoSerializer(kwargs['instance'])
 #     data = serializer.data
 #     update_model(sender.__name__.lower(), data)
 #
 #
-# @receiver(post_save, sender=Medicamento)
+# @receiver(post_save, sender=Produto)
 # def medicamento_update_signal(sender, **kwargs):
 #     serializer = MedicamentoSerializer(kwargs['instance'])
 #     data = serializer.data

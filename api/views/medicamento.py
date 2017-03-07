@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from api.filters import MedicamentoFilter, OrderingFilter
 from api.mixins.base import SyncApiMixin
-from api.models.medicamento import Medicamento
+from api.models.produto import Produto
 from django_filters.rest_framework import DjangoFilterBackend
 
 from api.pagination import SmallResultsSetPagination, StandardResultsSetPagination, LargeResultsSetPagination
@@ -18,7 +18,7 @@ class MedicamentoList(generics.ListAPIView):
     """
     Listagem dos medicamentos cadastrados
     """
-    queryset = Medicamento.objects.all()
+    queryset = Produto.objects.all()
     serializer_class = MedicamentoSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
@@ -28,7 +28,7 @@ class MedicamentoList(generics.ListAPIView):
 
 
 class MedicamentoSync(generics.ListAPIView, SyncApiMixin):
-    queryset = Medicamento.objects.all()
+    queryset = Produto.objects.all()
     serializer_class = MedicamentoExportSerializer
     pagination_class = LargeResultsSetPagination
 
@@ -39,13 +39,13 @@ class MedicamentoRetrieve(generics.RetrieveAPIView):
 
     def get_queryset(self):
         if 'id' in self.kwargs and self.kwargs['id']:
-            return Medicamento.objects.filter(id=self.kwargs['id'])
+            return Produto.objects.filter(id=self.kwargs['id'])
         else:
-            return Medicamento.objects.none()
+            return Produto.objects.none()
 
 
 class MedicamentoExport(generics.ListAPIView):
-    queryset = Medicamento.objects.all()
+    queryset = Produto.objects.all()
     serializer_class = MedicamentoExportSerializer
     pagination_class = LargeResultsSetPagination
 

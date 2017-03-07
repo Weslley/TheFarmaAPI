@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 
 from api.models.apresentacao import Apresentacao
 from api.models.laboratorio import Laboratorio
-from api.models.medicamento import Medicamento
+from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
 from api.serializers.apresentacao import ApresentacaoExportSerializer
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         medicamentos = {}
         spinner = spinning_cursor()
         print('Carregando medicamentos...')
-        for medicamento in Medicamento.objects.all():
+        for medicamento in Produto.objects.all():
             serializer = MedicamentoExportSerializer(medicamento)
             data = serializer.data
             medicamentos[data['id']] = data

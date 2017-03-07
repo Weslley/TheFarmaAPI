@@ -1,14 +1,14 @@
 import django_filters
 from rest_framework.filters import BaseFilterBackend
 
-from api.models.medicamento import Medicamento
+from api.models.produto import Produto
 
 
 class MedicamentoFilter(django_filters.rest_framework.FilterSet):
     nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
 
     class Meta:
-        model = Medicamento
+        model = Produto
         fields = ['nome', ]
 
 

@@ -9,7 +9,7 @@ from django.db import transaction
 from api.models import *
 from api.models.apresentacao import Apresentacao
 from api.models.laboratorio import Laboratorio
-from api.models.medicamento import Medicamento
+from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
@@ -113,7 +113,7 @@ def create_apresentacao(**kwargs):
 
 
 def create_medicamento(**kwargs):
-    return Medicamento.objects.create(**kwargs)
+    return Produto.objects.create(**kwargs)
 
 
 def create_tabelas(apresentacao, precos, vigencia):
