@@ -15,3 +15,9 @@ class UfSync(generics.ListAPIView, SyncApiMixin):
     queryset = Uf.objects.all()
     serializer_class = UfReduzidoSerializer
     pagination_class = LargeResultsSetPagination
+
+
+class UfExport(generics.ListAPIView):
+    queryset = Uf.objects.all()
+    serializer_class = UfReduzidoSerializer
+    pagination_class = LargeResultsSetPagination
