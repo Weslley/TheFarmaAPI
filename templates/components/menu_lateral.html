@@ -28,16 +28,10 @@
                 </a>
             </li>
             {% if user.is_superuser %}
-                <li id="menu_instituicao">
-                    <a href="{% url 'instituicao-admin-list' %}">
+                <li id="menu_parceiro">
+                    <a href="{% url 'parceiro-admin-list' %}">
                         <i class="material-icons">domain</i>
-                        <p>Instituições</p>
-                    </a>
-                </li>
-                <li id="menu_usuario">
-                    <a href="#">
-                        <i class="material-icons">people</i>
-                        <p>Usuários</p>
+                        <p>Parceiros</p>
                     </a>
                 </li>
             {% endif %}

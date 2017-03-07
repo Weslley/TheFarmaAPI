@@ -1,15 +1,15 @@
 from awesome_mixins.mixins.list import ListMixin
 from core.views.mixins import AdminBaseMixin
-from api.models.instituicao import Instituicao, UsuarioInstituicao
+from api.models.parceiro import Parceiro, UsuarioParceiro
 from django.views.generic import CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy
-from core.forms import UsuarioInstituicaoForm
+from core.forms import UsuarioParceiroForm
 import re
 
 
-class InstituicaoList(ListMixin, AdminBaseMixin):
-    model = Instituicao
-    queryset = Instituicao.objects.all()
+class ParceiroList(ListMixin, AdminBaseMixin):
+    model = Parceiro
+    queryset = Parceiro.objects.all()
     paginate_by = 10
     search_default = ('nome_fantasia', 'nome_fantasia', 'Nome fantasia')
     css_table = 'table'
@@ -29,8 +29,8 @@ class InstituicaoList(ListMixin, AdminBaseMixin):
     ]
 
 
-class InstituicaoCreate(CreateView, AdminBaseMixin):
-    model = Instituicao
+class ParceiroCreate(CreateView, AdminBaseMixin):
+    model = Parceiro
     fields = (
         'razao_social',
         'nome_fantasia',
@@ -40,11 +40,11 @@ class InstituicaoCreate(CreateView, AdminBaseMixin):
         'telefone'
     )
 
-    success_url = reverse_lazy('instituicao-admin-list')
+    success_url = reverse_lazy('parceiro-admin-list')
 
 
-class InstituicaoUpdate(UpdateView, AdminBaseMixin):
-    model = Instituicao
+class ParceiroUpdate(UpdateView, AdminBaseMixin):
+    model = Parceiro
     fields = (
         'razao_social',
         'nome_fantasia',
@@ -53,35 +53,35 @@ class InstituicaoUpdate(UpdateView, AdminBaseMixin):
         'logo',
         'telefone'
     )
-    success_url = reverse_lazy('instituicao-admin-list')
+    success_url = reverse_lazy('parceiro-admin-list')
 
 
-class InstituicaoDetail(DetailView, AdminBaseMixin):
-    model = Instituicao
+class ParceiroDetail(DetailView, AdminBaseMixin):
+    model = Parceiro
     pk_url_kwarg = 'id'
 
 
-class UsuarioInstituicaoCreate(CreateView, AdminBaseMixin):
-    model = UsuarioInstituicao
-    form_class = UsuarioInstituicaoForm
+class UsuarioParceiroCreate(CreateView, AdminBaseMixin):
+    model = UsuarioParceiro
+    form_class = UsuarioParceiroForm
 
     def dispatch(self, request, *args, **kwargs):
         match = re.search('[0-9]+', request.META['PATH_INFO'])
         if match:
             farmacia_id = int(match.group())
-            self.instituicao = Instituicao.objects.get(id=farmacia_id)
-        return super(UsuarioInstituicaoCreate, self).dispatch(request, *args, **kwargs)
+            self.parceiro = Parceiro.objects.get(id=farmacia_id)
+        return super(UsuarioParceiroCreate, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(UsuarioInstituicaoCreate, self).get_context_data(**kwargs)
-        context['instituicao'] = self.instituicao
+        context = super(UsuarioParceiroCreate, self).get_context_data(**kwargs)
+        context['parceiro'] = self.parceiro
         return context
 
     def get_initial(self):
-        return {'instituicao': self.instituicao}
+        return {'parceiro': self.parceiro}
 
     def get_success_url(self):
-        self.success_url = reverse_lazy('instituicao-admin-view', kwargs={'id': self.object.instituicao.id})
+        self.success_url = reverse_lazy('parceiro-admin-view', kwargs={'id': self.object.parceiro.id})
         from django.utils.encoding import force_text
         self.success_url = force_text(self.success_url)
         url = self.success_url.format(**self.object.__dict__)

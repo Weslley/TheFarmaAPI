@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class Instituicao(models.Model):
+class Parceiro(models.Model):
     razao_social = models.CharField(max_length=120)
     nome_fantasia = models.CharField(max_length=70)
     cpf_cnpj = models.CharField(verbose_name='CPF/CNPJ', max_length=14)
@@ -13,15 +13,15 @@ class Instituicao(models.Model):
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Instituição'
+        verbose_name = 'Parceiro'
 
     def __str__(self):
         return self.nome_fantasia
 
 
-class UsuarioInstituicao(models.Model):
-    instituicao = models.ForeignKey(Instituicao, related_name='usuarios')
+class UsuarioParceiro(models.Model):
+    parceiro = models.ForeignKey(Parceiro, related_name='usuarios')
     usuario = models.OneToOneField(User, related_name='user_instituicao')
 
     class Meta:
-        unique_together = ('instituicao', 'usuario')
+        unique_together = ('parceiro', 'usuario')

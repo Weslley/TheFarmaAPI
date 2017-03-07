@@ -3,7 +3,7 @@
 {% load helper %}
 
 {% block header %}
-  Representante Legal
+  Usuários
 {% endblock header %}
 
 {% block conteudo %}
@@ -54,8 +54,8 @@
 
                     </div>
 
-                    {{ form.instituicao|addclass:"form-control hidden" }}
-                    <a href="{% url 'instituicao-admin-view' instituicao.id %}" class="btn btn-default pull-left">Voltar</a>
+                    {{ form.parceiro|addclass:"form-control hidden" }}
+                    <a href="{% url 'parceiro-admin-view' parceiro.id %}" class="btn btn-default pull-left">Voltar</a>
                     <button type="submit" class="btn btn-primary pull-right">Salvar</button>
                     <div class="clearfix"></div>
                 </div>
@@ -71,7 +71,7 @@
     (function () {
 
         $('.active').removeClass('active');
-        $('#menu_instituicao').addClass('active');
+        $('#menu_parceiro').addClass('active');
 
     })();
     </script>

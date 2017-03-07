@@ -5,7 +5,7 @@ from core.views.base import *
 from core.views.posts import *
 from core.views.produto import *
 from core.views.usuarios import *
-from core.views.instituicoes import *
+from core.views.parceiro import *
 from core.views.atualizacao import *
 from core.views.estoque import *
 from core.views.farmacia import *
@@ -20,10 +20,10 @@ urlpatterns = [
     url(r'^posts/(?P<id>[0-9]+)/$', PostDetail.as_view(), name='post-admin-view'),
 
     # Instituição
-    url(r'^instituicoes/$', InstituicaoList.as_view(), name='instituicao-admin-list'),
-    url(r'^instituicoes/adicionar/$', InstituicaoCreate.as_view(), name='instituicao-admin-add'),
-    url(r'^instituicoes/(?P<id>[0-9]+)/$', InstituicaoDetail.as_view(), name='instituicao-admin-view'),
-    url(r'^instituicoes/(?P<id>[0-9]+)/adicionar/usuario/$', UsuarioInstituicaoCreate.as_view(), name='instituicao-admin-add-usuario'),
+    url(r'^parceiros/$', ParceiroList.as_view(), name='parceiro-admin-list'),
+    url(r'^parceiros/adicionar/$', ParceiroCreate.as_view(), name='parceiro-admin-add'),
+    url(r'^parceiros/(?P<id>[0-9]+)/$', ParceiroDetail.as_view(), name='parceiro-admin-view'),
+    url(r'^parceiros/(?P<id>[0-9]+)/adicionar/usuario/$', UsuarioParceiroCreate.as_view(), name='parceiro-admin-add-usuario'),
 
     # Medicamentos
     url(r'^produtos/$', MedicamentoList.as_view(), name='produto-admin-list'),

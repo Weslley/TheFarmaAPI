@@ -3,7 +3,7 @@
 {% load helper %}
 
 {% block header %}
-  Instituição
+  Parceiros
 {% endblock header %}
 
 {% block conteudo %}
@@ -21,13 +21,13 @@
                         <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Razão Social</label>
-                                <input type="text" class="form-control" disabled value="{{ instituicao.razao_social }}">
+                                <input type="text" class="form-control" disabled value="{{ parceiro.razao_social }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group label-floating">
                                 <label class="control-label">Nome Fantasia</label>
-                                <input type="text" class="form-control" disabled value="{{ instituicao.nome_fantasia }}">
+                                <input type="text" class="form-control" disabled value="{{ parceiro.nome_fantasia }}">
                             </div>
                         </div>
                     </div>
@@ -36,24 +36,24 @@
                         <div class="col-md-3">
                             <div class="form-group label-floating">
                                 <label class="control-label">CNPJ</label>
-                                <input id="id_cnpj" type="text" class="form-control" disabled value="{{ instituicao.cpf_cnpj }}">
+                                <input id="id_cnpj" type="text" class="form-control" disabled value="{{ parceiro.cpf_cnpj }}">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group label-floating">
                                 <label class="control-label">Telefone</label>
-                                <input id="id_telefone" type="text" class="form-control" disabled value="{{ instituicao.telefone }}">
+                                <input id="id_telefone" type="text" class="form-control" disabled value="{{ parceiro.telefone }}">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group label-floating">
                                 <label class="control-label">Site</label>
-                                <input id="id_cnpj" type="text" class="form-control" disabled value="{{ instituicao.site }}">
+                                <input id="id_cnpj" type="text" class="form-control" disabled value="{{ parceiro.site }}">
                             </div>
                         </div>
                     </div>
 
-                    <a href="{% url 'instituicao-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                    <a href="{% url 'parceiro-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
                     <div class="clearfix"></div>
 
                 </div>
@@ -66,13 +66,13 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header" data-background-color="purple">
-                    <h4 class="title" style="float: left; margin-top:15px;">Parceiros</h4>
-                    <a href="{% url 'instituicao-admin-add-usuario' instituicao.id %}" class="btn btn-white pull-right" style="color: #999999;"><i class="fa fa-plus"></i> Adicionar</a>
+                    <h4 class="title" style="float: left; margin-top:15px;">Usuários</h4>
+                    <a href="{% url 'parceiro-admin-add-usuario' parceiro.id %}" class="btn btn-white pull-right" style="color: #999999;"><i class="fa fa-plus"></i> Adicionar</a>
                     <div class="clearfix"></div>
                 </div>
 
                 <div class="card-content">
-                    {% for usuario in instituicao.usuarios.all %}
+                    {% for usuario in parceiro.usuarios.all %}
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group label-floating">
@@ -108,7 +108,7 @@
             }
 
             $('.active').removeClass('active');
-            $('#menu_instituicao').addClass('active');
+            $('#menu_parceiro').addClass('active');
         });
     </script>
 {% endblock js %}

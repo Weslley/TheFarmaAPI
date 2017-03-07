@@ -17,7 +17,7 @@ from api.models.farmacia import Farmacia
 from api.models.laboratorio import Laboratorio
 from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
-from api.models.instituicao import Instituicao, UsuarioInstituicao
+from api.models.parceiro import Parceiro, UsuarioParceiro
 
 
 # class FarmaciaAdmin(admin.ModelAdmin):
@@ -187,5 +187,5 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(Perfil)
 admin.site.register(Curtida)
 admin.site.register(Atualizacao)
-admin.site.register(Instituicao)
-admin.site.register(UsuarioInstituicao)
+admin.site.register(Parceiro)
+admin.site.register(UsuarioParceiro)

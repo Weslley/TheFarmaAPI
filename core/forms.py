@@ -1,7 +1,7 @@
 from django import forms
 from api.models.atualizacao import Atualizacao
 from api.models.farmacia import Farmacia
-from api.models.instituicao import UsuarioInstituicao
+from api.models.parceiro import UsuarioParceiro
 from api.models.representante_legal import RepresentanteLegal
 from api.models.cidade import Cidade
 from api.models.bairro import Bairro
@@ -168,7 +168,7 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             return self.instance
 
 
-class UsuarioInstituicaoForm(forms.ModelForm):
+class UsuarioParceiroForm(forms.ModelForm):
     nome = forms.CharField(max_length=30)
     sobrenome = forms.CharField(max_length=30, required=False)
     email = forms.EmailField()
@@ -176,7 +176,7 @@ class UsuarioInstituicaoForm(forms.ModelForm):
     confirmacao_senha = forms.CharField(label='Confirmação de senha', widget=forms.PasswordInput)
 
     class Meta:
-        model = UsuarioInstituicao
+        model = UsuarioParceiro
         exclude = ('usuario',)
 
     def clean_confirmacao_senha(self):
@@ -196,10 +196,10 @@ class UsuarioInstituicaoForm(forms.ModelForm):
 
     def get_usuario(self, commit=True):
         try:
-            instituicao = self.initial['instituicao']
-            cpf_cnpj = instituicao.cpf_cnpj if instituicao.cpf_cnpj else ''
+            parceiro = self.initial['parceiro']
+            cpf_cnpj = parceiro.cpf_cnpj if parceiro.cpf_cnpj else ''
             username = '{}{}{}'.format(
-                instituicao.id,
+                parceiro.id,
                 cpf_cnpj[:3].rjust(3, '0'),
                 self.cleaned_data['nome']
             )[:30].ljust(30, '0')
@@ -222,9 +222,9 @@ class UsuarioInstituicaoForm(forms.ModelForm):
 
     def save(self, commit=True):
         with transaction.atomic():
-            self.instance = super(UsuarioInstituicaoForm, self).save(commit=False)
+            self.instance = super(UsuarioParceiroForm, self).save(commit=False)
             self.instance.usuario = self.get_usuario(commit=commit)
-            self.instance.instituicao = self.initial['instituicao']
+            self.instance.parceiro = self.initial['parceiro']
             if commit:
                 self.instance.save()
             return self.instance
