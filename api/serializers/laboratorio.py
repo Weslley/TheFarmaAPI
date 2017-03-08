@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 
 
 class LaboratorioSerializer(serializers.ModelSerializer):
     data_atualizacao = serializers.SerializerMethodField()
 
     class Meta:
-        model = Laboratorio
+        model = Fabricante
         fields = '__all__'
 
     def get_data_atualizacao(self, obj):

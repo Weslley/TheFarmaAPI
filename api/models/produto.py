@@ -2,7 +2,7 @@ from django.db import models
 
 from api.utils import tipo_produto
 from api.models.principio_ativo import PrincipioAtivo
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 from api.models.secao import Secao
 from api.models.subsecao import Subsecao
 
@@ -10,7 +10,7 @@ from api.models.subsecao import Subsecao
 class Produto(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
     principio_ativo = models.ForeignKey(PrincipioAtivo)
-    laboratorio = models.ForeignKey(Laboratorio)
+    laboratorio = models.ForeignKey(Fabricante)
     tipo = models.IntegerField(choices=tipo_produto.CHOICES)
     secao = models.ForeignKey(Secao, null=True)
     subsecao = models.ForeignKey(Subsecao, null=True)

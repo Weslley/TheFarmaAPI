@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 from misc.pusher_message import Message
 from api.models.apresentacao import Apresentacao
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 from api.models.produto import MedicamentoApExport, Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
@@ -249,13 +249,13 @@ def add_laboratorio(line):
     :return:
     """
     try:
-        lab = Laboratorio.objects.get(id=int(line[2:5]))
+        lab = Fabricante.objects.get(id=int(line[2:5]))
         lab.nome = line[5:25].strip()
         lab.razao_social = line[25:65].strip()
         lab.save()
         return lab
-    except Laboratorio.DoesNotExist:
-        return Laboratorio.objects.create(
+    except Fabricante.DoesNotExist:
+        return Fabricante.objects.create(
             id=int(line[2:5]),
             nome=line[5:25].strip(),
             razao_social=line[25:65].strip()

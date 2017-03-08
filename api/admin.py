@@ -14,7 +14,7 @@ from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.parceiro import Parceiro, UsuarioParceiro
@@ -175,7 +175,7 @@ class PostAdmin(admin.ModelAdmin):
 admin.site.register(Farmacia, FarmaciaAdmin)
 admin.site.register(Produto)
 admin.site.register(PrincipioAtivo)
-admin.site.register(Laboratorio)
+admin.site.register(Fabricante)
 admin.site.register(Endereco)
 admin.site.register(Cidade)
 admin.site.register(Bairro)

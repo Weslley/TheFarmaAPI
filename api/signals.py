@@ -6,7 +6,7 @@ from django.conf import settings
 # from api.models.cidade import Cidade
 from api.models.curtida import Curtida
 # from api.models.farmacia import Farmacia
-# from api.models.laboratorio import Laboratorio
+# from api.models.laboratorio import Fabricante
 # from api.models.medicamento import Produto
 from api.models.post import Post
 # from api.models.principio_ativo import PrincipioAtivo

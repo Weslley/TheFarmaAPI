@@ -8,7 +8,7 @@ from django.db import transaction
 
 from api.models import *
 from api.models.apresentacao import Apresentacao
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
@@ -38,7 +38,7 @@ class Command(BaseCommand):
             try:
                 with transaction.atomic():
                     # Buscando laboratorio
-                    laboratorio = Laboratorio.objects.get(cnpj=clean_cnpj(cnpj))
+                    laboratorio = Fabricante.objects.get(cnpj=clean_cnpj(cnpj))
                     # Buscando principio ativo
                     principio_ativo = PrincipioAtivo.objects.get(nome=clean_principio(principio))
                     # Salvando medicamento
@@ -99,7 +99,7 @@ def export_laboratorios():
             cnpj, nome = linha.split(';')
             cnpj = cnpj.replace('.', '').replace('/', '').replace('-', '')
             nome = nome.strip()
-            Laboratorio.objects.create(
+            Fabricante.objects.create(
                 cnpj=cnpj,
                 nome=nome
             )

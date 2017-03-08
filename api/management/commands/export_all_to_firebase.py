@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from api.models.apresentacao import Apresentacao
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
@@ -77,7 +77,7 @@ class Command(BaseCommand):
         laboratorios = {}
         spinner = spinning_cursor()
         print('Carregando laboratórios...')
-        for lab in Laboratorio.objects.all():
+        for lab in Fabricante.objects.all():
             serializer = LaboratorioSerializer(lab)
             data = serializer.data
             laboratorios[data['id']] = data
