@@ -237,5 +237,10 @@
         $(window).on('load', function () {
             $('.pagination').addClass('pagination-success');
         });
+        function limparMascaras() {
+            $('form input[type=text]').each(function () {
+                $(this).unmask();
+            });
+        }
     </script>
 </html>

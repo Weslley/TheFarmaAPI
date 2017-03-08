@@ -68,7 +68,7 @@
                         </div>
 
                         <a href="{% url 'parceiro-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
-                        <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                        <button type="submit" class="btn btn-primary pull-right" onclick="limparMascaras();">Salvar</button>
                         <div class="clearfix"></div>
 
                     </div>
@@ -110,6 +110,35 @@
     $(window).on('load', function () {
         $('.active').removeClass('active');
         $('#menu_parceiro').addClass('active');
+
+        $('#id_telefone').attr('maxlength', 11);
+        $('#id_cpf_cnpj').attr('maxlength', 14);
+
+        $('#id_telefone').on('focus', function (e) {
+            $('#id_telefone').mask('00000000000');
+        });
+
+        $('#id_telefone').on('blur', function (e) {
+            $(this).unmask();
+            if($('#id_telefone').val().length <= 10){
+                $('#id_telefone').mask('(00) 0000-0000');
+            }else{
+                $('#id_telefone').mask('(00) 00000-0000');
+            }
+        });
+
+        $('#id_cpf_cnpj').on('focus', function (e) {
+            $('#id_cpf_cnpj').mask('00000000000000');
+        });
+
+        $('#id_cpf_cnpj').on('blur', function (e) {
+            $(this).unmask();
+            if($('#id_cpf_cnpj').val().length <= 11){
+                $('#id_cpf_cnpj').mask('000.000.000-00');
+            }else{
+                $('#id_cpf_cnpj').mask('00.000.000/0000-00');
+            }
+        });
 
 
         document.getElementById('id_logo').onchange = function (evt) {
