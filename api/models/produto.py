@@ -5,6 +5,7 @@ from api.models.principio_ativo import PrincipioAtivo
 from api.models.fabricante import Fabricante
 from api.models.secao import Secao
 from api.models.subsecao import Subsecao
+from api.models.sintoma import Sintoma
 
 
 class Produto(models.Model):
@@ -14,6 +15,7 @@ class Produto(models.Model):
     tipo = models.IntegerField(choices=tipo_produto.CHOICES)
     secao = models.ForeignKey(Secao, null=True)
     subsecao = models.ForeignKey(Subsecao, null=True)
+    sintomas = models.ManyToManyField(Sintoma, related_name='medicamentos_associados', blank=True)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
 
     def __str__(self):
