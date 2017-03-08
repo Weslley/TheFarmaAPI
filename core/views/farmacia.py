@@ -24,7 +24,6 @@ class FarmaciaList(ListMixin, AdminBaseMixin):
         {'lookup': 'razao_social', 'name': 'Razão social'},
         {'lookup': 'nome_fantasia', 'name': 'Nome fantasia'},
         {'lookup': 'telefone', 'name': 'Telefone'},
-        {'lookup': 'cliente_infog2', 'name': 'Cliente INFOG2'},
     ]
 
 
