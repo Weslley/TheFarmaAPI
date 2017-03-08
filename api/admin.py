@@ -9,7 +9,7 @@ from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
-from api.models.apresentacao import Apresentacao
+from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.endereco import Endereco
@@ -189,3 +189,4 @@ admin.site.register(Curtida)
 admin.site.register(Atualizacao)
 admin.site.register(Parceiro)
 admin.site.register(UsuarioParceiro)
+admin.site.register(ImagemApresentacao)
