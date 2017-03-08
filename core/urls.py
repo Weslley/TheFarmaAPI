@@ -14,6 +14,7 @@ from core.views.uf import *
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^desativar_usuario/(?P<id>[0-9]+)/(?P<fk_id>[0-9]+)/(?P<model>[a-z]+)/$', desativa_usuario, name='desativar-usuario'),
     # Post
     url(r'^posts/$', PostList.as_view(), name='post-admin-list'),
     url(r'^posts/adicionar/$', PostCreate.as_view(), name='post-admin-add'),

@@ -123,20 +123,25 @@
 
                 <div class="card-content">
                     {% for representante in farmacia.representantes.all %}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">Nome</label>
-                                    <input type="text" class="form-control" disabled value="{{ representante }}">
+                        {% if representante.usuario.is_active %}
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Nome</label>
+                                        <input type="text" class="form-control" disabled value="{{ representante }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Email</label>
+                                        <input type="text" class="form-control" disabled value="{{ representante.usuario.email }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button style="margin-top: 20px;" onclick="remover_usuario({{ representante.usuario.id }}, {{ farmacia.id }}, 'farmacia');"><i class="fa fa-trash"></i></button>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">Email</label>
-                                    <input type="text" class="form-control" disabled value="{{ representante.usuario.email }}">
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
 
