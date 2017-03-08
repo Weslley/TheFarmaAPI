@@ -33,19 +33,25 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.cargo.label }}</label>
+                                    {{ form.cargo|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.rg.label }}</label>
                                     {{ form.rg|addclass:"form-control" }}
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.cpf.label }}</label>
                                     {{ form.cpf|addclass:"form-control" }}
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.telefone.label }}</label>
                                     {{ form.telefone|addclass:"form-control" }}

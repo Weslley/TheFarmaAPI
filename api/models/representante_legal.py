@@ -8,6 +8,7 @@ class RepresentanteLegal(models.Model):
     rg = models.CharField(verbose_name='RG', max_length=14, blank=True, null=True)
     cpf = models.CharField(verbose_name='CPF', max_length=11)
     telefone = models.CharField(max_length=11)
+    cargo = models.CharField(max_length=60, null=True, blank=True)
     endereco = models.OneToOneField(Endereco)
     farmacia = models.ForeignKey(Farmacia, related_name='representantes')
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
