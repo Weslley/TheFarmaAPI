@@ -19,6 +19,8 @@ urlpatterns = [
     url(r'^posts/$', PostList.as_view(), name='post-admin-list'),
     url(r'^posts/adicionar/$', PostCreate.as_view(), name='post-admin-add'),
     url(r'^posts/(?P<id>[0-9]+)/$', PostDetail.as_view(), name='post-admin-view'),
+    url(r'^posts/(?P<id>[0-9]+)/editar/$', PostUpdate.as_view(), name='post-admin-update'),
+    url(r'^posts/(?P<id>[0-9]+)/remover/$', PostDelete.as_view(), name='post-admin-delete'),
 
     # Instituição
     url(r'^parceiros/$', ParceiroList.as_view(), name='parceiro-admin-list'),

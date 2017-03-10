@@ -8,38 +8,27 @@
 
 {% block conteudo %}
 
-<style type="text/css">
-    .file_input {
-    background: linear-gradient(60deg, #12A298, #44BABB);
-    padding: 10px;
-    border-radius: 50%;
-    color: whitesmoke;
-    float: left;
-    margin-right: 10px;
-}
-</style>
-
     <div class="row">
         <form method="post" enctype="multipart/form-data">{% csrf_token %}
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header" data-background-color="purple">
-                        <h4 class="title">Adicionando Post</h4>
+                        <h4 class="title">Visualizando Post</h4>
                     </div>
                     <div class="card-content">
 
                         <div class="row">
                             <div class="col-md-10">
                                 <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.titulo.label }}</label>
-                                    {{ form.titulo|addclass:"form-control" }}
+                                    <label class="control-label">Titulo</label>
+                                    <input type="text" class="form-control" disabled value="{{ post.titulo }}">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="checkbox" style="margin-top: 24px;">
                                     <label>
-                                        {{ form.ativo }}
-                                        {{ form.ativo.label }}
+                                        <input type="checkbox" disabled {% if post.ativo %}checked{% endif %}>
+                                        Ativo
                                     </label>
                                 </div>
                             </div>
@@ -48,8 +37,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group label-floating">
-                                    <label>{{ form.conteudo.label }}</label>
-                                    {{ form.conteudo|addclass:"form-control" }}
+                                    <label>Conteúdo</label>
+                                    <textarea cols="40" rows="10" disabled class="form-control">{{ post.conteudo }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -58,29 +47,30 @@
                             {% if user.is_superuser %}
                                 <div class="col-md-3">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.tipo.label }}</label>
-                                        {{ form.tipo|addclass:"form-control" }}
+                                        <label class="control-label">Tipo</label>
+                                        <input type="text" class="form-control" disabled value="{% if post.tipo == 0 %}NOTÍCIA{% elif post.tipo == 1 %}PATROCINADO{% else %}AVISO{% endif %}">
                                     </div>
                                 </div>
                                 <div class="col-md-9">
                             {% else %}
                                 <div class="col-md-3 hidden">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.tipo.label }}</label>
-                                        {{ form.tipo|addclass:"form-control" }}
+                                        <label class="control-label">Tipo</label>
+                                        <input type="text" class="form-control" disabled value="{% if post.tipo == 0 %}NOTÍCIA{% elif post.tipo == 1 %}PATROCINADO{% else %}AVISO{% endif %}">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                             {% endif %}
                                 <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.url_referencia.label }}</label>
-                                    {{ form.url_referencia|addclass:"form-control" }}
+                                    <label class="control-label">URL de referência</label>
+                                    <input type="text" class="form-control" disabled value="{{ post.url_referencia }}">
                                 </div>
                             </div>
                         </div>
 
                         <a href="{% url 'post-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
-                        <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                        <a href="{% url 'post-admin-update' post.id %}" class="btn btn-primary pull-right">Editar</a>
+                        <a href="{% url 'post-admin-delete' post.id %}" class="btn btn-danger pull-right">Excluir</a>
                         <div class="clearfix"></div>
 
                     </div>
@@ -97,11 +87,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group label-floating">
-                                    <i class="material-icons file_input">file_upload</i>
-                                    <label style="margin-top: 12px;">{{ form.imagem.label }}</label>
-                                    {{ form.imagem }}
+                                    <label style="margin-top: 12px;">Imagem</label>
                                     <div class="clearfix"></div>
-                                    <img id="id_thumbnail_imagem" style="margin-top: 10px;" src="">
+                                    <img id="id_thumbnail_imagem" style="margin-top: 10px;" src="{% if post.imagem %}{{ post.imagem.url  }}{% endif %}">
                                 </div>
                             </div>
                         </div>
@@ -109,8 +97,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group label-floating">
-                                    <label>URL {{ form.video.label }}</label>
-                                    {{ form.video|addclass:"form-control" }}
+                                    <label>URL do video</label>
+                                    <input id="id_video" type="text" class="form-control" disabled value="{{ post.video }}">
                                     <img id="id_thumbnail_youtube" class="hidden" src="">
                                 </div>
                             </div>
@@ -132,7 +120,7 @@
 
 
     function load_youtube_thumbnail(){
-        var url = $(this).val();
+        var url = $('#id_video').val();
         if (url != null && url != ''){
             try{
                 var code = url.replace('https://www.youtube.com/watch?v=', '');
@@ -151,39 +139,13 @@
     }
 
     (function () {
-        $("#id_tipo option[value=1]").remove()
         $('.active').removeClass('active');
         $('#menu_post').addClass('active');
-        $('#id_video').on('blur', load_youtube_thumbnail);
-
-        document.getElementById('id_imagem').onchange = function (evt) {
-            var tgt = evt.target || window.event.srcElement,
-                files = tgt.files;
-
-            // FileReader support
-            if (FileReader && files && files.length) {
-                var fr = new FileReader();
-                fr.onload = function () {
-                    document.getElementById('id_thumbnail_imagem').src = fr.result;
-                }
-                fr.readAsDataURL(files[0]);
-            }
-
-            // Not supported
-            else {
-                // fallback -- perhaps submit the input to an iframe and temporarily store
-                // them on the server until the user's session ends.
-            }
-        }
 
     })();
 
+    $(window).on('load', load_youtube_thumbnail);
 
-    $(window).on('load', function (event) {
-       $('#id_video').blur();
-       var t = $('#id_imagem').parent().children('a');
-       $('#id_thumbnail_imagem').attr('src', 'http://' + pegaDominio() + $(t).attr('href'));
-    });
     </script>
 {% endblock js %}
 

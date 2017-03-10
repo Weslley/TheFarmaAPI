@@ -18,7 +18,7 @@ from api.serializers.post import PostExportSerializer
 # from api.serializers.principio_ativo import PrincipioAtivoSerializer
 
 
-def update_model(model_name, data):
+def update_model(model_name, data, remove=False):
     try:
         firebase = pyrebase.initialize_app(settings.PYREBASE_CONFIG)
         auth = firebase.auth()
@@ -26,54 +26,31 @@ def update_model(model_name, data):
         db = firebase.database()
         table = '{}s'.format(model_name)
         # row = {data['id']: data}
-        db.child(table).child(str(data['id'])).set(data)
+        if remove:
+            db.child(table).child(str(data['id'])).remove()
+        else:
+            db.child(table).child(str(data['id'])).set(data)
     except Exception as err:
         print(err)
-
-#
-# @receiver(post_save, sender=Produto)
-# def teste_signal(sender, **kwargs):
-#     serializer = MedicamentoSerializer(kwargs['instance'])
-#     data = serializer.data
-#     update_model(sender.__name__.lower(), data)
-#
-#
-# @receiver(post_save, sender=Produto)
-# def medicamento_update_signal(sender, **kwargs):
-#     serializer = MedicamentoSerializer(kwargs['instance'])
-#     data = serializer.data
-#     update_model(sender.__name__.lower(), data)
-#
-#
-# @receiver(post_save, sender=Farmacia)
-# def farmacia_update_signal(sender, **kwargs):sett
-#     serializer = FarmaciaSerializer(kwargs['instance'])
-#     data = serializer.data
-#     update_model(sender.__name__.lower(), data)
-#
-#
-# @receiver(post_save, sender=Cidade)
-# def cidade_update_signal(sender, **kwargs):
-#     serializer = CidadeSerializer(kwargs['instance'])
-#     data = serializer.data
-#     update_model(sender.__name__.lower(), data)
-#
-#
-# @receiver(post_save, sender=PrincipioAtivo)
-# def principio_ativo_update_signal(sender, **kwargs):
-#     serializer = PrincipioAtivoSerializer(kwargs['instance'])
-#     data = serializer.data
-#     update_model(sender.__name__.lower(), data)
-#
-#
 
 
 @receiver(post_save, sender=Post)
 def post_update_signal(sender, **kwargs):
-    serializer = PostExportSerializer(kwargs['instance'])
+    post = kwargs['instance']
+    serializer = PostExportSerializer(post)
     data = serializer.data
-    data['usuario']['foto'] = ''
-    update_model(sender.__name__.lower(), data)
+    if post.ativo:
+        update_model(sender.__name__.lower(), data)
+    else:
+        update_model(sender.__name__.lower(), data, True)
+
+
+@receiver(post_delete, sender=Post)
+def post_update_signal(sender, **kwargs):
+    post = kwargs['instance']
+    serializer = PostExportSerializer(post)
+    data = serializer.data
+    update_model(sender.__name__.lower(), data, True)
 
 
 @receiver(post_save, sender=Curtida)

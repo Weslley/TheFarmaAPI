@@ -160,7 +160,7 @@ class PostAdmin(admin.ModelAdmin):
             'fields': (
                 'titulo',
                 'conteudo',
-                'tipo',
+                ('tipo', 'ativo'),
                 ('imagem', 'video'),
                 'url_referencia'
             )
