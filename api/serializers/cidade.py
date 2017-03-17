@@ -19,3 +19,4 @@ class CidadeBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cidade
         fields = ('ibge', 'nome', 'uf')
+

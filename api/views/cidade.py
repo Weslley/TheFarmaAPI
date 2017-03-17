@@ -10,3 +10,4 @@ class CidadeList(generics.ListAPIView):
     queryset = Cidade.objects.all()
     serializer_class = CidadeSerializer
     pagination_class = SmallResultsSetPagination
+

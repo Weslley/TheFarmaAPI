@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from api.models.produto import Produto
-from api.serializers.apresentacao import ApresentacaoListSerializer
+from api.serializers.apresentacao import ApresentacaoListSerializer, ApresentacaoBusca
 
 
 class MedicamentoSerializer(serializers.ModelSerializer):
@@ -31,3 +31,12 @@ class MedicamentoExportSerializer(serializers.ModelSerializer):
 
     def get_data_atualizacao(self, obj):
         return int(obj.data_atualizacao.timestamp() * 1000)
+
+
+class ProdutoSerializer(serializers.ModelSerializer):
+    apresentacoes = ApresentacaoBusca(many=True)
+    fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
+
+    class Meta:
+        model = Produto
+        fields = ('id', 'nome', 'fabricante', 'apresentacoes')

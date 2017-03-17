@@ -12,6 +12,16 @@ class MedicamentoFilter(django_filters.rest_framework.FilterSet):
         fields = ['nome', ]
 
 
+class ProdutoFilter(django_filters.rest_framework.FilterSet):
+    nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
+    secao = django_filters.CharFilter(name="secao", lookup_expr='nome__istartswith')
+    subsecao = django_filters.CharFilter(name="subsecao", lookup_expr='nome__istartswith')
+
+    class Meta:
+        model = Produto
+        fields = ['nome', 'secao', 'subsecao']
+
+
 class OrderingFilter(BaseFilterBackend):
     """
     Filter that only allows users to see their own objects.

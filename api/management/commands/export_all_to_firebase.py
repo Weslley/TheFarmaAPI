@@ -14,7 +14,7 @@ from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
 from api.serializers.apresentacao import ApresentacaoExportSerializer
 from api.serializers.laboratorio import LaboratorioSerializer
-from api.serializers.medicamento import *
+from api.serializers.produto import *
 from api.serializers.principio_ativo import PrincipioAtivoSerializer
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 
