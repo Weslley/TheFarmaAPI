@@ -20,3 +20,14 @@ class CidadeBasicSerializer(serializers.ModelSerializer):
         model = Cidade
         fields = ('ibge', 'nome', 'uf')
 
+
+class CoberturaCidadeSerializer(serializers.ModelSerializer):
+    uf = serializers.CharField(source='uf.sigla')
+    coberta_pelo_thefarma = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cidade
+        fields = ('ibge', 'nome', 'uf', 'coberta_pelo_thefarma')
+
+    def get_coberta_pelo_thefarma(self, obj):
+        return True
