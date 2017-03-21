@@ -34,9 +34,16 @@ class MedicamentoExportSerializer(serializers.ModelSerializer):
 
 
 class ProdutoSerializer(serializers.ModelSerializer):
-    apresentacoes = ApresentacaoBusca(many=True)
+    apresentacoes = serializers.SerializerMethodField()
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
 
     class Meta:
         model = Produto
         fields = ('id', 'nome', 'fabricante', 'apresentacoes')
+
+    def get_apresentacoes(self, obj):
+        qs = obj.apresentacoes.filter(ativo=True)
+        serializer = ApresentacaoBusca(instance=qs, many=True, context=self.context)
+        return serializer.data
+
+

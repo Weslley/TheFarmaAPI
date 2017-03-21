@@ -23,7 +23,8 @@ class HomeApiView(APIView):
         """
         context = {}
         for url in self.urls_names:
-            context[url[:-5]] = reverse(url, request=request, format=format)
+            if url != 'produto-list':
+                context[url[:-5]] = reverse(url, request=request, format=format)
         return Response(context)
 
     def show_urls(self):
