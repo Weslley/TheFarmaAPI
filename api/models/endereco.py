@@ -8,7 +8,7 @@ class Endereco(models.Model):
     logradouro = models.CharField(max_length=80)
     numero = models.IntegerField(null=True, blank=True)
     complemento = models.CharField(max_length=100, null=True, blank=True)
-    cidade = models.ForeignKey(Cidade)
+    cidade = models.ForeignKey(Cidade, related_name='enderecos')
     bairro = models.ForeignKey(Bairro)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     """

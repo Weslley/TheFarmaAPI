@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from api.models.cidade import Cidade
+from api.models.farmacia import Farmacia
 from api.serializers.uf import UfSerializer
 
 
@@ -30,4 +31,4 @@ class CoberturaCidadeSerializer(serializers.ModelSerializer):
         fields = ('ibge', 'nome', 'uf', 'coberta_pelo_thefarma')
 
     def get_coberta_pelo_thefarma(self, obj):
-        return True
+        return True if Farmacia.objects.filter(endereco__cidade=obj).count() > 0 else False
