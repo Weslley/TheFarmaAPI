@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.mixins.base import CustomJSONAPIView, LogoutMixin, IsAuthenticatedMixin
-from api.models.perfil import Perfil
+from api.models.cliente import Cliente
 from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer
 
 
@@ -119,7 +119,7 @@ class TesteLogin(generics.CreateAPIView):
             )
             usuario.set_password(data['facebook_id'])
             usuario.save()
-            perfil = Perfil()
+            perfil = Cliente()
             perfil.facebook_id = data['facebook_id']
             perfil.sexo = data['sexo'] if 'sexo' in data else ''
             perfil.usuario = usuario

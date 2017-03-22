@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from api.models.atualizacao import Atualizacao
 from api.models.curtida import Curtida
-from api.models.perfil import Perfil
+from api.models.cliente import Cliente
 from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
 from api.models.tabela_preco import TabelaPreco
@@ -184,7 +184,7 @@ admin.site.register(RepresentanteLegal)
 admin.site.register(Apresentacao)
 admin.site.register(TabelaPreco)
 admin.site.register(Post, PostAdmin)
-admin.site.register(Perfil)
+admin.site.register(Cliente)
 admin.site.register(Curtida)
 admin.site.register(Atualizacao)
 admin.site.register(Parceiro)
