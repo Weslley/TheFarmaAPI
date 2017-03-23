@@ -7,6 +7,8 @@ from api.models.curtida import Curtida
 from api.models.cliente import Cliente
 from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
+from api.models.secao import Secao
+from api.models.subsecao import Subsecao
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
 from api.models.apresentacao import Apresentacao, ImagemApresentacao, Unidade
@@ -191,3 +193,5 @@ admin.site.register(Parceiro)
 admin.site.register(UsuarioParceiro)
 admin.site.register(ImagemApresentacao)
 admin.site.register(Unidade)
+admin.site.register(Secao)
+admin.site.register(Subsecao)
