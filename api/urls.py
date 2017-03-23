@@ -13,7 +13,7 @@ from api.views.post import *
 from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
-from api.views.secao import SecaoList
+from api.views.secao import *
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
@@ -88,6 +88,7 @@ urlpatterns = [
 
     # Seções
     url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),
+    url(r'^secoes/(?P<id>[0-9]+)/$', SecaoDetail.as_view(), name='secao-view'),
 
 
 ]
