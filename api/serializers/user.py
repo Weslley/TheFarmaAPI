@@ -8,9 +8,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_foto_url(self, obj):
         base = ''
-        if hasattr(obj, 'perfil'):
-            if obj.perfil.foto:
-                return 'http://thefarmaapi.herokuapp.com{}'.format(obj.perfil.foto.url)
+        if hasattr(obj, 'cliente'):
+            if obj.cliente.foto:
+                return 'http://thefarmaapi.herokuapp.com{}'.format(obj.cliente.foto.url)
         return ''
 
     class Meta:
@@ -59,3 +59,13 @@ class LoginFacebookSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('nome', 'sobrenome', 'facebook_id', 'data_nascimento', 'email', 'foto', 'sexo')
+
+
+class DefaultUserSerializer(serializers.ModelSerializer):
+    nome = serializers.CharField(source='first_name')
+    sobrenome = serializers.CharField(source='last_name', required=False)
+    email = serializers.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('nome', 'sobrenome', 'email')

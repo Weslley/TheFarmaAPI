@@ -35,7 +35,7 @@ class Login(APIView, CustomJSONAPIView):
 
             data = {
                 'id': usuario.id,
-                'foto': 'http://thefarmaapi.herokuapp.com' + usuario.perfil.foto.url if hasattr(usuario, 'perfil') and usuario.perfil.foto else '',
+                'foto': 'http://thefarmaapi.herokuapp.com' + usuario.cliente.foto.url if hasattr(usuario, 'cliente') and usuario.cliente.foto else '',
                 'nome': usuario.first_name,
                 'sobrenome': usuario.last_name,
                 'email': usuario.email,
@@ -54,7 +54,7 @@ class LoginFacebook(APIView, CustomJSONAPIView):
 
         # Autenticando o usuario
         try:
-            usuario = User.objects.get(perfil__facebook_id=data['facebook_id'])
+            usuario = User.objects.get(cliente__facebook_id=data['facebook_id'])
         except User.DoesNotExist:
             usuario = None
         except:
@@ -71,7 +71,7 @@ class LoginFacebook(APIView, CustomJSONAPIView):
 
             data = {
                 'id': usuario.id,
-                'foto': 'http://thefarmaapi.herokuapp.com' + usuario.perfil.foto.url if hasattr(usuario, 'perfil') and usuario.perfil.foto else '',
+                'foto': 'http://thefarmaapi.herokuapp.com' + usuario.cliente.foto.url if hasattr(usuario, 'cliente') and usuario.cliente.foto else '',
                 'nome': usuario.first_name,
                 'sobrenome': usuario.last_name,
                 'email': usuario.email,
@@ -99,7 +99,7 @@ class TesteLogin(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.data
         try:
-            usuario = User.objects.get(perfil__facebook_id=data['facebook_id'])
+            usuario = User.objects.get(cliente__facebook_id=data['facebook_id'])
             serializer = self.get_serializer(usuario)
             data = dict(serializer.data)
             token, create = Token.objects.get_or_create(user=usuario)
@@ -119,11 +119,11 @@ class TesteLogin(generics.CreateAPIView):
             )
             usuario.set_password(data['facebook_id'])
             usuario.save()
-            perfil = Cliente()
-            perfil.facebook_id = data['facebook_id']
-            perfil.sexo = data['sexo'] if 'sexo' in data else ''
-            perfil.usuario = usuario
-            perfil.save()
+            cliente = Cliente()
+            cliente.facebook_id = data['facebook_id']
+            cliente.sexo = data['sexo'] if 'sexo' in data else ''
+            cliente.usuario = usuario
+            cliente.save()
             serializer = self.get_serializer(usuario)
             data = dict(serializer.data)
             token, create = Token.objects.get_or_create(user=usuario)

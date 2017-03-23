@@ -4,6 +4,7 @@ from django.conf.urls import url
 
 from api.views.atualizacao import UltimaAtualizacao
 from api.views.bairro import BairroList
+from api.views.cliente import ClienteCreate
 from api.views.produto import *
 from api.views.laboratorio import *
 from api.views.cidade import *
@@ -12,6 +13,7 @@ from api.views.post import *
 from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
+from api.views.secao import SecaoList
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
@@ -80,5 +82,12 @@ urlpatterns = [
 
     # Estoque
     url(r'^estoques/adicionar/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
+
+    # Clientes
+    url(r'^clientes/$', ClienteCreate.as_view(), name='estoque-create'),
+
+    # Seções
+    url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),
+
 
 ]
