@@ -15,7 +15,7 @@ from api.views.root import HomeApiView
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
-from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia
+from api.views.cliente import Logout, LoginFacebook, TesteLogin, LoginFarmacia
 
 urlpatterns = [
     # Raiz
