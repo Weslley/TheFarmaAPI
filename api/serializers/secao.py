@@ -6,4 +6,4 @@ from api.models.secao import Secao
 class SecaoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Secao
-        fields = ('nome', 'imagem')
+        fields = ('id', 'nome', 'imagem')

@@ -65,7 +65,16 @@ class DefaultUserSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='first_name')
     sobrenome = serializers.CharField(source='last_name', required=False)
     email = serializers.EmailField(required=True)
+    senha = serializers.CharField(max_length=30, style={'input_type': 'password'})
+    confirmacao_senha = serializers.CharField(max_length=30, style={'input_type': 'password'})
 
     class Meta:
         model = User
         fields = ('nome', 'sobrenome', 'email')
+
+    def restore_object(self, attrs, instance=None):
+        # call set_password on user object. Without this
+        # the password will be stored in plain text.
+        user = super(DefaultUserSerializer, self).restore_object(attrs, instance)
+        user.set_password(attrs['senha'])
+        return user
