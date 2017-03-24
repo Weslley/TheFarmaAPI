@@ -24,3 +24,9 @@ class CidadeList(generics.ListAPIView):
             return CoberturaCidadeSerializer
         else:
             return CidadeSerializer
+
+
+class CidadeDetail(generics.RetrieveAPIView):
+    lookup_url_kwarg = 'ibge'
+    queryset = Cidade.objects.all()
+    serializer_class = CidadeSerializer

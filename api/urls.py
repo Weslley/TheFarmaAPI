@@ -35,6 +35,7 @@ urlpatterns = [
 
     # Cidades
     url(r'^cidades/$', CidadeList.as_view(), name='cidade-list'),
+    url(r'^cidades/(?P<ibge>[0-9]+)/$', CidadeDetail.as_view(), name='cidade-view'),
 
     # Bairros
     url(r'^bairros/$', BairroList.as_view(), name='bairro-list'),
