@@ -61,20 +61,39 @@ class LoginFacebookSerializer(serializers.ModelSerializer):
         fields = ('nome', 'sobrenome', 'facebook_id', 'data_nascimento', 'email', 'foto', 'sexo')
 
 
-class DefaultUserSerializer(serializers.ModelSerializer):
-    nome = serializers.CharField(source='first_name')
-    sobrenome = serializers.CharField(source='last_name', required=False)
-    email = serializers.EmailField(required=True)
+class DefaultUserSerializer(serializers.Serializer):
+    nome = serializers.CharField()
+    sobrenome = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField()
     senha = serializers.CharField(max_length=30, style={'input_type': 'password'})
     confirmacao_senha = serializers.CharField(max_length=30, style={'input_type': 'password'})
 
-    class Meta:
-        model = User
-        fields = ('nome', 'sobrenome', 'email')
+    def validate_senha(self, value):
+        confirmacao = self.initial_data['confirmacao_senha']
+        confirmacao = confirmacao.strip()
 
-    def restore_object(self, attrs, instance=None):
-        # call set_password on user object. Without this
-        # the password will be stored in plain text.
-        user = super(DefaultUserSerializer, self).restore_object(attrs, instance)
-        user.set_password(attrs['senha'])
-        return user
+        if value != confirmacao:
+            raise serializers.ValidationError("As senhas não conferem !")
+
+        return value
+
+    def create(self, validated_data):
+        # return Comment.objects.create(**validated_data)
+        nome = validated_data['nome']
+        sobrenome = validated_data['sobrenome'] if 'sobrenome' in validated_data else ''
+        email = validated_data['email']
+        senha = validated_data['senha']
+        username = nome[:6].ljust(10, 'a') + email[:40].ljust(60, '2')
+        usuario = User.objects.create_user(username, email, senha)
+        usuario.first_name = nome
+        usuario.last_name = sobrenome
+        usuario.save()
+
+        return usuario
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('nome', instance.content)
+        instance.last_name = validated_data.get('sobrenome', instance.created)
+        instance.save()
+        return instance

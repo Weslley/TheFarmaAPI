@@ -17,10 +17,7 @@ class ClienteCreate(generics.CreateAPIView):
         with transaction.atomic():
             user_serializer = DefaultUserSerializer(data=data)
             user_serializer.is_valid(raise_exception=True)
-            usuario = user_serializer.save()
-
-            raise Exception('Testando...')
-
+            self.usuario = user_serializer.save()
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
