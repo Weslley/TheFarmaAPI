@@ -4,7 +4,7 @@ from api.models.bairro import Bairro
 
 
 class Endereco(models.Model):
-    cep = models.CharField(max_length=8, null=True, blank=True)
+    cep = models.CharField(max_length=8)
     logradouro = models.CharField(max_length=80)
     numero = models.IntegerField(null=True, blank=True)
     complemento = models.CharField(max_length=100, null=True, blank=True)

@@ -38,7 +38,7 @@ urlpatterns = [
     url(r'^cidades/(?P<ibge>[0-9]+)/$', CidadeDetail.as_view(), name='cidade-view'),
 
     # Bairros
-    url(r'^bairros/$', BairroList.as_view(), name='bairro-list'),
+    url(r'^bairros/(?P<ibge>[0-9]+)/$', BairroList.as_view(), name='bairro-list'),
 
     # Medicamentos
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-list'),
@@ -82,11 +82,13 @@ urlpatterns = [
     url(r'^posts/likes/$', PostsCurtidosView.as_view(), name='like-list'),
 
     # Estoque
-    url(r'^estoques/adicionar/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
+    url(r'^estoques/add/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
 
     # Clientes
     url(r'^clientes/$', ClienteCreate.as_view(), name='cliente-create'),
-    url(r'^clientes/$', ClienteDetail.as_view(), name='cliente-view'),
+    url(r'^clientes/enderecos/$', EnderecoCreate.as_view(), name='cliente-endereco-list'),
+    url(r'^clientes/enderecos/(?P<id>[0-9]+)/update$', EnderecoCreate.as_view(), name='cliente-endereco-update'),
+    url(r'^clientes/enderecos/(?P<id>[0-9]+)/delete', EnderecoCreate.as_view(), name='cliente-endereco-delete'),
 
     # Seções
     url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),

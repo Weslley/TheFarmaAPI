@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from api.models.cliente import Cliente
+from api.models.endereco import Endereco
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.user import CreateUserSerializer
 from api import permissions
@@ -14,7 +15,6 @@ class ClienteCreate(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
     permission_classes = (permissions.IsAuthenticatedInGetPut, )
-    usuario = None
 
     def login(self, usuario):
         print('Fez login')
@@ -72,7 +72,34 @@ class ClienteCreate(generics.CreateAPIView):
         return obj
 
 
-class ClienteDetail(generics.RetrieveUpdateAPIView):
-    lookup_url_kwarg = 'id'
-    serializer_class = ClienteSerializer
-    queryset = Cliente.objects.all()
+class EnderecoCreate(generics.CreateAPIView):
+    queryset = Endereco
+    serializer_class = ''
+
+
+class EnderecoRetreive():
+    pass
+
+
+class EnderecoUpdate():
+    pass
+
+
+class EnderecoDelete():
+    pass
+
+
+class CartaoCreate():
+    pass
+
+
+class CartaoRetreive():
+    pass
+
+
+class CartaoUpdate():
+    pass
+
+
+class CartaoDelete():
+    pass

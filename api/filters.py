@@ -1,6 +1,7 @@
 import django_filters
 from rest_framework.filters import BaseFilterBackend
 
+from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.produto import Produto
 
@@ -46,4 +47,12 @@ class CidadeFilter(django_filters.rest_framework.FilterSet):
 
     class Meta:
         model = Cidade
+        fields = ['nome', ]
+
+
+class BairroFilter(django_filters.rest_framework.FilterSet):
+    nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
+
+    class Meta:
+        model = Bairro
         fields = ['nome', ]
