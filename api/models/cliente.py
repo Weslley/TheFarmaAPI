@@ -13,5 +13,5 @@ class Cliente(models.Model):
     facebook_id = models.CharField(max_length=255, null=True, blank=True, unique=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     data_nascimento = models.DateField(blank=True, null=True)
-    cpf = models.CharField(max_length=11, blank=False)
-    telefone = models.CharField(max_length=11, blank=False)
+    cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
+    telefone = models.CharField(max_length=11, null=True, blank=False, unique=True)

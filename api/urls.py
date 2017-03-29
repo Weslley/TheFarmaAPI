@@ -4,7 +4,7 @@ from django.conf.urls import url
 
 from api.views.atualizacao import UltimaAtualizacao
 from api.views.bairro import BairroList
-from api.views.cliente import ClienteCreate
+from api.views.cliente import *
 from api.views.produto import *
 from api.views.laboratorio import *
 from api.views.cidade import *
@@ -85,7 +85,8 @@ urlpatterns = [
     url(r'^estoques/adicionar/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
 
     # Clientes
-    url(r'^clientes/$', ClienteCreate.as_view(), name='estoque-create'),
+    url(r'^clientes/$', ClienteCreate.as_view(), name='cliente-create'),
+    url(r'^clientes/$', ClienteDetail.as_view(), name='cliente-view'),
 
     # Seções
     url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),

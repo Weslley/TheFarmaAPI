@@ -1,32 +1,54 @@
 from rest_framework import serializers
+from rest_framework.compat import set_many
+from rest_framework.serializers import raise_errors_on_nested_writes
+from rest_framework.utils import model_meta
+
 from api.models.cliente import Cliente
+from api.serializers.user import DetailUserSerializer
 
 
-class ClienteCreateSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    nome = serializers.CharField(source='usuario.first_name', max_length=30, read_only=True)
-    sobrenome = serializers.CharField(source='usuario.last_name', max_length=30, read_only=True)
-    email = serializers.EmailField(source='usuario.email', read_only=True)
-    senha = serializers.CharField(max_length=30, style={'input_type': 'password'}, read_only=True)
-    confirmacao_senha = serializers.CharField(max_length=30, style={'input_type': 'password'}, read_only=True)
+class ClienteSerializer(serializers.ModelSerializer):
+    usuario = DetailUserSerializer()
 
     class Meta:
         model = Cliente
         fields = (
             'id',
-            'nome',
-            'sobrenome',
-            'email',
             'data_nascimento',
             'sexo',
             'foto',
             'cpf',
             'telefone',
-            'senha',
-            'confirmacao_senha'
+            'facebook_id',
+            'usuario'
         )
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }
 
-    def create(self, validated_data):
-        validated_data['usuario'] = self.context['view'].usuario
-        instance = super(ClienteCreateSerializer, self).create(validated_data)
+    def update(self, instance, validated_data):
+        # Salvando o usuario
+        if 'usuario' in validated_data:
+            usuario = instance.usuario
+            user_info = model_meta.get_field_info(usuario)
+            user_validated_data = dict(validated_data['usuario'])
+
+            for attr, value in user_validated_data.items():
+                if attr in user_info.relations and user_info.relations[attr].to_many:
+                    set_many(usuario, attr, value)
+                else:
+                    setattr(usuario, attr, value)
+            usuario.save()
+
+        # Salvando o cliente
+        info = model_meta.get_field_info(instance)
+
+        for attr, value in validated_data.items():
+            if attr != 'usuario':
+                if attr in info.relations and info.relations[attr].to_many:
+                    set_many(instance, attr, value)
+                else:
+                    setattr(instance, attr, value)
+        instance.save()
+
         return instance
