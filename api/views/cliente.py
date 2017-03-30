@@ -8,8 +8,10 @@ from rest_framework.response import Response
 from api.models.cliente import Cliente
 from api.models.endereco import Endereco
 from api.serializers.cliente import ClienteSerializer
+from api.serializers.endereco import EnderecoSerializer
 from api.serializers.user import CreateUserSerializer
 from api import permissions
+from rest_framework.permissions import IsAuthenticated
 
 
 class ClienteCreate(generics.CreateAPIView):
@@ -76,13 +78,15 @@ class ClienteCreate(generics.CreateAPIView):
         return obj
 
 
-class EnderecoCreate(generics.CreateAPIView):
-    queryset = Endereco
-    serializer_class = ''
+class EnderecoCreate(generics.ListCreateAPIView):
+    serializer_class = EnderecoSerializer
+    permission_classes = (IsAuthenticated, )
 
-
-class EnderecoRetreive():
-    pass
+    def get_queryset(self):
+        queryset = Endereco.objects.filter(
+            clienteendereco___cliente__usuario=self.request.user
+        )
+        return queryset
 
 
 class EnderecoUpdate():

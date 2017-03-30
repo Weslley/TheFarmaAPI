@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from api.models.atualizacao import Atualizacao
 from api.models.curtida import Curtida
-from api.models.cliente import Cliente
+from api.models.cliente import Cliente, ClienteEndereco
 from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
 from api.models.secao import Secao
@@ -195,3 +195,4 @@ admin.site.register(ImagemApresentacao)
 admin.site.register(Unidade)
 admin.site.register(Secao)
 admin.site.register(Subsecao)
+admin.site.register(ClienteEndereco)

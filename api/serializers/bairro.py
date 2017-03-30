@@ -10,3 +10,9 @@ class BairroListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bairro
         fields = '__all__'
+
+
+class BairroSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bairro
+        fields = ('id', 'nome')

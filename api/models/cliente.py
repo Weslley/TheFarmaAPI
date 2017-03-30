@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+
+from api.models.endereco import Endereco
 from api.utils import sexo
 
 
@@ -16,3 +18,11 @@ class Cliente(models.Model):
     cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
     telefone = models.CharField(max_length=11, null=True, blank=False, unique=True)
     email_confirmado = models.BooleanField(default=False)
+
+
+class ClienteEndereco(models.Model):
+    _cliente = models.ForeignKey(Cliente, related_name='enderecos')
+    endereco = models.OneToOneField(Endereco)
+
+    class Meta:
+        unique_together = ('_cliente', 'endereco')
