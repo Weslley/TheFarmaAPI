@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+from api.models.cliente import Cliente
+
 
 class UserSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='get_full_name')
@@ -62,9 +64,11 @@ class LoginFacebookSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
+    telefone = serializers.CharField(max_length=11, required=False, allow_blank=False, allow_null=True)
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ('email', 'password', 'telefone')
         extra_kwargs = {
             'password': {'required': True, 'write_only': True},
             'email': {'required': True, 'allow_blank': False},
@@ -75,10 +79,21 @@ class CreateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Um usuário com este email já existe.')
         return value
 
+    def validate_telefone(self, value):
+        if value and Cliente.objects.filter(telefone=value.strip()).count():
+            raise serializers.ValidationError('Um usuário com este telefone já existe.')
+        return value
+
     def create(self, validated_data):
+        username = validated_data['telefone'] if 'telefone' in validated_data else None
+        email = validated_data['email']
+
+        if not username:
+            username = email[:150]
+
         user = User(
-            email=validated_data['email'],
-            username=validated_data['username']
+            email=email,
+            username=username
         )
         user.set_password(validated_data['password'])
         user.save()

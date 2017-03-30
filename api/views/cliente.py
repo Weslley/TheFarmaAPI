@@ -28,7 +28,10 @@ class ClienteCreate(generics.CreateAPIView):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             user = serializer.instance
-            cliente = Cliente.objects.create(usuario=user)
+            cliente = Cliente.objects.create(
+                usuario=user,
+                telefone=serializer.validated_data['telefone'] if 'telefone' in serializer.validated_data else None
+            )
             cliente_serializer = ClienteSerializer(instance=cliente)
             headers = self.get_success_headers(serializer.data)
             self.login(user)
