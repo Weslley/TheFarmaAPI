@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -22,16 +23,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=60, write_only=True)
-    email = serializers.CharField(max_length=254)
+    email_telefone = serializers.CharField(max_length=254)
 
     def create(self, validated_data):
-        data = {'email': '', 'password': ''}
+        data = {'email_telefone': '', 'password': ''}
         for key in validated_data:
             data[key] = validated_data[key]
         return data
 
     def update(self, instance, validated_data):
-        instance['email'] = validated_data.get('email', instance['emai'])
+        instance['email_telefone'] = validated_data.get('email_telefone', instance['email_telefone'])
         instance['password'] = validated_data.get('password', instance['password'])
         return instance
 
@@ -95,6 +96,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             email=email,
             username=username
         )
+        user.last_login = datetime.now()
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -103,10 +105,11 @@ class CreateUserSerializer(serializers.ModelSerializer):
 class DetailUserSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='first_name')
     sobrenome = serializers.CharField(source='last_name')
+    token = serializers.CharField(read_only=True, source='auth_token.key')
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'nome', 'sobrenome', 'email')
+        fields = ('id', 'nome', 'sobrenome', 'email', 'token')
         extra_kwargs = {
             'id': {'read_only': True},
             'username': {'read_only': True},

@@ -17,7 +17,7 @@ from api.views.secao import *
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
-from api.views.autenticacao import Logout, LoginFacebook, TesteLogin, LoginFarmacia
+from api.views.autenticacao import Logout, LoginFacebook, TesteLogin, LoginFarmacia, Login
 
 urlpatterns = [
     # Raiz
@@ -27,6 +27,7 @@ urlpatterns = [
     # Login token
     url(r'^login/$', TesteLogin.as_view(), name='login'),
     url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
+    url(r'^login/cliente/$', Login.as_view(), name='login'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
     url(r'^login_farmacia/$', LoginFarmacia.as_view(), name='login-farmacia'),
 

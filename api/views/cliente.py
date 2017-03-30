@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import generics
@@ -16,8 +17,8 @@ class ClienteCreate(generics.CreateAPIView):
     serializer_class = CreateUserSerializer
     permission_classes = (permissions.IsAuthenticatedInGetPut, )
 
-    def login(self, usuario):
-        print('Fez login')
+    def login(self, usuario, password):
+        authenticate(username=usuario.email, password=password)
 
     def send_email_confirmation(self, usuario):
         print('Enviou email de confirmação')
@@ -34,7 +35,7 @@ class ClienteCreate(generics.CreateAPIView):
             )
             cliente_serializer = ClienteSerializer(instance=cliente)
             headers = self.get_success_headers(serializer.data)
-            self.login(user)
+            self.login(user, serializer.validated_data['password'])
             self.send_email_confirmation(user)
             return Response(cliente_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -62,7 +63,7 @@ class ClienteCreate(generics.CreateAPIView):
         return self.update(request, *args, **kwargs)
 
     def perform_update(self, serializer):
-        serializer.save()
+        instance = serializer.save()
 
     def get_object(self):
         queryset = Cliente.objects.all()

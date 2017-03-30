@@ -15,3 +15,4 @@ class Cliente(models.Model):
     data_nascimento = models.DateField(blank=True, null=True)
     cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
     telefone = models.CharField(max_length=11, null=True, blank=False, unique=True)
+    email_confirmado = models.BooleanField(default=False)

@@ -49,6 +49,10 @@ class ClienteSerializer(serializers.ModelSerializer):
                     set_many(instance, attr, value)
                 else:
                     setattr(instance, attr, value)
+                if attr == 'telefone' and value:
+                    instance.usuario.username = value
+
         instance.save()
+        instance.usuario.save()
 
         return instance

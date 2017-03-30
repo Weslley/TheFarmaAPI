@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.mixins.base import CustomJSONAPIView, LogoutMixin, IsAuthenticatedMixin
 from api.models.cliente import Cliente
+from api.serializers.cliente import ClienteSerializer
 from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer
 
 
@@ -22,28 +24,15 @@ class Login(APIView, CustomJSONAPIView):
         data = self.get_data(request)
 
         # Autenticando o usuario
-        usuario = authenticate(username=data['email'], password=data['password'])
+        usuario = authenticate(username=data['email_telefone'], password=data['password'])
 
         # Se o mesmo existir, gero o token
         if usuario:
-            token, create = Token.objects.get_or_create(user=usuario)
+            if hasattr(usuario, 'cliente') and usuario.cliente:
+                cliente_serializer = ClienteSerializer(instance=usuario.cliente)
+                return Response(cliente_serializer.data, status=status.HTTP_200_OK)
 
-            # caso esteja fazendo a requisição do login novamente, reseta o token
-            if not create:
-                token.delete()
-                token = Token.objects.create(user=usuario)
-
-            data = {
-                'id': usuario.id,
-                'foto': 'http://thefarmaapi.herokuapp.com' + usuario.cliente.foto.url if hasattr(usuario, 'cliente') and usuario.cliente.foto else '',
-                'nome': usuario.first_name,
-                'sobrenome': usuario.last_name,
-                'email': usuario.email,
-                'token': token.key
-            }
-            return Response(data, status=status.HTTP_200_OK)
-
-        return Response({'detail': 'Email ou senha incorretos'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'detail': 'Email/Telefone ou senha incorretos'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class LoginFacebook(APIView, CustomJSONAPIView):
@@ -164,3 +153,4 @@ class LoginFarmacia(APIView, CustomJSONAPIView):
             return Response(data, status=status.HTTP_200_OK)
 
         return Response({'detail': 'Email ou senha incorretos'}, status=status.HTTP_404_NOT_FOUND)
+

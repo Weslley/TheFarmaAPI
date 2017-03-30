@@ -147,6 +147,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTHENTICATION_BACKENDS = (
     # 'django.contrib.auth.backends.ModelBackend',
     'thefarmaapi.backends.EmailModelBackend',
+    'thefarmaapi.backends.EmailTelefoneModelBackend',
 )
 
 REST_FRAMEWORK = {
