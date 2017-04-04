@@ -5,8 +5,9 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from api.models.cliente import Cliente
+from api.models.cliente import Cliente, ClienteEndereco
 from api.models.endereco import Endereco
+from api.permissions import IsOwnerClienteEndereco
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.endereco import EnderecoSerializer
 from api.serializers.user import CreateUserSerializer
@@ -88,13 +89,40 @@ class EnderecoCreate(generics.ListCreateAPIView):
         )
         return queryset
 
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            cliente = self.request.user.cliente
+            instance = serializer.save()
 
-class EnderecoUpdate():
-    pass
+            if instance.principal:
+                for item in cliente.enderecos.all():
+                    endereco = item.endereco
+                    endereco.principal = False
+                    endereco.save()
+
+            ClienteEndereco.objects.create(
+                _cliente=cliente,
+                endereco=instance
+            )
 
 
-class EnderecoDelete():
-    pass
+class EnderecoUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Endereco.objects.all()
+    serializer_class = EnderecoSerializer
+    permission_classes = (IsAuthenticated, IsOwnerClienteEndereco)
+    lookup_url_kwarg = 'id'
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            cliente = self.request.user.cliente
+            instance = serializer.save()
+
+            if instance.principal:
+                for item in cliente.enderecos.all():
+                    endereco = item.endereco
+                    if endereco.id != instance.id:
+                        endereco.principal = False
+                        endereco.save()
 
 
 class CartaoCreate():

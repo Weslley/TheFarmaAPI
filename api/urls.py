@@ -88,8 +88,7 @@ urlpatterns = [
     # Clientes
     url(r'^clientes/$', ClienteCreate.as_view(), name='cliente-create'),
     url(r'^clientes/enderecos/$', EnderecoCreate.as_view(), name='cliente-endereco-list'),
-    url(r'^clientes/enderecos/(?P<id>[0-9]+)/update$', EnderecoCreate.as_view(), name='cliente-endereco-update'),
-    url(r'^clientes/enderecos/(?P<id>[0-9]+)/delete', EnderecoCreate.as_view(), name='cliente-endereco-delete'),
+    url(r'^clientes/enderecos/(?P<id>[0-9]+)/$', EnderecoUpdateDelete.as_view(), name='cliente-endereco-update-delete'),
 
     # Seções
     url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),
