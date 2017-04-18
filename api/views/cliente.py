@@ -5,20 +5,23 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+
+from api.mixins.edit import ClienteQuerysetOnly, RetrieveUpdateDestroyAPIViewNoPatch
+from api.models.cartao import Cartao
 from api.models.cliente import Cliente, ClienteEndereco
 from api.models.endereco import Endereco
-from api.permissions import IsOwnerClienteEndereco
+from api.permissions import IsOwnerClienteEndereco, IsOwnerClienteCartao, IsOnlyCliente, IsAuthenticatedInGetPut
+from api.serializers.cartao import CartaoSerializer
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.endereco import EnderecoSerializer
 from api.serializers.user import CreateUserSerializer
-from api import permissions
 from rest_framework.permissions import IsAuthenticated
 
 
 class ClienteCreate(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
-    permission_classes = (permissions.IsAuthenticatedInGetPut, )
+    permission_classes = (IsAuthenticatedInGetPut, )
 
     def login(self, usuario, password):
         authenticate(username=usuario.email, password=password)
@@ -81,7 +84,7 @@ class ClienteCreate(generics.CreateAPIView):
 
 class EnderecoCreate(generics.ListCreateAPIView):
     serializer_class = EnderecoSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, IsOnlyCliente)
 
     def get_queryset(self):
         queryset = Endereco.objects.filter(
@@ -109,7 +112,7 @@ class EnderecoCreate(generics.ListCreateAPIView):
 class EnderecoUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoSerializer
-    permission_classes = (IsAuthenticated, IsOwnerClienteEndereco)
+    permission_classes = (IsAuthenticated, IsOnlyCliente, IsOwnerClienteEndereco)
     lookup_url_kwarg = 'id'
 
     def perform_update(self, serializer):
@@ -125,17 +128,12 @@ class EnderecoUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
                         endereco.save()
 
 
-class CartaoCreate():
-    pass
+class CartaoCreate(generics.ListCreateAPIView, ClienteQuerysetOnly):
+    serializer_class = CartaoSerializer
+    permission_classes = (IsAuthenticated, IsOnlyCliente)
 
 
-class CartaoRetreive():
-    pass
-
-
-class CartaoUpdate():
-    pass
-
-
-class CartaoDelete():
-    pass
+class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, ClienteQuerysetOnly):
+    serializer_class = CartaoSerializer
+    permission_classes = (IsAuthenticated, IsOnlyCliente, IsOwnerClienteCartao)
+    lookup_url_kwarg = 'id'

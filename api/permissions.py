@@ -21,7 +21,7 @@ class IsAuthenticatedInGetPut(permissions.BasePermission):
 
 class IsOwnerClienteEndereco(permissions.BasePermission):
     """
-    Permissão para só poder fazer put e get se estiver authenticado
+    Permissão para o endereço do cliente
     """
 
     def has_object_permission(self, request, view, obj):
@@ -32,3 +32,24 @@ class IsOwnerClienteEndereco(permissions.BasePermission):
             return False
 
 
+class IsOwnerClienteCartao(permissions.BasePermission):
+    """
+    Permissão para o cartão do cliente
+    """
+
+    def has_object_permission(self, request, view, obj):
+        try:
+            return obj.cliente.usuario == request.user
+        except Exception as err:
+            print(err)
+            return False
+
+
+class IsOnlyCliente(permissions.BasePermission):
+    """
+    Permissão para só ppermitir acesso de usuario que é cliente
+    """
+
+    def has_permission(self, request, view):
+
+        return hasattr(request.user, 'cliente') and request.user.cliente
