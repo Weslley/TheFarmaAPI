@@ -15,7 +15,7 @@ from api.views.root import HomeApiView
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
-from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia
+from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia, CreateUser
 
 urlpatterns = [
     # Raiz
@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
     url(r'^login_farmacia/$', LoginFarmacia.as_view(), name='login-farmacia'),
+    url(r'^auth/user/$', CreateUser.as_view(), name='create-user'),
 
     # Farmacias
     url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-list'),
@@ -69,7 +70,7 @@ urlpatterns = [
     url(r'^ufs/$', UfList.as_view(), name='uf-list'),
     url(r'^ufs_export/$', UfExport.as_view(), name='uf-export'),
     url(r'^ufs/sync/(?P<data>[0-9]+)/$', UfSync.as_view(), name='uf-sync'),
-    
+
     # Post
     url(r'^posts/$', PostExportList.as_view(), name='post-list'),
     url(r'^posts/(?P<id>[0-9]+)/like/$', CurtirView.as_view(), name='post-like'),

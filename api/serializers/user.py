@@ -1,5 +1,68 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from api.models.perfil import Perfil
+from rest_framework.validators import UniqueValidator
+from rest_framework.authtoken.models import Token
+from django.db import transaction
+import re
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    phone = serializers.CharField(max_length=11, required=False, write_only=True)
+    token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
+
+    class Meta:
+        model = User
+        fields = ('email', 'password', 'phone', 'id', 'token')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'email': {
+                'required': True,
+                'allow_blank': False,
+                'validators': [UniqueValidator(
+                    queryset=User.objects.all(),
+                    message='Usuário ja cadastrado com este email.'
+                )]
+            }
+        }
+
+    def validate_phone(self, data):
+        if not data.isdigit():
+            raise serializers.ValidationError('Número de celular inválido.')
+
+        try:
+            User.objects.get(perfil__celular=data)
+            raise serializers.ValidationError('Usuário ja cadastrado com este celular.')
+        except User.DoesNotExist:
+            pass
+
+        return data
+
+    def validate(self, attrs):
+        attrs['username'] = self.create_username(attrs['email'])
+        return attrs
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            phone = None
+            if 'phone' in validated_data:
+                phone = validated_data.pop('phone')
+
+            user = super(CreateUserSerializer, self).create(validated_data)
+            user.set_password(validated_data['password'])
+            user.save()
+            Perfil.objects.create(usuario=user, celular=phone)
+            Token.objects.create(user=user)
+            return user
+
+    def create_username(self, email):
+        highest_user_id = User.objects.all().order_by('-id')[0].id  # or something more efficient
+        leading_part_of_email = email.split('@', 1)[0]
+        leading_part_of_email = re.sub(r'[^a-zA-Z0-9+]', '', leading_part_of_email)  # remove non-alphanumerics
+        truncated_part_of_email = leading_part_of_email[:3] + leading_part_of_email[-3:]
+        derived_username = '%s%s' % (truncated_part_of_email, highest_user_id + 1)
+        return derived_username
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -7,7 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
     foto = serializers.SerializerMethodField('get_foto_url')
 
     def get_foto_url(self, obj):
-        base = ''
+        # base = ''
         if hasattr(obj, 'perfil'):
             if obj.perfil.foto:
                 return 'http://thefarmaapi.herokuapp.com{}'.format(obj.perfil.foto.url)
