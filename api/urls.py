@@ -15,7 +15,7 @@ from api.views.root import HomeApiView
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
-from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia, CreateUser
+from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia, CreateUser, LoginDefault
 
 urlpatterns = [
     # Raiz
@@ -27,7 +27,9 @@ urlpatterns = [
     url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
     url(r'^login_farmacia/$', LoginFarmacia.as_view(), name='login-farmacia'),
-    url(r'^auth/user/$', CreateUser.as_view(), name='create-user'),
+    url(r'^auth/users/$', CreateUser.as_view(), name='create-user'),
+    url(r'^auth/login/$', LoginDefault.as_view(), name='login-user'),
+
 
     # Farmacias
     url(r'^farmacias/$', FarmaciaList.as_view(), name='farmacia-list'),

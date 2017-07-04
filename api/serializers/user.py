@@ -5,6 +5,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from django.db import transaction
 import re
+from thefarmaapi.backends import EmailModelBackend
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -122,3 +123,50 @@ class LoginFacebookSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('nome', 'sobrenome', 'facebook_id', 'data_nascimento', 'email', 'foto', 'sexo')
+
+
+class LoginDefautSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
+
+    class Meta:
+        model = User
+        fields = ('email', 'password', 'id', 'token')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'email': {
+                'required': True,
+                'allow_blank': False
+            }
+        }
+
+    def validate_email(self, value):
+        try:
+            User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Email não cadastrado.')
+
+        return value
+
+    def validate(self, attrs):
+        email = attrs['email']
+        password = attrs['password']
+
+        back = EmailModelBackend()
+        user = back.authenticate(email, password)
+
+        if not user:
+            raise serializers.ValidationError('Email ou senha incorretos.')
+
+        return attrs
+
+    def create(self, validated_data):
+        user = User.objects.get(email=validated_data['email'])
+        token, created = Token.objects.get_or_create(user=user)
+        if not created:
+            token.delete()
+            Token.objects.create(user=user)
+        return user
+
+    def update(self, instance, validated_data):
+        return instance

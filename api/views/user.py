@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.mixins.base import CustomJSONAPIView, LogoutMixin, IsAuthenticatedMixin
 from api.models.perfil import Perfil
-from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer, CreateUserSerializer
+from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer, CreateUserSerializer, LoginDefautSerializer
 
 
 class UserDetail(generics.RetrieveAPIView):
@@ -93,6 +93,11 @@ class Logout(IsAuthenticatedMixin, LogoutMixin):
 class CreateUser(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
+
+
+class LoginDefault(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = LoginDefautSerializer
 
 
 class TesteLogin(generics.CreateAPIView):
