@@ -49,9 +49,9 @@ class LogoutMixin(CustomJSONAPIView):
             token = request._auth
             token.delete()
         except Token.DoesNotExist:
-            return Response({'detail': 'Token inválido'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Token inválido.'}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'detail': 'Logout realizado com sucesso'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'Logout realizado com sucesso.'}, status=status.HTTP_200_OK)
 
 
 class SyncApiMixin(GenericAPIView):
