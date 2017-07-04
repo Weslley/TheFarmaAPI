@@ -14,6 +14,8 @@ class EmailModelBackend(object):
 
         if '@' in username:  # se tiver @ no nome do usuário  username vai ser o email
             kwargs = {'email': username}
+        elif len(username) <= 11 and username.isdigit():
+            kwargs = {'perfil__celular': username}
         else:
             return None
         try:

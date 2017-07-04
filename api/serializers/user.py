@@ -128,6 +128,7 @@ class LoginFacebookSerializer(serializers.ModelSerializer):
 class LoginDefautSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
+    email = serializers.CharField(max_length=250)
 
     class Meta:
         model = User
@@ -141,10 +142,23 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, value):
+        if '@' in value:  # se tiver @ no nome do usuário  username vai ser o email
+            kwargs = {'email': value}
+        elif len(value) <= 11 and value.isdigit():
+            kwargs = {'perfil__celular': value}
+        elif len(value) > 11 and value.isdigit():
+            raise serializers.ValidationError('Certifique-se de que este campo não tenha mais de 11 caracteres.')
+        elif len(value) > 11 and not value.isdigit():
+            raise serializers.ValidationError('Insira um endereço de email válido.')
+        else:
+            raise serializers.ValidationError('Este campo é obrigatório.')
         try:
-            User.objects.get(email=value)
+            User.objects.get(**kwargs)
         except User.DoesNotExist:
-            raise serializers.ValidationError('Email não cadastrado.')
+            if 'email' in kwargs:
+                raise serializers.ValidationError('Email não cadastrado.')
+            else:
+                raise serializers.ValidationError('Celular não cadastrado.')
 
         return value
 
@@ -153,20 +167,19 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         password = attrs['password']
 
         back = EmailModelBackend()
-        user = back.authenticate(email, password)
+        self.user = back.authenticate(email, password)
 
-        if not user:
+        if not self.user:
             raise serializers.ValidationError('Email ou senha incorretos.')
 
         return attrs
 
     def create(self, validated_data):
-        user = User.objects.get(email=validated_data['email'])
-        token, created = Token.objects.get_or_create(user=user)
+        token, created = Token.objects.get_or_create(user=self.user)
         if not created:
             token.delete()
-            Token.objects.create(user=user)
-        return user
+            Token.objects.create(user=self.user)
+        return self.user
 
     def update(self, instance, validated_data):
         return instance
