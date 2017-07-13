@@ -15,3 +15,4 @@ class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     data_nascimento = models.DateField(blank=True, null=True)
     celular = models.CharField(max_length=11, null=True, blank=True, unique=True)
+    cpf = models.CharField(max_length=11, unique=True, null=True, blank=True)

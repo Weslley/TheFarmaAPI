@@ -12,10 +12,11 @@ class CreateUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     phone = serializers.CharField(max_length=11, required=False, write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
+    cpf = serializers.CharField(max_length=11, write_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'phone', 'id', 'token')
+        fields = ('email', 'password', 'phone', 'id', 'token', 'cpf')
         extra_kwargs = {
             'id': {'read_only': True},
             'email': {
@@ -27,6 +28,18 @@ class CreateUserSerializer(serializers.ModelSerializer):
                 )]
             }
         }
+
+    def validate_cpf(self, data):
+        if not data.isdigit():
+            raise serializers.ValidationError('Número de celular inválido.')
+
+        try:
+            User.objects.get(perfil__cpf=data)
+            raise serializers.ValidationError('Usuário ja cadastrado com este CPF.')
+        except User.DoesNotExist:
+            pass
+
+        return data
 
     def validate_phone(self, data):
         if not data.isdigit():
@@ -50,10 +63,12 @@ class CreateUserSerializer(serializers.ModelSerializer):
             if 'phone' in validated_data:
                 phone = validated_data.pop('phone')
 
+            cpf = validated_data.pop('cpf')
+
             user = super(CreateUserSerializer, self).create(validated_data)
             user.set_password(validated_data['password'])
             user.save()
-            Perfil.objects.create(usuario=user, celular=phone)
+            Perfil.objects.create(usuario=user, celular=phone, cpf=cpf)
             Token.objects.create(user=user)
             return user
 
