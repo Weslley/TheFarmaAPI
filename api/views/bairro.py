@@ -6,6 +6,8 @@ from api.serializers.bairro import BairroListSerializer
 
 
 class BairroList(generics.ListAPIView):
-    queryset = Bairro.objects.all()
     serializer_class = BairroListSerializer
     pagination_class = SmallResultsSetPagination
+
+    def get_queryset(self):
+        return Bairro.objects.filter(cidade__ibge=self.kwargs['ibge'])

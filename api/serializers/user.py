@@ -1,6 +1,7 @@
+from datetime import datetime
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from api.models.perfil import Perfil
+from api.models.cliente import Cliente
 from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from django.db import transaction
@@ -34,7 +35,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Número de celular inválido.')
 
         try:
-            User.objects.get(perfil__cpf=data)
+            User.objects.get(cliente__cpf=data)
             raise serializers.ValidationError('Usuário ja cadastrado com este CPF.')
         except User.DoesNotExist:
             pass
@@ -46,7 +47,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Número de celular inválido.')
 
         try:
-            User.objects.get(perfil__celular=data)
+            User.objects.get(cliente__celular=data)
             raise serializers.ValidationError('Usuário ja cadastrado com este celular.')
         except User.DoesNotExist:
             pass
@@ -68,7 +69,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             user = super(CreateUserSerializer, self).create(validated_data)
             user.set_password(validated_data['password'])
             user.save()
-            Perfil.objects.create(usuario=user, celular=phone, cpf=cpf)
+            Cliente.objects.create(usuario=user, celular=phone, cpf=cpf)
             Token.objects.create(user=user)
             return user
 
@@ -80,16 +81,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
         derived_username = '%s%s' % (truncated_part_of_email, highest_user_id + 1)
         return derived_username
 
+from api.models.cliente import Cliente
+
 
 class UserSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='get_full_name')
     foto = serializers.SerializerMethodField('get_foto_url')
 
     def get_foto_url(self, obj):
-        # base = ''
-        if hasattr(obj, 'perfil'):
-            if obj.perfil.foto:
-                return 'http://thefarmaapi.herokuapp.com{}'.format(obj.perfil.foto.url)
+        if hasattr(obj, 'cliente'):
+            if obj.cliente.foto:
+                return 'http://thefarmaapi.herokuapp.com{}'.format(obj.cliente.foto.url)
         return ''
 
     class Meta:
@@ -99,16 +101,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=60, write_only=True)
-    email = serializers.CharField(max_length=254)
+    email_telefone = serializers.CharField(max_length=254)
 
     def create(self, validated_data):
-        data = {'email': '', 'password': ''}
+        data = {'email_telefone': '', 'password': ''}
         for key in validated_data:
             data[key] = validated_data[key]
         return data
 
     def update(self, instance, validated_data):
-        instance['email'] = validated_data.get('email', instance['emai'])
+        instance['email_telefone'] = validated_data.get('email_telefone', instance['email_telefone'])
         instance['password'] = validated_data.get('password', instance['password'])
         return instance
 
@@ -129,11 +131,11 @@ class LoginSerializer(serializers.Serializer):
 class LoginFacebookSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='first_name')
     sobrenome = serializers.CharField(source='last_name', required=False)
-    facebook_id = serializers.CharField(required=True, source='perfil.facebook_id')
+    facebook_id = serializers.CharField(required=True, source='cliente.facebook_id')
     email = serializers.EmailField(required=True)
-    data_nascimento = serializers.DateField(source='perfil.data_nascimento', required=False)
-    sexo = serializers.CharField(max_length=1, source='perfil.sexo', required=False)
-    foto = serializers.URLField(source='perfil.foto', required=False)
+    data_nascimento = serializers.DateField(source='cliente.data_nascimento', required=False)
+    sexo = serializers.CharField(max_length=1, source='cliente.sexo', required=False)
+    foto = serializers.URLField(source='cliente.foto', required=False)
 
     class Meta:
         model = User
@@ -160,7 +162,7 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         if '@' in value:  # se tiver @ no nome do usuário  username vai ser o email
             kwargs = {'email': value}
         elif len(value) <= 11 and value.isdigit():
-            kwargs = {'perfil__celular': value}
+            kwargs = {'cliente__celular': value}
         elif len(value) > 11 and value.isdigit():
             raise serializers.ValidationError('Certifique-se de que este campo não tenha mais de 11 caracteres.')
         elif len(value) > 11 and not value.isdigit():
@@ -198,3 +200,18 @@ class LoginDefautSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         return instance
+
+
+class DetailUserSerializer(serializers.ModelSerializer):
+    nome = serializers.CharField(source='first_name')
+    sobrenome = serializers.CharField(source='last_name')
+    token = serializers.CharField(read_only=True, source='auth_token.key')
+
+    class Meta:
+        model = User
+        fields = ('id', 'nome', 'sobrenome', 'email', 'token')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'username': {'read_only': True},
+            'email': {'read_only': True},
+        }

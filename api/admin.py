@@ -4,20 +4,22 @@ from django.contrib import admin
 
 from api.models.atualizacao import Atualizacao
 from api.models.curtida import Curtida
-from api.models.perfil import Perfil
+from api.models.cliente import Cliente, ClienteEndereco
 from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
+from api.models.secao import Secao
+from api.models.subsecao import Subsecao
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
-from api.models.apresentacao import Apresentacao
+from api.models.apresentacao import Apresentacao, ImagemApresentacao, Unidade
 from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
-from api.models.laboratorio import Laboratorio
-from api.models.medicamento import Medicamento
+from api.models.fabricante import Fabricante
+from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
-from api.models.instituicao import Instituicao, UsuarioInstituicao
+from api.models.parceiro import Parceiro, UsuarioParceiro
 
 
 # class FarmaciaAdmin(admin.ModelAdmin):
@@ -160,7 +162,7 @@ class PostAdmin(admin.ModelAdmin):
             'fields': (
                 'titulo',
                 'conteudo',
-                'tipo',
+                ('tipo', 'ativo'),
                 ('imagem', 'video'),
                 'url_referencia'
             )
@@ -173,9 +175,9 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Farmacia, FarmaciaAdmin)
-admin.site.register(Medicamento)
+admin.site.register(Produto)
 admin.site.register(PrincipioAtivo)
-admin.site.register(Laboratorio)
+admin.site.register(Fabricante)
 admin.site.register(Endereco)
 admin.site.register(Cidade)
 admin.site.register(Bairro)
@@ -184,8 +186,13 @@ admin.site.register(RepresentanteLegal)
 admin.site.register(Apresentacao)
 admin.site.register(TabelaPreco)
 admin.site.register(Post, PostAdmin)
-admin.site.register(Perfil)
+admin.site.register(Cliente)
 admin.site.register(Curtida)
 admin.site.register(Atualizacao)
-admin.site.register(Instituicao)
-admin.site.register(UsuarioInstituicao)
+admin.site.register(Parceiro)
+admin.site.register(UsuarioParceiro)
+admin.site.register(ImagemApresentacao)
+admin.site.register(Unidade)
+admin.site.register(Secao)
+admin.site.register(Subsecao)
+admin.site.register(ClienteEndereco)

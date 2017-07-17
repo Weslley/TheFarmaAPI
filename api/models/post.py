@@ -18,6 +18,7 @@ class Post(models.Model):
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     tipo = models.IntegerField(choices=tipo_post.CHOICES, default=tipo_post.NOTICIA)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    ativo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.titulo

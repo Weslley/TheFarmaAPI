@@ -4,14 +4,14 @@ from datetime import date
 from decimal import Decimal
 from misc.pusher_message import Message
 from api.models.apresentacao import Apresentacao
-from api.models.laboratorio import Laboratorio
-from api.models.medicamento import MedicamentoApExport, Medicamento
+from api.models.fabricante import Fabricante
+from api.models.produto import MedicamentoApExport, Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
 from datetime import datetime
 import time
-from api.utils import tipo_medicamento
+from api.utils import tipo_produto
 
 TIPO_LABORATORIO = 1
 TIPO_NAO_USADO2 = 2
@@ -115,7 +115,7 @@ def update_dados_medicamentos(path, channel=None):
                 print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentacoes\n{} tabelas de preco'.format(
                     len(laboratorios),
                     len(principios_ativos),
-                    Medicamento.objects.count(),
+                    Produto.objects.count(),
                     Apresentacao.objects.count(),
                     TabelaPreco.objects.count()
                 ))
@@ -164,7 +164,7 @@ def get_or_create_apresentacao(ap_temp, medicamento):
 
 def exist_medicamento(med_temp):
     try:
-        med = Medicamento.objects.get(
+        med = Produto.objects.get(
             principio_ativo_id=med_temp.principioAtivo_id,
             laboratorio_id=med_temp.laboratorio_id,
             nome=med_temp.descricao,
@@ -179,11 +179,11 @@ def get_or_create_medicamento(med_temp):
     if exist:
         return obj
 
-    return Medicamento.objects.create(
+    return Produto.objects.create(
         principio_ativo_id=med_temp.principioAtivo_id,
         laboratorio_id=med_temp.laboratorio_id,
         nome=med_temp.descricao,
-        tipo=tipo_medicamento.GENERICO if med_temp.generico else tipo_medicamento.ETICO  # consultar com o gabriel
+        tipo=tipo_produto.GENERICO if med_temp.generico else tipo_produto.ETICO  # consultar com o gabriel
     )
 
 
@@ -249,13 +249,13 @@ def add_laboratorio(line):
     :return:
     """
     try:
-        lab = Laboratorio.objects.get(id=int(line[2:5]))
+        lab = Fabricante.objects.get(id=int(line[2:5]))
         lab.nome = line[5:25].strip()
         lab.razao_social = line[25:65].strip()
         lab.save()
         return lab
-    except Laboratorio.DoesNotExist:
-        return Laboratorio.objects.create(
+    except Fabricante.DoesNotExist:
+        return Fabricante.objects.create(
             id=int(line[2:5]),
             nome=line[5:25].strip(),
             razao_social=line[25:65].strip()

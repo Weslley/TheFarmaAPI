@@ -1,7 +1,7 @@
 from awesome_mixins.mixins.list import ListMixin
 from core.views.mixins import AdminBaseMixin
 from api.models.post import Post
-from django.views.generic import CreateView, DetailView, UpdateView
+from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from api.utils import tipo_post
 
@@ -15,6 +15,7 @@ class PostList(ListMixin, AdminBaseMixin):
     css_div_header = 'card-header'
     css_div_body = 'card-content table-responsive'
     css_div_footer = ''
+    detail_url = '\'+ id + \'/'
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
     columns = [
@@ -23,7 +24,8 @@ class PostList(ListMixin, AdminBaseMixin):
         {'lookup': 'data_criacao', 'name': 'Data de criação', 'js_function': 'translate_datetime'},
         {'lookup': 'data_atualizacao', 'name': 'Atualização', 'js_function': 'translate_datetime'},
         {'lookup': 'usuario__first_name', 'name': 'Usuário'},
-        {'lookup': 'usuario__user_instituicao__instituicao__nome_fantasia', 'name': 'Instituição', 'js_function': 'translate_instituicao'}
+        {'lookup': 'usuario__user_instituicao__instituicao__nome_fantasia', 'name': 'Instituição', 'js_function': 'translate_instituicao'},
+        {'lookup': 'ativo', 'name': 'Ativo', 'js_function': 'translate_ativo'}
     ]
 
     def get_queryset(self):
@@ -38,7 +40,7 @@ class PostList(ListMixin, AdminBaseMixin):
 
 class PostCreate(CreateView, AdminBaseMixin):
     model = Post
-    fields = ('titulo', 'conteudo', 'tipo', 'imagem', 'video', 'url_referencia')
+    fields = ('titulo', 'conteudo', 'tipo', 'imagem', 'video', 'url_referencia', 'ativo')
     success_url = reverse_lazy('post-admin-list')
 
     def form_valid(self, form):
@@ -52,10 +54,17 @@ class PostCreate(CreateView, AdminBaseMixin):
 
 class PostUpdate(UpdateView, AdminBaseMixin):
     model = Post
-    fields = ('titulo', 'conteudo', 'imagem', 'video', 'url_referencia')
+    pk_url_kwarg = 'id'
+    fields = ('titulo', 'conteudo', 'imagem', 'video', 'url_referencia', 'ativo', 'tipo')
     success_url = reverse_lazy('post-admin-list')
 
 
 class PostDetail(DetailView, AdminBaseMixin):
     model = Post
     pk_url_kwarg = 'id'
+
+
+class PostDelete(DeleteView, AdminBaseMixin):
+    model = Post
+    pk_url_kwarg = 'id'
+    success_url = reverse_lazy('post-admin-list')

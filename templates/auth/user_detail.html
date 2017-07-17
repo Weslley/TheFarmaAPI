@@ -48,7 +48,7 @@
                         <div class="col-md-4">
                             <div class="form-group label-floating">
                                 <label class="control-label">Data de nascimento</label>
-                                <input type="text" class="form-control" disabled value="{{ user.perfil.data_nascimento|default_if_none:"" }}">
+                                <input type="text" class="form-control" disabled value="{{ user.cliente.data_nascimento|default_if_none:"" }}">
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                         <h6 class="category text-gray">ADMINISTRADOR</h6>
                     {% endif %}
                     <h4 class="card-title">{{ user.get_full_name }}</h4>
-                    <p class="card-content">{{ user.perfil.sobre }}</p>
+                    {# <p class="card-content">{{ user.perfil.sobre }}</p> #}
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@ WORKDIR /thefarmaapi
 
 EXPOSE 8000
 
-# VOLUME [""]
+VOLUME ["postgres"]
 
 RUN apk add post
 

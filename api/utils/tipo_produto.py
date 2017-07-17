@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+
+GENERICO = 0
+SIMILAR = 1
+ETICO = 2
+NAO_MEDICAMENTO = 3
+
+CHOICES = (
+    (GENERICO, 'GENÉRICO'),
+    (SIMILAR, 'SIMILAR'),
+    (ETICO, 'ÉTICO'),
+    (NAO_MEDICAMENTO, 'NÃO MEDICAMENTO')
+)

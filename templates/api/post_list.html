@@ -27,6 +27,13 @@
         return data;
     }
 
+    function translate_ativo(data) {
+        if(data){
+            return '<i class="material-icons">done</i>';
+        }
+        return '<i class="material-icons">block</i>'
+    }
+
     function translate_datetime(data){
         var data = new Date(data);
         var hora = data.getHours() + 3;

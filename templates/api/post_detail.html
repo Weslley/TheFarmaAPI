@@ -1,0 +1,151 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block header %}
+  Posts
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="row">
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Visualizando Post</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">Titulo</label>
+                                    <input type="text" class="form-control" disabled value="{{ post.titulo }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="checkbox" style="margin-top: 24px;">
+                                    <label>
+                                        <input type="checkbox" disabled {% if post.ativo %}checked{% endif %}>
+                                        Ativo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label>Conteúdo</label>
+                                    <textarea cols="40" rows="10" disabled class="form-control">{{ post.conteudo }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            {% if user.is_superuser %}
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Tipo</label>
+                                        <input type="text" class="form-control" disabled value="{% if post.tipo == 0 %}NOTÍCIA{% elif post.tipo == 1 %}PATROCINADO{% else %}AVISO{% endif %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                            {% else %}
+                                <div class="col-md-3 hidden">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Tipo</label>
+                                        <input type="text" class="form-control" disabled value="{% if post.tipo == 0 %}NOTÍCIA{% elif post.tipo == 1 %}PATROCINADO{% else %}AVISO{% endif %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                            {% endif %}
+                                <div class="form-group label-floating">
+                                    <label class="control-label">URL de referência</label>
+                                    <input type="text" class="form-control" disabled value="{{ post.url_referencia }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'post-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                        <a href="{% url 'post-admin-update' post.id %}" class="btn btn-primary pull-right">Editar</a>
+                        <a href="{% url 'post-admin-delete' post.id %}" class="btn btn-danger pull-right">Excluir</a>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header" data-background-color="green">
+                        <h4 class="title">Imagem e Vídeo</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label style="margin-top: 12px;">Imagem</label>
+                                    <div class="clearfix"></div>
+                                    <img id="id_thumbnail_imagem" style="margin-top: 10px;" src="{% if post.imagem %}{{ post.imagem.url  }}{% endif %}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label>URL do video</label>
+                                    <input id="id_video" type="text" class="form-control" disabled value="{{ post.video }}">
+                                    <img id="id_thumbnail_youtube" class="hidden" src="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+
+
+    function load_youtube_thumbnail(){
+        var url = $('#id_video').val();
+        if (url != null && url != ''){
+            try{
+                var code = url.replace('https://www.youtube.com/watch?v=', '');
+                $('#id_thumbnail_youtube').attr('src', 'http://img.youtube.com/vi/'+ code +'/hqdefault.jpg');
+                $('#id_thumbnail_youtube').removeClass("hidden");
+            }catch(err){
+                $('#id_thumbnail_youtube').attr('src', '');
+                $('#id_thumbnail_youtube').removeClass("hidden");
+                $('#id_thumbnail_youtube').addClass("hidden");
+            }
+        }else{
+            $('#id_thumbnail_youtube').attr('src', '');
+            $('#id_thumbnail_youtube').removeClass("hidden");
+            $('#id_thumbnail_youtube').addClass("hidden");
+        }
+    }
+
+    (function () {
+        $('.active').removeClass('active');
+        $('#menu_post').addClass('active');
+
+    })();
+
+    $(window).on('load', load_youtube_thumbnail);
+
+    </script>
+{% endblock js %}
+

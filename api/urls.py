@@ -4,7 +4,8 @@ from django.conf.urls import url
 
 from api.views.atualizacao import UltimaAtualizacao
 from api.views.bairro import BairroList
-from api.views.medicamento import *
+from api.views.cliente import *
+from api.views.produto import *
 from api.views.laboratorio import *
 from api.views.cidade import *
 from api.views.farmacia import *
@@ -12,10 +13,12 @@ from api.views.post import *
 from api.views.principio_ativo import *
 from api.views.apresentacao import *
 from api.views.root import HomeApiView
+from api.views.secao import *
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
-from api.views.user import Logout, LoginFacebook, TesteLogin, LoginFarmacia, CreateUser, LoginDefault
+from api.views.autenticacao import Logout, LoginFacebook, TesteLogin, LoginFarmacia, Login, LoginDefault, CreateUser
+
 
 urlpatterns = [
     # Raiz
@@ -25,6 +28,7 @@ urlpatterns = [
     # Login token
     url(r'^login/$', TesteLogin.as_view(), name='login'),
     url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
+    url(r'^login/cliente/$', Login.as_view(), name='login'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
     url(r'^login_farmacia/$', LoginFarmacia.as_view(), name='login-farmacia'),
     url(r'^auth/users/$', CreateUser.as_view(), name='create-user'),
@@ -36,15 +40,19 @@ urlpatterns = [
 
     # Cidades
     url(r'^cidades/$', CidadeList.as_view(), name='cidade-list'),
+    url(r'^cidades/(?P<ibge>[0-9]+)/$', CidadeDetail.as_view(), name='cidade-view'),
 
     # Bairros
-    url(r'^bairros/$', BairroList.as_view(), name='bairro-list'),
+    url(r'^bairros/(?P<ibge>[0-9]+)/$', BairroList.as_view(), name='bairro-list'),
 
     # Medicamentos
     url(r'^medicamentos/$', MedicamentoList.as_view(), name='medicamento-list'),
     url(r'^medicamentos/(?P<id>[0-9]+)/$', MedicamentoRetrieve.as_view(), name='medicamento-view'),
     url(r'^medicamentos_export/$', MedicamentoExport.as_view(), name='medicamento-export'),
     url(r'^medicamentos/sync/(?P<data>[0-9]+)/$', MedicamentoSync.as_view(), name='medicamento-sync'),
+
+    # Produtos
+    url(r'^produtos/(?P<uf>[A-Z]{2})/$', ProdutosBusca.as_view(), name='produto-list'),
 
     # Apresetação
     url(r'^apresentacoes/(?P<id>[0-9]+)/$', ApresentacaoRetrieve.as_view(), name='apresentacao-view'),
@@ -79,6 +87,18 @@ urlpatterns = [
     url(r'^posts/likes/$', PostsCurtidosView.as_view(), name='like-list'),
 
     # Estoque
-    url(r'^estoques/adicionar/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
+    url(r'^estoques/add/$', EstoqueCreateUpdate.as_view(), name='estoque-add'),
+
+    # Clientes - Enderecos - Cartões
+    url(r'^clientes/$', ClienteCreate.as_view(), name='cliente-create'),
+    url(r'^clientes/enderecos/$', EnderecoCreate.as_view(), name='cliente-endereco-list-create'),
+    url(r'^clientes/enderecos/(?P<id>[0-9]+)/$', EnderecoUpdateDelete.as_view(), name='cliente-endereco-update-delete'),
+    url(r'^clientes/cartoes/$', CartaoCreate.as_view(), name='cliente-cartao-list-create'),
+    url(r'^clientes/cartoes/(?P<id>[0-9]+)/$', CartaoUpdateDelete.as_view(), name='cliente-cartao-update-delete'),
+
+    # Seções
+    url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),
+    url(r'^secoes/(?P<id>[0-9]+)/$', SecaoDetail.as_view(), name='secao-view'),
+
 
 ]

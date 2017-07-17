@@ -29,10 +29,18 @@
                     <div class="card-content">
 
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-10">
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.titulo.label }}</label>
                                     {{ form.titulo|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="checkbox" style="margin-top: 24px;">
+                                    <label>
+                                        {{ form.ativo }}
+                                        {{ form.ativo.label }}
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -148,28 +156,34 @@
         $('#menu_post').addClass('active');
         $('#id_video').on('blur', load_youtube_thumbnail);
 
+        document.getElementById('id_imagem').onchange = function (evt) {
+            var tgt = evt.target || window.event.srcElement,
+                files = tgt.files;
 
-document.getElementById('id_imagem').onchange = function (evt) {
-    var tgt = evt.target || window.event.srcElement,
-        files = tgt.files;
+            // FileReader support
+            if (FileReader && files && files.length) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    document.getElementById('id_thumbnail_imagem').src = fr.result;
+                }
+                fr.readAsDataURL(files[0]);
+            }
 
-    // FileReader support
-    if (FileReader && files && files.length) {
-        var fr = new FileReader();
-        fr.onload = function () {
-            document.getElementById('id_thumbnail_imagem').src = fr.result;
+            // Not supported
+            else {
+                // fallback -- perhaps submit the input to an iframe and temporarily store
+                // them on the server until the user's session ends.
+            }
         }
-        fr.readAsDataURL(files[0]);
-    }
-
-    // Not supported
-    else {
-        // fallback -- perhaps submit the input to an iframe and temporarily store
-        // them on the server until the user's session ends.
-    }
-}
 
     })();
+
+
+    $(window).on('load', function (event) {
+       $('#id_video').blur();
+       var t = $('#id_imagem').parent().children('a');
+       $('#id_thumbnail_imagem').attr('src', 'http://' + pegaDominio() + $(t).attr('href'));
+    });
     </script>
 {% endblock js %}
 

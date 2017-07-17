@@ -6,24 +6,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.mixins.base import SyncApiMixin
-from api.models.laboratorio import Laboratorio
+from api.models.fabricante import Fabricante
 from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
 from api.serializers.laboratorio import LaboratorioSerializer
 
 
 class LaboratorioList(generics.ListAPIView):
-    queryset = Laboratorio.objects.all()
+    queryset = Fabricante.objects.all()
     serializer_class = LaboratorioSerializer
     pagination_class = SmallResultsSetPagination
 
 
 class LaboratorioSync(generics.ListAPIView, SyncApiMixin):
-    queryset = Laboratorio.objects.all()
+    queryset = Fabricante.objects.all()
     serializer_class = LaboratorioSerializer
     pagination_class = LargeResultsSetPagination
 
 
 class LaboratorioExport(generics.ListAPIView):
-    queryset = Laboratorio.objects.all()
+    queryset = Fabricante.objects.all()
     serializer_class = LaboratorioSerializer
     pagination_class = LargeResultsSetPagination

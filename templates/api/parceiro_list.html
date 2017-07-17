@@ -1,0 +1,49 @@
+{% extends 'components/base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+  Parceiros
+{% endblock header %}
+
+{% block conteudo %}
+
+    <div class="card">
+        {{ view.as_table }}
+    </div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    function translate_tipo(data) {
+        if(data == 2) return 'AVISO';
+        if(data == 1) return 'PATROCINADO'
+        return 'NOTÍCIA';
+    }
+
+    function translate_parceiro(data){
+        if (data == '')
+            return '<span style="color: green; font-weight: 600;">TheFarma</span>';
+        return data;
+    }
+
+    function translate_datetime(data){
+        var data = new Date(data);
+        var hora = data.getHours() + 3;
+        data.setHours(hora);
+        return data.toLocaleString();
+    }
+</script>
+{{ view.as_statics }}
+<script type="text/javascript">
+    (function () {
+        $('#am_add_button').removeClass('btn-primary');
+        $('#am_add_button').addClass('btn-white');
+        $('.active').removeClass('active');
+        $('#menu_parceiro').addClass('active');
+    })();
+    $(window).on('load', function () {
+        $('.pagination').addClass('pagination-success');
+    });
+</script>
+{% endblock %}

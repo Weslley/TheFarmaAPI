@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'api',
     'rest_framework',
     'django_ajax',
@@ -148,6 +149,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTHENTICATION_BACKENDS = (
     # 'django.contrib.auth.backends.ModelBackend',
     'thefarmaapi.backends.EmailModelBackend',
+    'thefarmaapi.backends.EmailTelefoneModelBackend',
 )
 
 REST_FRAMEWORK = {
