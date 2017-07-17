@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='cliente',
-            name='cpf',
-            field=models.CharField(max_length=11, unique=True),
-        ),
+        # migrations.AlterField(
+        #     model_name='cliente',
+        #     name='cpf',
+        #     field=models.CharField(max_length=11, unique=True),
+        # ),
         migrations.AlterField(
             model_name='cliente',
             name='telefone',

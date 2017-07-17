@@ -12,9 +12,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='perfil',
-            name='cpf',
-            field=models.CharField(blank=True, max_length=11, null=True, unique=True),
-        ),
+        # migrations.AddField(
+        #     model_name='perfil',
+        #     name='cpf',
+        #     field=models.CharField(blank=True, max_length=11, null=True, unique=True),
+        # ),
     ]
