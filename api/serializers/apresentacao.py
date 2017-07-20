@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.models.estoque import Estoque
+from api.models.produto import Produto
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 from decimal import Decimal
 
@@ -72,3 +73,45 @@ class ApresentacaoBusca(serializers.ModelSerializer):
         return data
 
 
+class ProdutoFabricante(serializers.ModelSerializer):
+    fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
+
+    class Meta:
+        model = Produto
+        fields = ('id', 'nome', 'fabricante')
+
+
+class ApresentacaoBuscaProduto(serializers.ModelSerializer):
+    preco = serializers.SerializerMethodField()
+    imagens = serializers.SerializerMethodField()
+    unidade = serializers.CharField(source='unidade.nome')
+    produto = ProdutoFabricante()
+
+    class Meta:
+        model = Apresentacao
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto')
+
+    def get_preco(self, obj):
+        cidade = self.context['cidade']
+        preco = Decimal(0)
+
+        estoque = Estoque.objects.filter(
+            apresentacao=obj,
+            farmacia__endereco__cidade=cidade
+        ).order_by('valor').first()
+        if estoque:
+            preco = estoque.valor
+
+        return round(preco, 2)
+
+    def get_imagens(self, obj):
+        qs = obj.imagens.order_by('-capa')
+        serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
+        data = [_['imagem'] for _ in serializer.data]
+
+        # verificando se tem um tipo caso não possua imagens
+        if not data and obj.unidade:
+            request = self.context['request']
+            data.append(request.build_absolute_uri(obj.unidade.imagem.url))
+
+        return data

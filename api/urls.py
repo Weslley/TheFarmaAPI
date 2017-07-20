@@ -60,6 +60,7 @@ urlpatterns = [
     url(r'^apresentacoes_export/$', ApresentacaoExport.as_view(), name='apresentacao-export'),
     url(r'^apresentacoes/(?P<id>[0-9]+)/rank/$', RankingApresentacao.as_view(), name='apresentacao-ranking'),
     url(r'^apresentacoes/sync/(?P<data>[0-9]+)/$', ApresentacaoSync.as_view(), name='apresentacao-sync'),
+    url(r'^apresentacoes/(?P<uf>[A-Z]{2})/$', ApresentacaoPorEstado.as_view(), name='apresentacao-list-estado'),
 
     # Principios ativos
     url(r'^principios_ativos/$', PrincipioAtivoList.as_view(), name='principio_ativo-list'),

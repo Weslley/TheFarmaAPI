@@ -4,6 +4,7 @@ from rest_framework.filters import BaseFilterBackend
 from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.produto import Produto
+from api.models.apresentacao import Apresentacao
 
 
 class MedicamentoFilter(django_filters.rest_framework.FilterSet):
@@ -56,3 +57,13 @@ class BairroFilter(django_filters.rest_framework.FilterSet):
     class Meta:
         model = Bairro
         fields = ['nome', ]
+
+
+class ApresentacaoFilter(django_filters.rest_framework.FilterSet):
+    nome = django_filters.CharFilter(name="produto__nome", lookup_expr='istartswith')
+    secao = django_filters.CharFilter(name="produto__secao", lookup_expr='nome__istartswith')
+    subsecao = django_filters.CharFilter(name="produto__subsecao", lookup_expr='nome__istartswith')
+
+    class Meta:
+        model = Apresentacao
+        fields = ['nome', 'secao', 'subsecao']

@@ -8,8 +8,11 @@ from rest_framework.views import APIView
 
 from api.mixins.base import SyncApiMixin
 from api.models.apresentacao import Apresentacao
+from api.models.cidade import Cidade
 from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
 from api.serializers.apresentacao import *
+from api.filters import ApresentacaoFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ApresentacaoRetrieve(generics.RetrieveAPIView):
@@ -53,3 +56,28 @@ class ApresentacaoExport(generics.ListAPIView):
     queryset = Apresentacao.objects.all()
     serializer_class = ApresentacaoExportSerializer
     pagination_class = LargeResultsSetPagination
+
+
+class ApresentacaoPorEstado(generics.ListAPIView):
+    queryset = Apresentacao.objects.all()
+    serializer_class = ApresentacaoBuscaProduto
+    pagination_class = SmallResultsSetPagination
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_class = ApresentacaoFilter
+    ordering_fields = ('produto__nome', '-produto__nome')
+    ordering = ('produto__nome',)
+
+    def get_serializer_context(self):
+        context = super(ApresentacaoPorEstado, self).get_serializer_context()
+        context['cidade'] = None
+
+        unidade_federativa = self.kwargs['uf']
+        nome_cidade = self.request.GET.get('cidade')
+
+        if nome_cidade:
+            nome_cidade = nome_cidade.strip()
+            cidades = Cidade.objects.filter(uf__sigla=unidade_federativa, nome__iexact=nome_cidade)
+            if cidades.count():
+                context['cidade'] = cidades.first()
+
+        return context

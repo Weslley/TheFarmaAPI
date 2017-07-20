@@ -45,5 +45,3 @@ class ProdutoSerializer(serializers.ModelSerializer):
         qs = obj.apresentacoes.filter(ativo=True)
         serializer = ApresentacaoBusca(instance=qs, many=True, context=self.context)
         return serializer.data
-
-
