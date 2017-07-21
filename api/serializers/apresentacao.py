@@ -41,11 +41,69 @@ class ImagemApresentacaoSerializer(serializers.ModelSerializer):
 class ApresentacaoBusca(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
     imagens = serializers.SerializerMethodField()
+    imagem = serializers.SerializerMethodField()
     unidade = serializers.CharField(source='unidade.nome')
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade')
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem')
+
+    def get_preco(self, obj):
+        cidade = self.context['cidade']
+        preco = Decimal(0)
+
+        estoque = Estoque.objects.filter(
+            apresentacao=obj,
+            farmacia__endereco__cidade=cidade
+        ).order_by('valor').first()
+        if estoque:
+            preco = estoque.valor
+
+        return round(preco, 2)
+
+    def get_imagem(self, obj):
+        qs = obj.imagens.order_by('-capa').first()
+        serializer = ImagemApresentacaoSerializer(instance=qs, context=self.context)
+        data = serializer.data['imagem']
+
+        # verificando se tem um tipo caso não possua imagens
+        if not data and obj.unidade:
+            request = self.context['request']
+            data = request.build_absolute_uri(obj.unidade.imagem.url)
+
+        return data
+
+    def get_imagens(self, obj):
+        qs = obj.imagens.order_by('-capa')
+        serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
+        data = [_['imagem'] for _ in serializer.data]
+
+        # verificando se tem um tipo caso não possua imagens
+        if not data and obj.unidade:
+            request = self.context['request']
+            data.append(request.build_absolute_uri(obj.unidade.imagem.url))
+
+        return data
+
+
+class ProdutoFabricante(serializers.ModelSerializer):
+    fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
+
+    class Meta:
+        model = Produto
+        fields = ('id', 'nome', 'fabricante')
+
+
+class ApresentacaoBuscaProduto(serializers.ModelSerializer):
+    preco = serializers.SerializerMethodField()
+    imagens = serializers.SerializerMethodField()
+    imagem = serializers.SerializerMethodField()
+    unidade = serializers.CharField(source='unidade.nome')
+    produto = ProdutoFabricante()
+
+    class Meta:
+        model = Apresentacao
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto', 'imagem')
 
     def get_preco(self, obj):
         cidade = self.context['cidade']
@@ -72,46 +130,14 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
         return data
 
-
-class ProdutoFabricante(serializers.ModelSerializer):
-    fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
-
-    class Meta:
-        model = Produto
-        fields = ('id', 'nome', 'fabricante')
-
-
-class ApresentacaoBuscaProduto(serializers.ModelSerializer):
-    preco = serializers.SerializerMethodField()
-    imagens = serializers.SerializerMethodField()
-    unidade = serializers.CharField(source='unidade.nome')
-    produto = ProdutoFabricante()
-
-    class Meta:
-        model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto')
-
-    def get_preco(self, obj):
-        cidade = self.context['cidade']
-        preco = Decimal(0)
-
-        estoque = Estoque.objects.filter(
-            apresentacao=obj,
-            farmacia__endereco__cidade=cidade
-        ).order_by('valor').first()
-        if estoque:
-            preco = estoque.valor
-
-        return round(preco, 2)
-
-    def get_imagens(self, obj):
-        qs = obj.imagens.order_by('-capa')
-        serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
-        data = [_['imagem'] for _ in serializer.data]
+    def get_imagem(self, obj):
+        qs = obj.imagens.order_by('-capa').first()
+        serializer = ImagemApresentacaoSerializer(instance=qs, context=self.context)
+        data = serializer.data['imagem']
 
         # verificando se tem um tipo caso não possua imagens
         if not data and obj.unidade:
             request = self.context['request']
-            data.append(request.build_absolute_uri(obj.unidade.imagem.url))
+            data = request.build_absolute_uri(obj.unidade.imagem.url)
 
         return data
