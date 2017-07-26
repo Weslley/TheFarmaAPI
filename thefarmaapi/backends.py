@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User, Permission
 from django.db.models import Q
 from rest_framework.authtoken.models import Token
-from api.models.farmacia import Farmacia
+from api.models.representante_legal import RepresentanteLegal
 
 
 class EmailModelBackend(object):
@@ -216,8 +216,8 @@ class FarmaciaBackend(object):
             return None
         try:
             # tentando buscar o usuário no banco
-            farmacia = Farmacia.objects.get(**kwargs)
-            user = farmacia.usuario
+            representante = RepresentanteLegal.objects.get(**kwargs)
+            user = representante.usuario
             if user.check_password(password):
                 token, create = Token.objects.get_or_create(user=user)
                 if not create:
