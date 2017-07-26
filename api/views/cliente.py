@@ -14,13 +14,13 @@ from api.permissions import IsOwnerClienteEndereco, IsOwnerClienteCartao, IsOnly
 from api.serializers.cartao import CartaoSerializer
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.endereco import EnderecoSerializer
-from api.serializers.user import CreateUserSerializer
+from api.serializers.user import CreateUserClienteSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
 class ClienteCreate(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
+    serializer_class = CreateUserClienteSerializer
     permission_classes = (IsAuthenticatedInGetPut, )
 
     def login(self, usuario, password):

@@ -6,10 +6,10 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from django.db import transaction
 import re
-from thefarmaapi.backends import EmailModelBackend
+from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUserClienteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     phone = serializers.CharField(max_length=11, required=False, write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
@@ -24,7 +24,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
                 'required': True,
                 'allow_blank': False,
                 'validators': [UniqueValidator(
-                    queryset=User.objects.all(),
+                    queryset=User.objects.exclude(farmacia__isnull=False),
                     message='Usuário ja cadastrado com este email.'
                 )]
             }
@@ -66,7 +66,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
             cpf = validated_data.pop('cpf')
 
-            user = super(CreateUserSerializer, self).create(validated_data)
+            user = super(CreateUserClienteSerializer, self).create(validated_data)
             user.set_password(validated_data['password'])
             user.save()
             Cliente.objects.create(usuario=user, celular=phone, cpf=cpf)
@@ -170,7 +170,7 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError('Este campo é obrigatório.')
         try:
-            User.objects.get(**kwargs)
+            User.objects.exclude(farmacia__isnull=False).get(**kwargs)
         except User.DoesNotExist:
             if 'email' in kwargs:
                 raise serializers.ValidationError('Email não cadastrado.')
@@ -196,6 +196,51 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         if not created:
             token.delete()
             Token.objects.create(user=self.user)
+        return self.user
+
+    def update(self, instance, validated_data):
+        return instance
+
+
+class LoginFarmaciaSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
+    email = serializers.EmailField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'password', 'id', 'token')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'email': {
+                'required': True,
+                'allow_blank': False
+            }
+        }
+
+    def validate_email(self, value):
+        if not value:
+            raise serializers.ValidationError('Este campo é obrigatório.')
+        try:
+            User.objects.exclude(cliente__isnull=False).get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Email não cadastrado.')
+
+        return value
+
+    def validate(self, attrs):
+        email = attrs['email']
+        password = attrs['password']
+
+        back = FarmaciaBackend()
+        self.user = back.authenticate(email, password)
+
+        if not self.user:
+            raise serializers.ValidationError('Email ou senha incorretos.')
+
+        return attrs
+
+    def create(self, validated_data):
         return self.user
 
     def update(self, instance, validated_data):

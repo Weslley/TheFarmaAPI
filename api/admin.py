@@ -177,7 +177,7 @@ class PostAdmin(admin.ModelAdmin):
         obj.save()
 
 
-admin.site.register(Farmacia, FarmaciaAdmin)
+admin.site.register(Farmacia)
 admin.site.register(Produto)
 admin.site.register(PrincipioAtivo)
 admin.site.register(Fabricante)

@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api.mixins.base import CustomJSONAPIView, LogoutMixin, IsAuthenticatedMixin
-from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer, CreateUserSerializer, LoginDefautSerializer
+from api.serializers.user import UserSerializer, LoginSerializer, LoginFacebookSerializer, CreateUserClienteSerializer, LoginDefautSerializer, LoginFarmaciaSerializer
 from api.models.cliente import Cliente
 from api.serializers.cliente import ClienteSerializer
 
@@ -81,7 +81,7 @@ class Logout(IsAuthenticatedMixin, LogoutMixin):
 
 class CreateUser(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
+    serializer_class = CreateUserClienteSerializer
 
 
 class LoginDefault(generics.GenericAPIView):
@@ -143,30 +143,12 @@ class TesteLogin(generics.CreateAPIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
-class LoginFarmacia(APIView, CustomJSONAPIView):
-    serializer_class = LoginSerializer
+class LoginFarmacia(generics.GenericAPIView):
+    queryset = User.objects.all()
+    serializer_class = LoginFarmaciaSerializer
 
-    def post(self, request, format=None):
-        data = self.get_data(request)
-
-        # Autenticando o usuario
-        usuario = authenticate(username=data['email'], password=data['password'])
-
-        # Se o mesmo existir, gero o token
-        if usuario:
-            token, create = Token.objects.get_or_create(user=usuario)
-
-            # caso esteja fazendo a requisição do login novamente, reseta o token
-            if not create:
-                token.delete()
-                token = Token.objects.create(user=usuario)
-
-            data = {
-                'id': usuario.id,
-                'email': usuario.email,
-                'token': token.key
-            }
-            return Response(data, status=status.HTTP_200_OK)
-
-        return Response({'detail': 'Email ou senha incorretos'}, status=status.HTTP_404_NOT_FOUND)
-
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
