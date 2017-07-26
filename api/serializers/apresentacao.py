@@ -162,9 +162,9 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
         try:
             tabela = obj.tabelas.get(icms=cidade.uf.icms)
-            pcm = tabela.pmc
-        except:
-            pass
+            pmc = tabela.pmc
+        except Exception as err:
+            print(err)
 
         return round(pmc, 2)
 
