@@ -21,6 +21,8 @@ from api.models.produto import Produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.parceiro import Parceiro, UsuarioParceiro
 from api.models.estoque import Estoque
+from api.models.sintoma import Sintoma
+
 
 
 # class FarmaciaAdmin(admin.ModelAdmin):
@@ -198,3 +200,4 @@ admin.site.register(Secao)
 admin.site.register(Subsecao)
 admin.site.register(ClienteEndereco)
 admin.site.register(Estoque)
+admin.site.register(Sintoma)

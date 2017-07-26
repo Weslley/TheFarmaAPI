@@ -94,6 +94,19 @@ class ProdutoFabricante(serializers.ModelSerializer):
         fields = ('id', 'nome', 'fabricante')
 
 
+class ProdutoCompleto(serializers.ModelSerializer):
+    fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
+    principio_ativo = serializers.CharField(read_only=True, source='principio_ativo.nome')
+    secao = serializers.CharField(read_only=True, source='secao.nome')
+    subsecao = serializers.CharField(read_only=True, source='subsecao.nome')
+    sintomas = serializers.StringRelatedField(many=True)
+
+
+    class Meta:
+        model = Produto
+        fields = ('id', 'nome', 'fabricante', 'descricao', 'principio_ativo', 'tipo', 'secao', 'subsecao', 'sintomas')
+
+
 class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
     imagens = serializers.SerializerMethodField()
@@ -141,3 +154,8 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             data = request.build_absolute_uri(obj.unidade.imagem.url)
 
         return data
+
+
+
+class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):
+    produto = ProdutoCompleto()

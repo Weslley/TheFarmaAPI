@@ -58,7 +58,7 @@ class ApresentacaoExport(generics.ListAPIView):
     pagination_class = LargeResultsSetPagination
 
 
-class ApresentacaoPorEstado(generics.ListAPIView):
+class ApresentacaoPorEstadoList(generics.ListAPIView):
     queryset = Apresentacao.objects.all()
     serializer_class = ApresentacaoBuscaProduto
     pagination_class = SmallResultsSetPagination
@@ -68,7 +68,7 @@ class ApresentacaoPorEstado(generics.ListAPIView):
     ordering = ('produto__nome',)
 
     def get_serializer_context(self):
-        context = super(ApresentacaoPorEstado, self).get_serializer_context()
+        context = super(ApresentacaoPorEstadoList, self).get_serializer_context()
         context['cidade'] = None
 
         unidade_federativa = self.kwargs['uf']
@@ -81,3 +81,25 @@ class ApresentacaoPorEstado(generics.ListAPIView):
                 context['cidade'] = cidades.first()
 
         return context
+
+
+class ApresentacaoPorEstadoRetrieve(generics.RetrieveAPIView):
+    queryset = Apresentacao.objects.all()
+    serializer_class = ApresentacaoProdutoRetrieve
+    lookup_url_kwarg = 'id'
+
+    def get_serializer_context(self):
+        context = super(ApresentacaoPorEstadoRetrieve, self).get_serializer_context()
+        context['cidade'] = None
+
+        unidade_federativa = self.kwargs['uf']
+        nome_cidade = self.request.GET.get('cidade')
+
+        if nome_cidade:
+            nome_cidade = nome_cidade.strip()
+            cidades = Cidade.objects.filter(uf__sigla=unidade_federativa, nome__iexact=nome_cidade)
+            if cidades.count():
+                context['cidade'] = cidades.first()
+
+        return context
+
