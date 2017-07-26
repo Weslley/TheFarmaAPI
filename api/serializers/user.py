@@ -24,7 +24,7 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
                 'required': True,
                 'allow_blank': False,
                 'validators': [UniqueValidator(
-                    queryset=User.objects.exclude(farmacia__isnull=False),
+                    queryset=User.objects.exclude(representante_farmacia__isnull=False),
                     message='Usuário ja cadastrado com este email.'
                 )]
             }
