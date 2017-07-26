@@ -11,6 +11,7 @@ class Apresentacao(models.Model):
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     ativo = models.BooleanField(default=True)
     unidade = models.ForeignKey(Unidade, null=True, blank=True)
+    quantidade = models.IntegerField(default=0)
 
     def __str__(self):
         return self.nome if self.nome else self.medicamento

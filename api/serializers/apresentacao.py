@@ -109,6 +109,7 @@ class ProdutoCompleto(serializers.ModelSerializer):
 
 class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
+    pmc = serializers.SerializerMethodField()
     imagens = serializers.SerializerMethodField()
     imagem = serializers.SerializerMethodField()
     unidade = serializers.CharField(source='unidade.nome')
@@ -116,7 +117,7 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto', 'imagem')
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto', 'imagem', 'pmc', 'quantidade')
 
     def get_preco(self, obj):
         cidade = self.context['cidade']
@@ -155,6 +156,17 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
         return data
 
+    def get_pmc(self, obj):
+        cidade = self.context['cidade']
+        pmc = Decimal(0)
+
+        try:
+            tabela = obj.tabelas.get(icms=cidade.uf.icms)
+            pcm = tabela.pmc
+        except:
+            pass
+
+        return round(pmc, 2)
 
 
 class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):

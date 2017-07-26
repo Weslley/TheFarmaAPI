@@ -15,3 +15,4 @@ class TabelaPreco(models.Model):
     class Meta:
         verbose_name = 'Tabela de preço'
         verbose_name_plural = 'Tabela de preços'
+        unique_together = ('apresentacao', 'icms')
