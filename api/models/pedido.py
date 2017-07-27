@@ -19,10 +19,13 @@ class Pedido(models.Model):
     remote_ip = models.GenericIPAddressField()
     browser = models.CharField(max_length=50)
 
+    def __str__(self):
+        return 'Pedido {}'.format(self.id)
+
 
 class ItemPedido(models.Model):
-    pedido = models.ForeignKey(Pedido)
-    apresentacao = models.ForeignKey(Apresentacao)
+    pedido = models.ForeignKey(Pedido, related_name='itens')
+    apresentacao = models.ForeignKey(Apresentacao, related_name='itens_vendidos')
     quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     valor = models.DecimalField(max_digits=15, decimal_places=2)
     farmacia = models.ForeignKey(Farmacia)

@@ -22,6 +22,8 @@ from api.models.principio_ativo import PrincipioAtivo
 from api.models.parceiro import Parceiro, UsuarioParceiro
 from api.models.estoque import Estoque
 from api.models.sintoma import Sintoma
+from api.models.pedido import Pedido, ItemPedido
+from api.models.cartao import Cartao
 
 
 
@@ -201,3 +203,6 @@ admin.site.register(Subsecao)
 admin.site.register(ClienteEndereco)
 admin.site.register(Estoque)
 admin.site.register(Sintoma)
+admin.site.register(Pedido)
+admin.site.register(ItemPedido)
+admin.site.register(Cartao)

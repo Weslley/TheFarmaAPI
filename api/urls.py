@@ -62,6 +62,7 @@ urlpatterns = [
     url(r'^apresentacoes/(?P<id>[0-9]+)/rank/$', RankingApresentacao.as_view(), name='apresentacao-ranking'),
     url(r'^apresentacoes/sync/(?P<data>[0-9]+)/$', ApresentacaoSync.as_view(), name='apresentacao-sync'),
     url(r'^apresentacoes/(?P<uf>[A-Z]{2})/$', ApresentacaoPorEstadoList.as_view(), name='apresentacao-list-estado'),
+    url(r'^apresentacoes/(?P<uf>[A-Z]{2})/mais_vendidos/$', ApresentacaoMaisVendidasPorEstadoList.as_view(), name='apresentacao-mais-vendida-list-estado'),
     url(r'^apresentacoes/(?P<uf>[A-Z]{2})/(?P<id>[0-9]+)/$', ApresentacaoPorEstadoRetrieve.as_view(), name='apresentacao-retrieve-estado'),
     url(r'^apresentacoes/(?P<uf>[A-Z]{2})/(?P<id>[0-9]+)/genericos/$', GenericosPorEstadoList.as_view(), name='apresentacao-genericos'),
 
