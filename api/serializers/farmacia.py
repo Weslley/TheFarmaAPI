@@ -6,7 +6,7 @@ from api.models.farmacia import Farmacia
 class FarmaciaListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Farmacia
-        fields = ('cnpj', 'nome_fantasia')
+        fields = ('cnpj', 'nome_fantasia', 'razao_social')
 
 
 class FarmaciaSerializer(serializers.ModelSerializer):

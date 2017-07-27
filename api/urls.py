@@ -17,6 +17,7 @@ from api.views.secao import *
 from api.views.tabela_preco import *
 from api.views.estoque import *
 from api.views.uf import *
+from api.views.representante_legal import *
 from api.views.autenticacao import Logout, LoginFacebook, TesteLogin, LoginFarmacia, Login, LoginDefault, CreateUser
 
 
@@ -104,6 +105,9 @@ urlpatterns = [
     # Seções
     url(r'^secoes/$', SecaoList.as_view(), name='secao-list'),
     url(r'^secoes/(?P<id>[0-9]+)/$', SecaoDetail.as_view(), name='secao-view'),
+
+    # Representantes legais
+    url(r'^representante_legal/$', RepresentanteRetrieve.as_view(), name='representante-view'),
 
 
 ]

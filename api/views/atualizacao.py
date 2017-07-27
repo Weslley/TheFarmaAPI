@@ -9,6 +9,6 @@ class UltimaAtualizacao(generics.GenericAPIView):
     serializer_class = AtualizacaoSerializer
 
     def get(self, request, format=None):
-        instance = Atualizacao.objects.last()
+        instance = Atualizacao.objects.order_by('id').last()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
