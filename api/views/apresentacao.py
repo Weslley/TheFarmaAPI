@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from api.mixins.base import SyncApiMixin
 from api.models.apresentacao import Apresentacao
 from api.models.cidade import Cidade
+from api.models.produto import Produto
 from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
 from api.serializers.apresentacao import *
 from api.filters import ApresentacaoFilter, OrderingFilter
@@ -103,3 +104,31 @@ class ApresentacaoPorEstadoRetrieve(generics.RetrieveAPIView):
 
         return context
 
+
+class GenericosPorEstadoList(generics.ListAPIView):
+    serializer_class = ApresentacaoBuscaProduto
+    pagination_class = SmallResultsSetPagination
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_class = ApresentacaoFilter
+    ordering_fields = ('produto__nome', '-produto__nome')
+    ordering = ('produto__nome',)
+
+    def get_queryset(self):
+        produto = Produto.objects.get(apresentacoes__id=self.kwargs['id'])
+        queryset = Apresentacao.objects.filter(produto__principio_ativo=produto.principio_ativo)
+        return queryset
+
+    def get_serializer_context(self):
+        context = super(GenericosPorEstadoList, self).get_serializer_context()
+        context['cidade'] = None
+
+        unidade_federativa = self.kwargs['uf']
+        nome_cidade = self.request.GET.get('cidade')
+
+        if nome_cidade:
+            nome_cidade = nome_cidade.strip()
+            cidades = Cidade.objects.filter(uf__sigla=unidade_federativa, nome__iexact=nome_cidade)
+            if cidades.count():
+                context['cidade'] = cidades.first()
+
+        return context

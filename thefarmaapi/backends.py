@@ -224,7 +224,7 @@ class FarmaciaBackend(object):
                     token.delete()
                     Token.objects.create(user=user)
                 return user
-        except Farmacia.DoesNotExist:
+        except RepresentanteLegal.DoesNotExist:
             return None
         except Exception as err:
             print(err)

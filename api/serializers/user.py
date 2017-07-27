@@ -170,7 +170,7 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError('Este campo é obrigatório.')
         try:
-            User.objects.exclude(farmacia__isnull=False).get(**kwargs)
+            User.objects.exclude(representante_farmacia__isnull=False).get(**kwargs)
         except User.DoesNotExist:
             if 'email' in kwargs:
                 raise serializers.ValidationError('Email não cadastrado.')
@@ -206,6 +206,7 @@ class LoginFarmaciaSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
     email = serializers.EmailField()
+
 
     class Meta:
         model = User

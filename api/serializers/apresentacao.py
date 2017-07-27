@@ -4,6 +4,7 @@ from api.models.estoque import Estoque
 from api.models.produto import Produto
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 from decimal import Decimal
+import locale
 
 
 class ApresentacaoListSerializer(serializers.ModelSerializer):
@@ -129,8 +130,9 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         ).order_by('valor').first()
         if estoque:
             preco = estoque.valor
-
-        return round(preco, 2)
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        preco = locale.currency(preco, grouping=True, symbol=None)
+        return preco
 
     def get_imagens(self, obj):
         qs = obj.imagens.order_by('-capa')
@@ -164,9 +166,12 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             tabela = obj.tabelas.get(icms=cidade.uf.icms)
             pmc = tabela.pmc
         except Exception as err:
-            print(err)
+            pass
 
-        return round(pmc, 2)
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        pmc = locale.currency(pmc, grouping=True, symbol=None)
+
+        return pmc
 
 
 class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):
