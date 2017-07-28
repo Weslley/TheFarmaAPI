@@ -261,3 +261,18 @@ class DetailUserSerializer(serializers.ModelSerializer):
             'username': {'read_only': True},
             'email': {'read_only': True},
         }
+
+
+class RepresentanteUserSerializer(serializers.ModelSerializer):
+    nome = serializers.CharField(source='first_name')
+    sobrenome = serializers.CharField(source='last_name')
+    token = serializers.CharField(read_only=True, source='auth_token.key')
+
+    class Meta:
+        model = User
+        fields = ('nome', 'sobrenome', 'email', 'token')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'username': {'read_only': True},
+            'email': {'read_only': True},
+        }
