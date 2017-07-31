@@ -2,6 +2,7 @@ from rest_framework import serializers
 from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.models.estoque import Estoque
 from api.models.produto import Produto
+from api.models.uf import Uf
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 from decimal import Decimal
 import locale
@@ -44,10 +45,26 @@ class ApresentacaoBusca(serializers.ModelSerializer):
     imagens = serializers.SerializerMethodField()
     imagem = serializers.SerializerMethodField()
     unidade = serializers.CharField(source='unidade.nome')
+    pmc = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem')
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem', 'pmc')
+
+    def get_pmc(self, obj):
+        pmc = Decimal(0)
+
+        try:
+            uf = Uf.objects.get(sigla=self.context['view'].kwargs['uf'])
+            tabela = obj.tabelas.get(icms=uf.icms)
+            pmc = tabela.pmc
+        except Exception as err:
+            pass
+
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        pmc = locale.currency(pmc, grouping=True, symbol=None)
+
+        return pmc
 
     def get_preco(self, obj):
         cidade = self.context['cidade']

@@ -1,19 +1,19 @@
 from rest_framework import serializers
 from api.models.representante_legal import RepresentanteLegal
 from api.serializers.endereco import EnderecoSerializer
-from api.serializers.farmacia import FarmaciaListSerializer
+from api.serializers.farmacia import FarmaciaRepresentanteSerializer
 from api.serializers.user import RepresentanteUserSerializer
 from django.db import transaction
 
+
 class RepresentanteSerializer(serializers.ModelSerializer):
     endereco = EnderecoSerializer()
-    farmacia = FarmaciaListSerializer()
+    farmacia = FarmaciaRepresentanteSerializer()
     usuario = RepresentanteUserSerializer()
 
     class Meta:
         model = RepresentanteLegal
         exclude = ('id',)
-
 
     def update(self, instance, validated_data):
         with transaction.atomic():
@@ -23,7 +23,7 @@ class RepresentanteSerializer(serializers.ModelSerializer):
 
             if 'farmacia' in validated_data:
                 farmacia_data = validated_data.pop('farmacia')
-                serializer = FarmaciaListSerializer(instance.farmacia, farmacia_data, **{'context': {'request': self.context['request']}})
+                serializer = FarmaciaRepresentanteSerializer(instance.farmacia, farmacia_data, **{'context': {'request': self.context['request']}})
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 

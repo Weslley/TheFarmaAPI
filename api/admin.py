@@ -3,6 +3,8 @@
 from django.contrib import admin
 
 from api.models.atualizacao import Atualizacao
+from api.models.banco import Banco
+from api.models.conta_bancaria import ContaBancaria
 from api.models.curtida import Curtida
 from api.models.cliente import Cliente, ClienteEndereco
 from api.models.post import Post
@@ -206,3 +208,5 @@ admin.site.register(Sintoma)
 admin.site.register(Pedido)
 admin.site.register(ItemPedido)
 admin.site.register(Cartao)
+admin.site.register(Banco)
+admin.site.register(ContaBancaria)

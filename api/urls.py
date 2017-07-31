@@ -3,7 +3,8 @@
 from django.conf.urls import url
 
 from api.views.atualizacao import UltimaAtualizacao
-from api.views.bairro import BairroList
+from api.views.bairro import *
+from api.views.banco import *
 from api.views.cliente import *
 from api.views.produto import *
 from api.views.laboratorio import *
@@ -109,5 +110,7 @@ urlpatterns = [
     # Representantes legais
     url(r'^representante_legal/$', RepresentanteRetrieve.as_view(), name='representante-view'),
 
+    # Banco
+    url(r'^bancos/$', BancoList.as_view(), name='banco-list'),
 
 ]
