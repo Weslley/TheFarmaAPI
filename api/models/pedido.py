@@ -30,6 +30,14 @@ class Pedido(models.Model):
     def __str__(self):
         return 'Pedido {}'.format(self.id)
 
+    @property
+    def valor_bruto(self):
+        return 0
+
+    @property
+    def valor_liquido(self):
+        return 0
+
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens')
