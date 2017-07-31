@@ -1,5 +1,6 @@
 import re
 
+
 class Converter:
     """
     Classe com metodos de conversão

@@ -4,6 +4,7 @@ from rest_framework import serializers
 from api.models.cliente import Cliente
 from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
+from rest_framework.fields import empty
 from django.db import transaction
 import re
 from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
@@ -264,15 +265,29 @@ class DetailUserSerializer(serializers.ModelSerializer):
 
 
 class RepresentanteUserSerializer(serializers.ModelSerializer):
-    nome = serializers.CharField(source='first_name')
-    sobrenome = serializers.CharField(source='last_name')
+    nome = serializers.CharField(source='first_name', required=False)
+    sobrenome = serializers.CharField(source='last_name', required=False)
     token = serializers.CharField(read_only=True, source='auth_token.key')
+    password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
-        fields = ('nome', 'sobrenome', 'email', 'token')
+        fields = ('nome', 'sobrenome', 'email', 'token', 'password')
         extra_kwargs = {
-            'id': {'read_only': True},
-            'username': {'read_only': True},
             'email': {'read_only': True},
         }
+
+    def run_validation(self, data=empty):
+        value = super(RepresentanteUserSerializer, self).run_validation(data)
+        if 'first_name' in data:
+            value['first_name'] = data['first_name']
+
+        if 'last_name' in data:
+            value['last_name'] = data['last_name']
+        return value
+
+    def update(self, instance, validated_data):
+        instance = super(RepresentanteUserSerializer, self).update(instance, validated_data)
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
+        return instance

@@ -1,6 +1,6 @@
 from django.db import models
+
 from api.models.endereco import Endereco
-from django.contrib.auth.models import User
 
 
 class Farmacia(models.Model):
@@ -14,6 +14,7 @@ class Farmacia(models.Model):
     endereco = models.OneToOneField(Endereco)
     data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
+    # conta_bancaria = models.OneToOneField(ContaBancaria)  # sugestão
 
     class Meta:
         verbose_name = 'Farmácia'
