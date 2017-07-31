@@ -265,17 +265,28 @@ class DetailUserSerializer(serializers.ModelSerializer):
 
 
 class RepresentanteUserSerializer(serializers.ModelSerializer):
-    nome = serializers.CharField(source='first_name', required=False)
-    sobrenome = serializers.CharField(source='last_name', required=False)
+    nome = serializers.CharField(source='first_name', required=False, max_length=30)
+    sobrenome = serializers.CharField(source='last_name', required=False, max_length=30)
     token = serializers.CharField(read_only=True, source='auth_token.key')
     password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
         fields = ('nome', 'sobrenome', 'email', 'token', 'password')
-        extra_kwargs = {
-            'email': {'read_only': True},
-        }
+
+    def validate_email(self, value):
+        obj = self.context['view'].get_object()
+
+        if not value:
+            raise serializers.ValidationError('Este campo é obrigatório.')
+
+        if value == obj.usuario.email:
+            return value
+
+        if User.objects.exclude(cliente__isnull=False).filter(email=value).exists():
+            raise serializers.ValidationError('Já existe usuário com este email')
+
+        return value
 
     def run_validation(self, data=empty):
         value = super(RepresentanteUserSerializer, self).run_validation(data)
