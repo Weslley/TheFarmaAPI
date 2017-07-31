@@ -5,7 +5,6 @@ from api.models.bairro import Bairro
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
 from api.models.cliente import Cliente
-from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
 from api.models.log import Log
 from django.core.validators import MinValueValidator
@@ -16,11 +15,9 @@ class Pedido(models.Model):
     valor_frete = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     cliente = models.ForeignKey(Cliente)
-    # endereco = models.ForeignKey(Endereco) # SUGESTÃO
     status = models.IntegerField(default=StatusPedido.ABERTO, choices=StatusPedido.choices())
     log = models.OneToOneField(Log)
     forma_pagamento = models.IntegerField(choices=FormaPagamento.choices(), default=FormaPagamento.CARTAO)
-
     cep = models.CharField(max_length=8)
     logradouro = models.CharField(max_length=80)
     numero = models.IntegerField(null=True, blank=True)
@@ -43,7 +40,6 @@ class ItemPedido(models.Model):
     status = models.IntegerField(choices=StatusItem.choices(), default=StatusItem.ABERTO)
 
 
-# Sugestão
 class PagamentoCartao(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='cartoes')
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
