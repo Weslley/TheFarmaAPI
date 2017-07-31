@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import time, timedelta
 
 from api.models.conta_bancaria import ContaBancaria
 from api.models.endereco import Endereco
@@ -22,6 +23,15 @@ class Farmacia(models.Model):
     percentual_generico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_etico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_nao_medicamentos = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    tempo_entrega = models.DurationField(default=timedelta())
+    horario_funcionamento_segunda_sexta_inicial = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_segunda_sexta_final = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_sabado_inicial = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_sabado_final = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_domindo_inicial = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_domindo_final = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_feriado_inicial = models.TimeField(default=time(0, 0, 0))
+    horario_funcionamento_feriado_final = models.TimeField(default=time(0, 0, 0))
 
     class Meta:
         verbose_name = 'Farmácia'
