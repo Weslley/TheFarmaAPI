@@ -25,6 +25,29 @@ class IsFullAuthenticatedMixin(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
+class IsRepresentantePermission(permissions.BasePermission):
+    """
+    Permissão para representante
+    """
+
+    def has_permission(self, request, view):
+        return hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia
+
+
+class IsAuthenticatedRepresentanteMixin(APIView):
+    """
+    Mixin para representante logado
+    """
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, IsRepresentantePermission)
+
+
 class CustomJSONAPIView(object):
     """
     Mixin para APIView de dados básicos
