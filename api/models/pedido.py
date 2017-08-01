@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum, F
+from datetime import datetime
 
 from api.models.apresentacao import Apresentacao
 from api.models.bairro import Bairro
@@ -32,11 +34,24 @@ class Pedido(models.Model):
 
     @property
     def valor_bruto(self):
-        return 0
+        resultado = self.contas_receber_farmacia.aggregate(valor_bruto=Sum('valor_bruto'))
+        return resultado['valor_bruto']
 
     @property
     def valor_liquido(self):
-        return 0
+        resultado = self.contas_receber_farmacia.aggregate(valor_liquido=Sum(
+            F('valor_bruto') - F('valor_administradora_cartao') - F('valor_thefarma') - F('valor_adiantamento')
+        ))
+        return resultado['valor_liquido']
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if self.log:
+            self.log.data_criacao = datetime.now()
+            self.log.save(using=using)
+        return super(Pedido, self).save(
+            force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
+        )
 
 
 class ItemPedido(models.Model):
