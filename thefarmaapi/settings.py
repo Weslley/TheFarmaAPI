@@ -187,4 +187,5 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
-CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=casting.to_tuple(','))
+# CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=casting.to_tuple(','))
+CORS_ORIGIN_ALLOW_ALL = True
