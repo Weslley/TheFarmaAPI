@@ -20,7 +20,7 @@ class FarmaciaSerializer(serializers.ModelSerializer):
 
 
 class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
-    conta_bancaria = ContaBancariaSerializer()
+    conta_bancaria = ContaBancariaSerializer(required=False)
 
     class Meta:
         model = Farmacia
@@ -31,7 +31,12 @@ class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
 
             if 'conta_bancaria' in validated_data:
                 conta_bancaria_data = validated_data.pop('conta_bancaria')
-                serializer = ContaBancariaSerializer(instance.farmacia, conta_bancaria_data, **{'context': {'request': self.context['request']}})
+                serializer = ContaBancariaSerializer(
+                    instance.conta_bancaria,
+                    conta_bancaria_data,
+                    **{'context': {'request': self.context['request']}},
+                    partial=True
+                )
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 

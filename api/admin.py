@@ -5,8 +5,10 @@ from django.contrib import admin
 from api.models.atualizacao import Atualizacao
 from api.models.banco import Banco
 from api.models.conta_bancaria import ContaBancaria
+from api.models.conta_receber_farmacia import ContaReceberFarmacia
 from api.models.curtida import Curtida
 from api.models.cliente import Cliente, ClienteEndereco
+from api.models.log import Log
 from api.models.post import Post
 from api.models.representante_legal import RepresentanteLegal
 from api.models.secao import Secao
@@ -210,3 +212,5 @@ admin.site.register(ItemPedido)
 admin.site.register(Cartao)
 admin.site.register(Banco)
 admin.site.register(ContaBancaria)
+admin.site.register(Log)
+admin.site.register(ContaReceberFarmacia)

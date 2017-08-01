@@ -23,18 +23,28 @@ class RepresentanteSerializer(serializers.ModelSerializer):
 
             if 'farmacia' in validated_data:
                 farmacia_data = validated_data.pop('farmacia')
-                serializer = FarmaciaRepresentanteSerializer(instance.farmacia, farmacia_data, **{'context': {'request': self.context['request']}})
+                serializer = FarmaciaRepresentanteSerializer(
+                    instance.farmacia,
+                    farmacia_data,
+                    **{'context': {'request': self.context['request']}},
+                    partial=True
+                )
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 
             if 'usuario' in validated_data:
                 usuario_data = validated_data.pop('usuario')
-                serializer = RepresentanteUserSerializer(instance.usuario, usuario_data, **{
-                    'context': {
-                        'request': self.context['request'],
-                        'view': self.context['view']
-                    }
-                })
+                serializer = RepresentanteUserSerializer(
+                    instance.usuario,
+                    usuario_data,
+                    **{
+                        'context': {
+                            'request': self.context['request'],
+                            'view': self.context['view']
+                        }
+                    },
+                    partial=True
+                )
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 

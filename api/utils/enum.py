@@ -14,7 +14,7 @@ class IntEnum(_IntEnum):
         Metodo que retorna uma lista de tuplas (NAME, VALUE) do itens do Enum
         :return: lista de tuplas (NAME, VALUE)
         """
-        return [(n.name, n.value) for n in cls]
+        return [(n.value, n.name) for n in cls]
 
 
 @enum.unique
@@ -29,4 +29,4 @@ class Enum(_Enum):
         Metodo que retorna uma lista de tuplas (NAME, VALUE) do itens do Enum
         :return: lista de tuplas (NAME, VALUE)
         """
-        return [(n.name, n.value) for n in cls]
+        return [(n.value, n.name) for n in cls]
