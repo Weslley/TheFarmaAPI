@@ -34,6 +34,7 @@ class CidadeCreateUpdateSerializer(serializers.Serializer):
     ibge = serializers.IntegerField()
     nome = serializers.CharField(max_length=150, required=False)
     uf = serializers.CharField(max_length=2, required=False)
+    uf_nome = serializers.CharField(source='uf.nome', read_only=True)
 
     def get_object(self, ibge):
         try:

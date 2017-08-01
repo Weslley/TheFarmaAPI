@@ -12,3 +12,9 @@ class PrincipioAtivoSerializer(serializers.ModelSerializer):
 
     def get_data_atualizacao(self, obj):
         return int(obj.data_atualizacao.timestamp() * 1000)
+
+
+class PrincipioAtivoBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrincipioAtivo
+        fields = ('id', 'nome')

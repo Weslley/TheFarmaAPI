@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from api.views.atualizacao import UltimaAtualizacao
 from api.views.bairro import *
@@ -20,6 +20,7 @@ from api.views.estoque import *
 from api.views.uf import *
 from api.views.representante_legal import *
 from api.views.autenticacao import Logout, LoginFacebook, TesteLogin, LoginFarmacia, Login, LoginDefault, CreateUser
+from api.views.financeiro import urls as financeiro_urls
 
 
 urlpatterns = [
@@ -113,4 +114,6 @@ urlpatterns = [
     # Banco
     url(r'^bancos/$', BancoList.as_view(), name='banco-list'),
 
+    # Financeiro
+    url(r'^financeiro/', include(financeiro_urls)),
 ]

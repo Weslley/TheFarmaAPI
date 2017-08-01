@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from api.models.produto import Produto
 from api.serializers.apresentacao import ApresentacaoListSerializer, ApresentacaoBusca
+from api.serializers.principio_ativo import PrincipioAtivoBasicSerializer
 
 
 class MedicamentoSerializer(serializers.ModelSerializer):
@@ -36,10 +37,11 @@ class MedicamentoExportSerializer(serializers.ModelSerializer):
 class ProdutoSerializer(serializers.ModelSerializer):
     apresentacoes = serializers.SerializerMethodField()
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
+    principio_ativo = PrincipioAtivoBasicSerializer()
 
     class Meta:
         model = Produto
-        fields = ('id', 'nome', 'fabricante', 'apresentacoes')
+        fields = ('id', 'nome', 'fabricante', 'apresentacoes', 'principio_ativo')
 
     def get_apresentacoes(self, obj):
         qs = obj.apresentacoes.filter(ativo=True)

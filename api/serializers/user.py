@@ -207,11 +207,11 @@ class LoginFarmaciaSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
     email = serializers.EmailField()
-
+    nome = serializers.CharField(read_only=True, source='first_name')
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'id', 'token')
+        fields = ('email', 'password', 'id', 'token', 'nome')
         extra_kwargs = {
             'id': {'read_only': True},
             'email': {
@@ -301,4 +301,5 @@ class RepresentanteUserSerializer(serializers.ModelSerializer):
         instance = super(RepresentanteUserSerializer, self).update(instance, validated_data)
         if 'password' in validated_data:
             instance.set_password(validated_data['password'])
+            instance.save()
         return instance
