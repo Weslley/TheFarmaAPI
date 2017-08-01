@@ -46,10 +46,14 @@ class ApresentacaoBusca(serializers.ModelSerializer):
     imagem = serializers.SerializerMethodField()
     unidade = serializers.CharField(source='unidade.nome')
     pmc = serializers.SerializerMethodField()
+    data_atualizacao = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem', 'pmc')
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem', 'pmc', 'data_atualizacao')
+
+    def get_data_atualizacao(self, obj):
+        return int(obj.data_atualizacao.timestamp() * 1000)
 
     def get_pmc(self, obj):
         pmc = Decimal(0)
