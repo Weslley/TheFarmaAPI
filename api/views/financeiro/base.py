@@ -41,7 +41,6 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
         # Valores calculados de rendimento de cada mês
         values = []
         for mes in range(1, 13):
-            valor = 0.0
             query = Pedido.objects.exclude(
                 status=StatusPedido.CANCELADO_PELA_FARMACIA
             ).exclude(
