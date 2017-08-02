@@ -1,5 +1,6 @@
 from django.db import models
 
+from api.models.enums import StatusProduto
 from api.utils import tipo_produto
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.fabricante import Fabricante
@@ -13,6 +14,7 @@ class Produto(models.Model):
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Fabricante)
     tipo = models.IntegerField(choices=tipo_produto.CHOICES)
+    status = models.IntegerField(choices=StatusProduto.choices(), default=StatusProduto.REVISAR)
     secao = models.ForeignKey(Secao, null=True)
     subsecao = models.ForeignKey(Subsecao, null=True)
     sintomas = models.ManyToManyField(Sintoma, related_name='medicamentos_associados', blank=True)
