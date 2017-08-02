@@ -20,7 +20,7 @@ class FarmaciaSerializer(serializers.ModelSerializer):
 
 
 class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
-    conta_bancaria = ContaBancariaSerializer(required=False)
+    conta_bancaria = ContaBancariaSerializer()
 
     class Meta:
         model = Farmacia
@@ -30,7 +30,8 @@ class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
         with transaction.atomic():
 
             if 'conta_bancaria' in validated_data:
-                conta_bancaria_data = validated_data.pop('conta_bancaria')
+                validated_data.pop('conta_bancaria')
+                conta_bancaria_data = self.context['request'].data['farmacia']['conta_bancaria']
                 serializer = ContaBancariaSerializer(
                     instance.conta_bancaria,
                     conta_bancaria_data,
