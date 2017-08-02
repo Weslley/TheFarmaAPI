@@ -10,7 +10,7 @@ from api.models.cliente import Cliente
 from api.models.farmacia import Farmacia
 from api.models.log import Log
 from django.core.validators import MinValueValidator
-from api.models.enums import FormaPagamento, StatusPedido, StatusPagamentoCartao, StatusItem
+from api.models.enums import FormaPagamento, StatusPedido, StatusPagamentoCartao, StatusItem, StatusItemProposta
 
 
 class Pedido(models.Model):
@@ -44,6 +44,11 @@ class Pedido(models.Model):
         ))
         return resultado['valor_liquido']
 
+    @property
+    def propostas(self):
+
+        return None
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         if self.log:
@@ -56,11 +61,14 @@ class Pedido(models.Model):
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens')
-    apresentacao = models.ForeignKey(Apresentacao, related_name='itens_vendidos')  # Não entendi por seria uma lista
+    apresentacao = models.ForeignKey(Apresentacao, related_name='itens_vendidos')
     quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2)
-    farmacia = models.ForeignKey(Farmacia)
+    farmacia = models.ForeignKey(Farmacia, null=True, related_name='apresentacoes_vendidos')
     status = models.IntegerField(choices=StatusItem.choices(), default=StatusItem.ABERTO)
+
+    class Meta:
+        unique_together = ('pedido', 'apresentacao', 'farmacia')
 
 
 class PagamentoCartao(models.Model):
@@ -68,3 +76,16 @@ class PagamentoCartao(models.Model):
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
     valor = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.IDENTIFICACAO)
+
+
+class ItemPropostaPedido(models.Model):
+    pedido = models.ForeignKey(Pedido, related_name='itens_proposta')
+    apresentacao = models.ForeignKey(Apresentacao, related_name='itens_propostos')
+    quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
+    valor_unitario = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    farmacia = models.ForeignKey(Farmacia, related_name='propostas')
+    status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
+    possui = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('pedido', 'apresentacao', 'farmacia')
