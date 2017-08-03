@@ -4,6 +4,7 @@ from django.contrib import admin
 
 from api.models.atualizacao import Atualizacao
 from api.models.banco import Banco
+from api.models.configuracao import Configuracao
 from api.models.conta_bancaria import ContaBancaria
 from api.models.conta_receber_farmacia import ContaReceberFarmacia
 from api.models.curtida import Curtida
@@ -26,7 +27,7 @@ from api.models.principio_ativo import PrincipioAtivo
 from api.models.parceiro import Parceiro, UsuarioParceiro
 from api.models.estoque import Estoque
 from api.models.sintoma import Sintoma
-from api.models.pedido import Pedido, ItemPedido
+from api.models.pedido import Pedido, ItemPedido, ItemPropostaPedido
 from api.models.cartao import Cartao
 
 
@@ -214,3 +215,5 @@ admin.site.register(Banco)
 admin.site.register(ContaBancaria)
 admin.site.register(Log)
 admin.site.register(ContaReceberFarmacia)
+admin.site.register(ItemPropostaPedido)
+admin.site.register(Configuracao)
