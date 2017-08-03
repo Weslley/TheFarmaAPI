@@ -18,6 +18,7 @@ django-cors-headers==2.1.0
 django-crispy-forms==1.6.1
 django-extensions==1.7.8
 django-filter==0.15.3
+django-filters==0.2.1
 djangoajax==2.3.7
 djangorestframework==3.5.1
 drfdocs==0.0.11
@@ -28,6 +29,7 @@ greenlet==0.4.12
 gunicorn==19.6.0
 httplib2==0.9.2
 idna==2.2
+invoke==0.20.2
 kombu==3.0.37
 ndg-httpsclient==0.4.2
 oauth2client==3.0.0
