@@ -14,3 +14,4 @@ class StatusPedido(IntEnum):
     CANCELADO_PELA_FARMACIA = 6       # Cancelamento pela farmacia - FEITO SOMENTE PELOS ADMINISTRADORES
     CANCELADO_PELO_CLIENTE = 7        # Quando o cliente não aceita a proposta
     SEM_PROPOSTA = 8                  # Caso na tenha sido encontrado uma proposta para o cliente
+    TIMEOUT = 9                       # Timeout para aceitar a proposta

@@ -48,8 +48,20 @@ class Pedido(models.Model):
 
     @property
     def propostas(self):
-
-        return None
+        """
+        Property que retorna todas as propostas
+        :return:
+        """
+        farmacias = [item.farmacia for item in self.itens_proposta.select_related('farmacia').distinct('farmacia')]
+        return [
+            {
+                'farmacia': farmacia,
+                'itens': farmacia.get_itens_proposta(self),
+                'status': farmacia.get_status_proposta(self),
+                'valor_total': farmacia.get_valor_proposta(self)
+            }
+            for farmacia in farmacias
+        ]
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -85,7 +97,7 @@ class ItemPropostaPedido(models.Model):
     apresentacao = models.ForeignKey(Apresentacao, related_name='itens_propostos')
     quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    farmacia = models.ForeignKey(Farmacia, related_name='propostas')
+    farmacia = models.ForeignKey(Farmacia, related_name='itens_proposta')
     status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
     possui = models.BooleanField(default=True)
 

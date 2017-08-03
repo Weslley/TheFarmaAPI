@@ -1,8 +1,10 @@
 from django.db import models
+from django.db.models import Sum, F
 from datetime import time, timedelta
 
 from api.models.conta_bancaria import ContaBancaria
 from api.models.endereco import Endereco
+from api.models.enums.status_item_proposta import StatusItemProposta
 
 
 class Farmacia(models.Model):
@@ -39,3 +41,34 @@ class Farmacia(models.Model):
 
     def __str__(self):
         return self.razao_social
+
+    def get_itens_proposta(self, pedido):
+        """
+        Retorna itens da proposta
+        :param pedido: Pedido proposto
+        :return: retorna os itens numa queryset
+        """
+        return self.itens_proposta.filter(pedido=pedido)
+
+    def get_status_proposta(self, pedido):
+        """
+        Retorna o status da proposta
+        :param pedido: Pedido proposto
+        :return: Status da proposta
+        """
+        # Verifica se todos os itens estão como enviado
+        if all(item.status == StatusItemProposta.ENVIADO for item in self.get_itens_proposta(pedido)):
+            return StatusItemProposta.ENVIADO
+
+        # Verifica se todos os itens estão como cancelados
+        if all(item.status == StatusItemProposta.CANCELADO for item in self.get_itens_proposta(pedido)):
+            return StatusItemProposta.CANCELADO
+
+        # caso contrario a proposta esta como em aberto
+        return StatusItemProposta.ABERTO
+
+    def get_valor_proposta(self, pedido):
+        resultado = self.get_itens_proposta(pedido).aggregate(valor_proposta=Sum(
+            F('quantidade') * F('valor_unitario'), output_field=models.DecimalField(max_digits=15, decimal_places=2)
+        ))
+        return resultado['valor_proposta']
