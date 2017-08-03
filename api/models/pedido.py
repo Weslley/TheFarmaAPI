@@ -28,6 +28,8 @@ class Pedido(models.Model):
     bairro = models.ForeignKey(Bairro, related_name='enderecos_pedido')
     nome_endereco = models.CharField(max_length=40)
     nome_destinatario = models.CharField(max_length=80, null=True, blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)
