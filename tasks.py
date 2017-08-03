@@ -6,11 +6,6 @@ def build(ctx):
     ctx.run('./manage.py makemigrations')
     ctx.run('./manage.py migrate')
 
-
-@task
-def run(ctx):
-    ctx.run('./manage.py runserver')
-
 @task
 def requirements(ctx):
     ctx.run("pip freeze | sed 's/@[a-z0-9]\+//' > requirements.txt")
