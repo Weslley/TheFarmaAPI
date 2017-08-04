@@ -7,6 +7,6 @@ def atualizacao():
     print('\nTeste\n')
 
 
-@app.task
+@app.task(queue='default')
 def update_dados_medicamentos(path, channel):
     update_command(path, channel)

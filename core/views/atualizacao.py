@@ -33,5 +33,5 @@ class AtualizacaoCreate(CreateView, AdminBaseMixin):
         instance = form.save(commit=False)
         instance.usuario = self.request.user
         instance.save()
-        update_dados_medicamentos.apply_async([instance.arquivo.path, self.request.session.session_key])
+        update_dados_medicamentos.apply_async([instance.arquivo.path, self.request.session.session_key], queue='default')
         return super(AtualizacaoCreate, self).form_valid(form)
