@@ -14,7 +14,7 @@ class Apresentacao(models.Model):
     quantidade = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.nome if self.nome else self.medicamento
+        return self.nome if self.nome else self.produto.nome
 
 
 def generate_filename(self, filename):

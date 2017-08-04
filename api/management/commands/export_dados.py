@@ -154,7 +154,7 @@ def get_or_create_apresentacao(ap_temp, medicamento):
                 codigo_barras=ap_temp.codbarras,
                 nome=ap_temp.apresentacao,
                 registro_ms=ap_temp.registroMS,
-                medicamento=medicamento
+                produto=medicamento
             )
         else:
             return None
