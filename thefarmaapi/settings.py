@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'corsheaders',
     'awesome_mixins',
-    'core'
+    'core',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -189,3 +190,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=casting.to_tuple(','))
 CORS_ORIGIN_ALLOW_ALL = True
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+        'ROUTING': 'thefarmaapi.routing.channels_routing',
+    }
+}
