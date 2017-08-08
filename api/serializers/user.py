@@ -208,10 +208,11 @@ class LoginFarmaciaSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
     email = serializers.EmailField()
     nome = serializers.CharField(read_only=True, source='first_name')
+    farmacia_id = serializers.IntegerField(source='representante_farmacia.farmacia_id', read_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'id', 'token', 'nome')
+        fields = ('email', 'password', 'id', 'token', 'nome', 'farmacia_id')
         extra_kwargs = {
             'id': {'read_only': True},
             'email': {
