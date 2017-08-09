@@ -30,8 +30,8 @@ class Pedido(models.Model):
     nome_destinatario = models.CharField(max_length=80, null=True, blank=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
-    #delivery
-    # troco
+    delivery = models.BooleanField(default=True)
+    troco = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)
