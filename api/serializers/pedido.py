@@ -26,23 +26,7 @@ class PedidoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Pedido
-        fields = (
-            'id',
-            'numero_parcelas',
-            'cliente',
-            'status',
-            'log',
-            'forma_pagamento',
-            'cep',
-            'logradouro',
-            'numero',
-            'complemento',
-            'cidade',
-            'bairro',
-            'nome_endereco',
-            'nome_destinatario',
-            'latitude',
-            'longitude',
-            'delivery',
-            'troco',
-        )
+        fields = '__all__'
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }

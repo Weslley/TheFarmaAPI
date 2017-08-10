@@ -23,6 +23,7 @@ import django.contrib.auth.views as auth_views
 from rest_framework_docs import urls as rest_framework_docs_urls
 from django.conf import settings
 
+
 urlpatterns = [
     url(r'^a/', include(api_urls)),
     url(r'^login/', auth_views.login, name='login'),
