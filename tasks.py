@@ -19,5 +19,6 @@ def deploy(ctx):
     ctx.run('./manage.py migrate')
     ctx.run('./manage.py collectstatic --no-input')
     ctx.run("sudo supervisorctl restart api-thefarma")
+    ctx.run("sudo supervisorctl restart api-thefarma-runworker")
     ctx.run("sudo supervisorctl restart api-thefarma-websocket")
     ctx.run("sudo supervisorctl restart api-thefarma-celery:")
