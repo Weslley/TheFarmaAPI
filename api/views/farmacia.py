@@ -35,6 +35,7 @@ class FarmaciaPedidos(generics.ListAPIView):
                 "delivery": True,
                 "status": 0,
                 "troco": 40,
+                "forma_pagamento": 0,
                 "cliente": "Philippe Valfok",
                 "endereco": {
                     "logradouro": "Rua selecionada da entrega",
@@ -53,8 +54,8 @@ class FarmaciaPedidos(generics.ListAPIView):
                             "fabricante": "Bayer"
                         },
                         "quantidade": 4,
-                        "PMC": 33.50
-
+                        "PMC": 33.50,
+                        "imagem": "http://www.farmaecia.com.br/img/gen/embalagem-medicamento-generico.gif"
                     },
                     {
                         "id": 13,
@@ -64,8 +65,8 @@ class FarmaciaPedidos(generics.ListAPIView):
                             "fabricante": "Bayer"
                         },
                         "quantidade": 2,
-                        "PMC": 18.70
-
+                        "PMC": 18.70,
+                        "imagem": "http://www.farmaecia.com.br/img/gen/embalagem-medicamento-generico.gif"
                     },
                     {
                         "id": 14,
@@ -75,8 +76,8 @@ class FarmaciaPedidos(generics.ListAPIView):
                             "fabricante": "Bayer"
                         },
                         "quantidade": 1,
-                        "PMC": 4.0
-
+                        "PMC": 4.0,
+                        "imagem": "http://www.farmaecia.com.br/img/gen/embalagem-medicamento-generico.gif"
                     },
                 ]
             }

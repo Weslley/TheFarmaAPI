@@ -17,7 +17,7 @@ from django.conf.urls.static import static
 from rest_framework import urls as drf_urls
 from django.conf.urls import url, include
 from django.contrib import admin
-from api import urls as api_urls
+from api.urls import urls as api_urls
 from core import urls as core_urls
 import django.contrib.auth.views as auth_views
 from rest_framework_docs import urls as rest_framework_docs_urls

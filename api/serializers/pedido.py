@@ -20,3 +20,29 @@ class PedidoSimplesSerializer(serializers.ModelSerializer):
 
     def get_valor_liquido(self, obj):
         return locale.currency(obj.valor_liquido, grouping=True, symbol=None)
+
+
+class PedidoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Pedido
+        fields = (
+            'id',
+            'numero_parcelas',
+            'cliente',
+            'status',
+            'log',
+            'forma_pagamento',
+            'cep',
+            'logradouro',
+            'numero',
+            'complemento',
+            'cidade',
+            'bairro',
+            'nome_endereco',
+            'nome_destinatario',
+            'latitude',
+            'longitude',
+            'delivery',
+            'troco',
+        )

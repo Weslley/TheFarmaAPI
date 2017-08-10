@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.conf.urls import url, include
 
 from api.views.atualizacao import UltimaAtualizacao
@@ -21,6 +19,7 @@ from api.views.uf import *
 from api.views.representante_legal import *
 from api.views.autenticacao import Logout, LoginFacebook, TesteLogin, LoginFarmacia, Login, LoginDefault, CreateUser
 from api.views.financeiro import urls as financeiro_urls
+from api.urls import pedido
 
 
 urlpatterns = [
@@ -117,4 +116,7 @@ urlpatterns = [
 
     # Financeiro
     url(r'^financeiro/', include(financeiro_urls)),
+
+    # Pedidos
+    url(r'^pedidos/', include(pedido)),
 ]
