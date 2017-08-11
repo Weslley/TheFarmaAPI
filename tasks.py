@@ -10,6 +10,8 @@ def build(ctx):
 @task
 def requirements(ctx):
     ctx.run("pip freeze | sed 's/@[a-z0-9]\+//' > requirements.txt")
+    ctx.run("git add requirements.txt")
+    ctx.run("git commit -m 'Update requirements'")
 
 
 @task
