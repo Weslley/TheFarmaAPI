@@ -1,7 +1,7 @@
 from django.db import models
 
-from api.models.farmacia import Farmacia
 from api.models.apresentacao import Apresentacao
+from api.models.farmacia import Farmacia
 
 
 class Estoque(models.Model):

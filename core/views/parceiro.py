@@ -1,12 +1,12 @@
 import re
 
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, UpdateView
 from awesome_mixins.mixins.list import ListMixin
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import CreateView, DetailView, UpdateView
 
+from api.models.parceiro import Parceiro, UsuarioParceiro
 from core.forms import UsuarioParceiroForm
 from core.views.mixins import AdminBaseMixin
-from api.models.parceiro import Parceiro, UsuarioParceiro
 
 
 class ParceiroList(ListMixin, AdminBaseMixin):

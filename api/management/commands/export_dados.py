@@ -1,18 +1,18 @@
 import time
-from decimal import Decimal
 from datetime import date, datetime
+from decimal import Decimal
 
-from django.db import transaction
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
-from api.utils import tipo_produto
-from api.models.uf import Uf
-from api.models.produto import Produto, MedicamentoApExport
-from misc.pusher_message import Message
-from api.models.fabricante import Fabricante
 from api.models.apresentacao import Apresentacao
-from api.models.tabela_preco import TabelaPreco
+from api.models.fabricante import Fabricante
 from api.models.principio_ativo import PrincipioAtivo
+from api.models.produto import MedicamentoApExport, Produto
+from api.models.tabela_preco import TabelaPreco
+from api.models.uf import Uf
+from api.utils import tipo_produto
+from misc.pusher_message import Message
 
 TIPO_LABORATORIO = 1
 TIPO_NAO_USADO2 = 2

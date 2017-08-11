@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
-from pyrebase import pyrebase
 from django.conf import settings
-from rest_framework import generics
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from pyrebase import pyrebase
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from api.utils import tipo_produto
-from api.filters import ProdutoFilter, OrderingFilter, MedicamentoFilter
-from api.pagination import (
-    LargeResultsSetPagination,
-    SmallResultsSetPagination,
-    StandardResultsSetPagination
-)
+from api.filters import MedicamentoFilter, OrderingFilter, ProdutoFilter
 from api.mixins.base import SyncApiMixin
 from api.models.cidade import Cidade
 from api.models.produto import Produto
+from api.pagination import (LargeResultsSetPagination,
+                            SmallResultsSetPagination,
+                            StandardResultsSetPagination)
 from api.serializers.produto import *
+from api.utils import tipo_produto
 
 
 class MedicamentoList(generics.ListAPIView):

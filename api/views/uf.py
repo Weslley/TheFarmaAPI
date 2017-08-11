@@ -1,9 +1,9 @@
 from rest_framework import generics
 
+from api.mixins.base import SyncApiMixin
 from api.models.uf import Uf
 from api.pagination import LargeResultsSetPagination
-from api.mixins.base import SyncApiMixin
-from api.serializers.uf import UfSerializer, UfReduzidoSerializer
+from api.serializers.uf import UfReduzidoSerializer, UfSerializer
 
 
 class UfList(generics.ListAPIView):

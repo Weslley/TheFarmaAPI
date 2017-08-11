@@ -3,11 +3,11 @@
 from __future__ import unicode_literals
 
 import django.db.models.deletion
-from django.db import models, migrations
 from django.conf import settings
+from django.db import migrations, models
 
-import api.models.post
 import api.models.cliente
+import api.models.post
 
 
 class Migration(migrations.Migration):

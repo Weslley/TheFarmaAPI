@@ -1,7 +1,7 @@
 from rest_framework import generics
 
-from api.pagination import SmallResultsSetPagination
 from api.models.bairro import Bairro
+from api.pagination import SmallResultsSetPagination
 from api.serializers.bairro import BairroListSerializer
 
 

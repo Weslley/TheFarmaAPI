@@ -3,13 +3,13 @@
 from __future__ import unicode_literals
 
 import django.db.models.deletion
-from django.db import models, migrations
+from django.db import migrations, models
 
-import api.models.enums.status_item
-import api.models.enums.status_pedido
 import api.models.enums.forma_pagamento
 import api.models.enums.status_conta_receber
+import api.models.enums.status_item
 import api.models.enums.status_pagamento_cartao
+import api.models.enums.status_pedido
 
 
 class Migration(migrations.Migration):

@@ -1,28 +1,22 @@
-from django.db import transaction
-from rest_framework import status, generics
 from django.contrib.auth import authenticate
-from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
 from django.contrib.auth.models import User
+from django.db import transaction
+from rest_framework import generics, status
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from api.mixins.edit import (
-    ClienteQuerysetOnly,
-    RetrieveUpdateDestroyAPIViewNoPatch
-)
-from api.permissions import (
-    IsOnlyCliente,
-    IsOwnerClienteCartao,
-    IsOwnerClienteEndereco,
-    IsAuthenticatedInGetPut
-)
+from api.mixins.edit import (ClienteQuerysetOnly,
+                             RetrieveUpdateDestroyAPIViewNoPatch)
 from api.models.cartao import Cartao
 from api.models.cliente import Cliente, ClienteEndereco
 from api.models.endereco import Endereco
-from api.serializers.user import CreateUserClienteSerializer
+from api.permissions import (IsAuthenticatedInGetPut, IsOnlyCliente,
+                             IsOwnerClienteCartao, IsOwnerClienteEndereco)
 from api.serializers.cartao import CartaoSerializer
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.endereco import EnderecoSerializer
+from api.serializers.user import CreateUserClienteSerializer
 
 
 class ClienteCreate(generics.CreateAPIView):

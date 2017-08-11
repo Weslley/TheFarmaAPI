@@ -1,11 +1,11 @@
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
 from awesome_mixins.mixins.list import ListMixin
+from django.views.generic import CreateView
+from rest_framework.reverse import reverse_lazy
 
+from api.models.atualizacao import Atualizacao
 from core.forms import AtualizacaoForm
 from core.tasks.task import update_dados_medicamentos
 from core.views.mixins import AdminBaseMixin
-from api.models.atualizacao import Atualizacao
 
 
 class AtualizacaoList(ListMixin, AdminBaseMixin):

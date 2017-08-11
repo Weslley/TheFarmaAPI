@@ -2,10 +2,10 @@ from datetime import datetime
 
 from rest_framework import serializers
 
-from api.models.uf import Uf
 from api.models.cidade import Cidade
-from api.serializers.uf import UfSerializer
 from api.models.farmacia import Farmacia
+from api.models.uf import Uf
+from api.serializers.uf import UfSerializer
 
 
 class CidadeSerializer(serializers.ModelSerializer):

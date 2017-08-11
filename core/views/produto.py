@@ -1,10 +1,10 @@
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from awesome_mixins.mixins.list import ListMixin
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
-from core.views.mixins import AdminBaseMixin
-from api.models.produto import Produto
 from api.models.atualizacao import Atualizacao
+from api.models.produto import Produto
+from core.views.mixins import AdminBaseMixin
 
 
 class MedicamentoList(ListMixin, AdminBaseMixin):

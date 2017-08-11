@@ -1,10 +1,10 @@
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 
-from api.models.uf import Uf
 from api.models.tabela_preco import TabelaPreco
+from api.models.uf import Uf
 
 
 class Command(BaseCommand):

@@ -49,15 +49,15 @@ The module is designed to work with Django 1.1.1. Since it hooks into
 the internals of the admin package, it may not work with later Django
 versions.
 '''
-from django.forms import ModelForm
-from django.db.models import ForeignKey, OneToOneField
-from django.forms.models import BaseModelFormSet, modelformset_factory
 # -*- coding: utf-8 -*-
 from django.contrib.admin import ModelAdmin
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.utils.functional import curry
-from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.admin.utils import flatten_fieldsets
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db.models import ForeignKey, OneToOneField
+from django.forms import ModelForm
+from django.forms.models import BaseModelFormSet, modelformset_factory
+from django.utils.functional import curry
 
 
 class ReverseInlineFormSet(BaseModelFormSet):

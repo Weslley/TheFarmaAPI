@@ -1,10 +1,8 @@
 from rest_framework import serializers
 
 from api.models.produto import Produto
-from api.serializers.apresentacao import (
-    ApresentacaoBusca,
-    ApresentacaoListSerializer
-)
+from api.serializers.apresentacao import (ApresentacaoBusca,
+                                          ApresentacaoListSerializer)
 from api.serializers.principio_ativo import PrincipioAtivoBasicSerializer
 
 

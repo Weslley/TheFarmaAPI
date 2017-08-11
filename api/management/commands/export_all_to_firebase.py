@@ -1,20 +1,20 @@
-import sys
 import inspect
+import sys
 
 import pyrebase
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from api.models.produto import Produto
-from api.models.fabricante import Fabricante
 from api.models.apresentacao import Apresentacao
-from api.models.tabela_preco import TabelaPreco
-from api.serializers.produto import *
+from api.models.fabricante import Fabricante
 from api.models.principio_ativo import PrincipioAtivo
-from api.serializers.laboratorio import LaboratorioSerializer
+from api.models.produto import Produto
+from api.models.tabela_preco import TabelaPreco
 from api.serializers.apresentacao import ApresentacaoExportSerializer
-from api.serializers.tabela_preco import TabelaPrecoSerializer
+from api.serializers.laboratorio import LaboratorioSerializer
 from api.serializers.principio_ativo import PrincipioAtivoSerializer
+from api.serializers.produto import *
+from api.serializers.tabela_preco import TabelaPrecoSerializer
 
 
 class Command(BaseCommand):

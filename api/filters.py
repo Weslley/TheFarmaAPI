@@ -1,10 +1,10 @@
 import django_filters
 from rest_framework.filters import BaseFilterBackend
 
+from api.models.apresentacao import Apresentacao
 from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.produto import Produto
-from api.models.apresentacao import Apresentacao
 
 
 class MedicamentoFilter(django_filters.FilterSet):

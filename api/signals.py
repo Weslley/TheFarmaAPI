@@ -1,14 +1,14 @@
-from pyrebase import pyrebase
 from django.conf import settings
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete
+from pyrebase import pyrebase
 
+# from api.models.cidade import Cidade
+from api.models.curtida import Curtida
 # from api.models.farmacia import Farmacia
 # from api.models.laboratorio import Fabricante
 # from api.models.medicamento import Produto
 from api.models.post import Post
-# from api.models.cidade import Cidade
-from api.models.curtida import Curtida
 # from api.models.principio_ativo import PrincipioAtivo
 # from api.serializers.cidade import CidadeSerializer
 # from api.serializers.farmacia import FarmaciaSerializer

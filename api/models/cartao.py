@@ -1,10 +1,10 @@
 from datetime import date
 
-from django.db import models
 from django.core.validators import MinLengthValidator
+from django.db import models
 
-from api.utils import tipo_cartao
 from api.models.cliente import Cliente
+from api.utils import tipo_cartao
 
 
 class Cartao(models.Model):

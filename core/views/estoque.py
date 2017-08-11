@@ -1,7 +1,7 @@
 from awesome_mixins.mixins.list import ListMixin
 
-from core.views.mixins import AdminBaseMixin
 from api.models.estoque import Estoque
+from core.views.mixins import AdminBaseMixin
 
 
 class EstoqueList(ListMixin, AdminBaseMixin):

@@ -1,23 +1,18 @@
 from datetime import datetime
 
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Sum
-from django.core.validators import MinValueValidator
 
-from api.models.log import Log
-from api.models.enums import (
-    StatusItem,
-    StatusPedido,
-    FormaPagamento,
-    StatusItemProposta,
-    StatusPagamentoCartao
-)
+from api.models.apresentacao import Apresentacao
 from api.models.bairro import Bairro
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
 from api.models.cliente import Cliente
+from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
+                              StatusPagamentoCartao, StatusPedido)
 from api.models.farmacia import Farmacia
-from api.models.apresentacao import Apresentacao
+from api.models.log import Log
 
 
 class Pedido(models.Model):

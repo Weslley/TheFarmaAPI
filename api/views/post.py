@@ -1,11 +1,11 @@
-from rest_framework import status, generics
-from rest_framework.views import APIView
+from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from api.pagination import StandardResultsSetPagination
 from api.mixins.base import IsAuthenticatedMixin
-from api.models.post import Post
 from api.models.curtida import Curtida
+from api.models.post import Post
+from api.pagination import StandardResultsSetPagination
 from api.serializers.post import PostExportSerializer
 
 

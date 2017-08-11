@@ -1,6 +1,6 @@
 # from awesome_mixins.mixins.list import ListMixin
-from django.views.generic import DetailView, UpdateView
 from django.contrib.auth.models import User
+from django.views.generic import DetailView, UpdateView
 
 from core.views.mixins import AdminBaseMixin
 

@@ -1,6 +1,6 @@
+from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from django.contrib.auth.models import User
 
 from core.views.mixins import AdminBaseMixin
 

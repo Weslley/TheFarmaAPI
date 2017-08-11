@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from api.serializers.uf import UfReduzidoSerializer
 from api.models.tabela_preco import TabelaPreco
+from api.serializers.uf import UfReduzidoSerializer
 
 
 class TabelaPrecoSerializer(serializers.ModelSerializer):

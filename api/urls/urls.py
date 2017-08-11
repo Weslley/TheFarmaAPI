@@ -1,34 +1,12 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 
-from api.urls import (
-    uf,
-    auth,
-    post,
-    banco,
-    secao,
-    bairro,
-    cidade,
-    pedido,
-    cliente,
-    estoque,
-    produto,
-    farmacia,
-    atualizacao,
-    laboratorio,
-    apresentacao,
-    tabela_preco,
-    principio_ativo,
-    representante_legal
-)
-
-from api.views.root import HomeApiView
+from api.urls import (apresentacao, atualizacao, auth, bairro, banco, cidade,
+                      cliente, estoque, farmacia, laboratorio, pedido, post,
+                      principio_ativo, produto, representante_legal, secao,
+                      tabela_preco, uf)
+from api.views.autenticacao import Login, LoginFacebook, Logout, TesteLogin
 from api.views.financeiro import urls as financeiro_urls
-from api.views.autenticacao import (
-    Login,
-    Logout,
-    TesteLogin,
-    LoginFacebook,
-)
+from api.views.root import HomeApiView
 
 urlpatterns = [
     url(r'^ultima_atualizacao/', include(atualizacao)),

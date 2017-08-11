@@ -1,7 +1,7 @@
 from django.db import models
 
-from api.models.uf import Uf
 from api.models.apresentacao import Apresentacao
+from api.models.uf import Uf
 
 
 class TabelaPreco(models.Model):

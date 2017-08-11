@@ -1,8 +1,8 @@
 from rest_framework import generics
 
-from api.pagination import SmallResultsSetPagination
 from api.models.secao import Secao
-from api.serializers.secao import SecaoListSerializer, SecaoDetailSerializer
+from api.pagination import SmallResultsSetPagination
+from api.serializers.secao import SecaoDetailSerializer, SecaoListSerializer
 
 
 class SecaoList(generics.ListAPIView):

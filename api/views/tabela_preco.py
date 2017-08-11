@@ -1,17 +1,15 @@
-from pyrebase import pyrebase
 from django.conf import settings
+from pyrebase import pyrebase
 from rest_framework import generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from api.pagination import (
-    LargeResultsSetPagination,
-    SmallResultsSetPagination,
-    ExtraLargeResultsSetPagination
-)
 from api.mixins.base import SyncApiMixin
 from api.models.atualizacao import Atualizacao
 from api.models.tabela_preco import TabelaPreco
+from api.pagination import (ExtraLargeResultsSetPagination,
+                            LargeResultsSetPagination,
+                            SmallResultsSetPagination)
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 
 

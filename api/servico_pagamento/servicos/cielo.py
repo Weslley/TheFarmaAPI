@@ -1,7 +1,7 @@
 import json
 
-from decouple import config
 from cieloApi3 import *
+from decouple import config
 
 from api.servico_pagamento import tipo_servicos
 from api.servico_pagamento.servicos.servico_abc import Servico

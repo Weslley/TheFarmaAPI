@@ -1,13 +1,13 @@
 from django import forms
-from django.db import transaction
 from django.contrib.auth.models import User
+from django.db import transaction
 
+from api.models.atualizacao import Atualizacao
 from api.models.bairro import Bairro
 from api.models.cidade import Cidade
 from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
 from api.models.parceiro import UsuarioParceiro
-from api.models.atualizacao import Atualizacao
 from api.models.representante_legal import RepresentanteLegal
 
 

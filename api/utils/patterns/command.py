@@ -1,5 +1,5 @@
-import sys
 import inspect
+import sys
 
 from api.utils import Converter
 

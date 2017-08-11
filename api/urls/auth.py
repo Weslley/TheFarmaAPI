@@ -1,11 +1,7 @@
 from django.conf.urls import url
 
-from api.views.autenticacao import (
-    Logout,
-    CreateUser,
-    LoginDefault,
-    LoginFarmacia
-)
+from api.views.autenticacao import (CreateUser, LoginDefault, LoginFarmacia,
+                                    Logout)
 
 urlpatterns = [
     url(r'^logout/$', Logout.as_view(), name='logout'),

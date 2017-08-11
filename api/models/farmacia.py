@@ -3,8 +3,8 @@ from datetime import time, timedelta
 from django.db import models
 from django.db.models import F, Sum
 
-from api.models.endereco import Endereco
 from api.models.conta_bancaria import ContaBancaria
+from api.models.endereco import Endereco
 from api.models.enums.status_item_proposta import StatusItemProposta
 
 

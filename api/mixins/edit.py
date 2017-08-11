@@ -1,10 +1,7 @@
 from rest_framework import exceptions
-from rest_framework.generics import (
-    CreateAPIView,
-    UpdateAPIView,
-    GenericAPIView,
-    RetrieveUpdateDestroyAPIView
-)
+from rest_framework.generics import (CreateAPIView, GenericAPIView,
+                                     RetrieveUpdateDestroyAPIView,
+                                     UpdateAPIView)
 
 
 class CreateUpdateMixin(CreateAPIView):

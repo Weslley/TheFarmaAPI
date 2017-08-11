@@ -4,8 +4,8 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
 from api.models.estoque import Estoque
-from misc.pusher_message import Message
 from api.serializers.estoque import *
+from misc.pusher_message import Message
 
 
 class EstoqueCreateUpdate(CreateAPIView):

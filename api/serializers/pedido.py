@@ -1,16 +1,16 @@
 import locale
 
-from rest_framework import serializers
 from django.db import transaction
+from rest_framework import serializers
 
-from api.models.log import Log
-from api.models.pedido import Pedido, ItemPedido
 from api.models.apresentacao import Apresentacao
+from api.models.log import Log
+from api.models.pedido import ItemPedido, Pedido
 from api.serializers.apresentacao import ApresentacaoListSerializer
+from api.utils import get_client_browser, get_client_ip
 from api.utils.generics import get_user_lookup
-from .log import LogSerializer
 
-from api.utils import get_client_ip, get_client_browser
+from .log import LogSerializer
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 

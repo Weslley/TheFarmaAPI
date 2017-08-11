@@ -1,6 +1,6 @@
-from django.db.models import Q
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission, User
+from django.db.models import Q
 from rest_framework.authtoken.models import Token
 
 from api.models.representante_legal import RepresentanteLegal

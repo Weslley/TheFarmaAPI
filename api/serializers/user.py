@@ -1,15 +1,15 @@
 import re
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from rest_framework.fields import empty
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
 
 from api.models.cliente import Cliente
-from thefarmaapi.backends import FarmaciaBackend, EmailModelBackend
+from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
 
 
 class CreateUserClienteSerializer(serializers.ModelSerializer):
