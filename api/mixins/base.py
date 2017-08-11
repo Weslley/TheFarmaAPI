@@ -13,8 +13,20 @@ class IsAuthenticatedMixin(APIView):
     """
     Mixin para views que a autenticação é obrigatória
     """
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    _authentication_classes = (authentication.TokenAuthentication,)
+    _permission_classes = (permissions.IsAuthenticated,)
+
+    def __init__(self, **kwargs):
+        super(IsAuthenticatedMixin, self).__init__(**kwargs)
+        self.authentication_classes = [_ for _ in self.authentication_classes]
+        for _ in self._authentication_classes:
+            self.authentication_classes.append(_)
+        self.authentication_classes = tuple(self.authentication_classes)
+
+        self.permission_classes = [_ for _ in self.permission_classes]
+        for _ in self._permission_classes:
+            self.permission_classes.append(_)
+        self.permission_classes = tuple(self.permission_classes)
 
 
 class IsFullAuthenticatedMixin(APIView):

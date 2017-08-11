@@ -31,8 +31,9 @@ class Pedido(models.Model):
     logradouro = models.CharField(max_length=80)
     numero = models.IntegerField(null=True, blank=True)
     complemento = models.CharField(max_length=100, null=True, blank=True)
-    cidade = models.ForeignKey(Cidade, related_name='enderecos_pedido')
-    bairro = models.ForeignKey(Bairro, related_name='enderecos_pedido')
+    cidade = models.CharField(max_length=150)
+    uf = models.CharField(max_length=2)
+    bairro = models.CharField(max_length=60)
     nome_endereco = models.CharField(max_length=40)
     nome_destinatario = models.CharField(max_length=80, null=True, blank=True)
     latitude = models.FloatField()
@@ -71,6 +72,18 @@ class Pedido(models.Model):
             }
             for farmacia in farmacias
         ]
+
+    @property
+    def cidade_obj(self):
+        """
+        Property de cidade, retorna o objeto baseado nos dados do pedido
+        :return:
+        """
+        qs = Cidade.objects.filter(nome__exact=self.cidade, uf__sigla=self.uf)
+        if qs.exists():
+            return qs.first()
+        return None
+
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

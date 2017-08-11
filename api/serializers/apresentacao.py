@@ -10,12 +10,6 @@ from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 
 
-class ApresentacaoListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Apresentacao
-        fields = ('nome', 'id')
-
-
 class ApresentacaoSerializer(serializers.ModelSerializer):
     tabelas = TabelaPrecoSerializer(many=True)
 
@@ -118,13 +112,19 @@ class ProdutoFabricante(serializers.ModelSerializer):
         fields = ('id', 'nome', 'fabricante')
 
 
-class ProdutoCompleto(serializers.ModelSerializer):
+class ProdutoSimplesSerializer(serializers.ModelSerializer):
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
     principio_ativo = serializers.CharField(read_only=True, source='principio_ativo.nome')
+
+    class Meta:
+        model = Produto
+        fields = ('id', 'nome', 'fabricante', 'principio_ativo', 'tipo')
+
+
+class ProdutoCompletoSerializer(ProdutoSimplesSerializer):
     secao = serializers.CharField(read_only=True, source='secao.nome')
     subsecao = serializers.CharField(read_only=True, source='subsecao.nome')
     sintomas = serializers.StringRelatedField(many=True)
-
 
     class Meta:
         model = Produto
@@ -198,4 +198,26 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
 
 class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):
-    produto = ProdutoCompleto()
+    produto = ProdutoCompletoSerializer()
+
+
+class ApresentacaoListSerializer(serializers.ModelSerializer):
+    imagem = serializers.SerializerMethodField()
+    unidade = serializers.CharField(source='unidade.nome')
+    produto = ProdutoSimplesSerializer()
+
+    class Meta:
+        model = Apresentacao
+        fields = ('nome', 'id', 'imagem', 'unidade', 'produto')
+
+    def get_imagem(self, obj):
+        qs = obj.imagens.order_by('-capa').first()
+        serializer = ImagemApresentacaoSerializer(instance=qs, context=self.context)
+        data = serializer.data['imagem']
+
+        # verificando se tem um tipo caso não possua imagens
+        if not data and obj.unidade:
+            request = self.context['request']
+            data = request.build_absolute_uri(obj.unidade.imagem.url)
+
+        return data
