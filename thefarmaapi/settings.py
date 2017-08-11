@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'awesome_mixins',
     'core',
-    'channels'
+    'channels',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [

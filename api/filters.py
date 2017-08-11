@@ -7,7 +7,7 @@ from api.models.produto import Produto
 from api.models.apresentacao import Apresentacao
 
 
-class MedicamentoFilter(django_filters.rest_framework.FilterSet):
+class MedicamentoFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
 
     class Meta:
@@ -15,7 +15,7 @@ class MedicamentoFilter(django_filters.rest_framework.FilterSet):
         fields = ['nome', ]
 
 
-class ProdutoFilter(django_filters.rest_framework.FilterSet):
+class ProdutoFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
     secao = django_filters.CharFilter(name="secao", lookup_expr='nome__istartswith')
     subsecao = django_filters.CharFilter(name="subsecao", lookup_expr='nome__istartswith')
@@ -43,7 +43,7 @@ class OrderingFilter(BaseFilterBackend):
             return queryset.order_by(*[order for order in view.ordering])
 
 
-class CidadeFilter(django_filters.rest_framework.FilterSet):
+class CidadeFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
 
     class Meta:
@@ -51,7 +51,7 @@ class CidadeFilter(django_filters.rest_framework.FilterSet):
         fields = ['nome', ]
 
 
-class BairroFilter(django_filters.rest_framework.FilterSet):
+class BairroFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
 
     class Meta:
@@ -59,7 +59,7 @@ class BairroFilter(django_filters.rest_framework.FilterSet):
         fields = ['nome', ]
 
 
-class ApresentacaoFilter(django_filters.rest_framework.FilterSet):
+class ApresentacaoFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="produto__nome", lookup_expr='istartswith')
     secao = django_filters.CharFilter(name="produto__secao", lookup_expr='nome__istartswith')
     subsecao = django_filters.CharFilter(name="produto__subsecao", lookup_expr='nome__istartswith')

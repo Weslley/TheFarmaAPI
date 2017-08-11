@@ -22,7 +22,9 @@ from core import urls as core_urls
 import django.contrib.auth.views as auth_views
 from rest_framework_docs import urls as rest_framework_docs_urls
 from django.conf import settings
+from rest_framework_swagger.views import get_swagger_view
 
+schema_view = get_swagger_view(title='Pastebin API')
 
 urlpatterns = [
     url(r'^a/', include(api_urls)),
@@ -31,5 +33,6 @@ urlpatterns = [
     url(r'^a/docs/', include(rest_framework_docs_urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^', include(core_urls)),
-    url(r'^api-auth/', include(drf_urls, namespace='rest_framework'))
+    url(r'^api-auth/', include(drf_urls, namespace='rest_framework')),
+    url(r'^docs/$', schema_view),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
