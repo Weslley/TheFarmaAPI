@@ -1,8 +1,9 @@
 import locale
 
 from rest_framework import serializers
+from django.db import transaction
 
-from api.models.pedido import Pedido
+from api.models.pedido import Pedido, ItemPedido
 from .log import LogSerializer
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -24,8 +25,27 @@ class PedidoSimplesSerializer(serializers.ModelSerializer):
         return locale.currency(obj.valor_liquido, grouping=True, symbol=None)
 
 
+class ItemPedidoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ItemPedido
+        fields = (
+            "apresentacao",
+            "quantidade",
+            "valor_unitario",
+            "farmacia",
+            "status"
+        )
+        extra_kwargs = {
+            'valor_unitario': {'read_only': True},
+            'status': {'read_only': True},
+            'farmacia': {'read_only': True},
+        }
+
+
 class PedidoSerializer(serializers.ModelSerializer):
     log = LogSerializer()
+    itens = ItemPedidoSerializer(many=True)
 
     class Meta:
         model = Pedido
@@ -46,7 +66,8 @@ class PedidoSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
             "delivery",
-            "troco"
+            "troco",
+            "itens"
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -54,3 +75,11 @@ class PedidoSerializer(serializers.ModelSerializer):
             'status': {'read_only': True},
             'valor_frete': {'read_only': True},
         }
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            itens = validated_data.pop('itens')
+            pedido = Pedido.objects.create(**validated_data)
+            for item_data in itens:
+                ItemPedido.objects.pedido(pedido=pedido, **item_data)
+            return pedido
