@@ -1,9 +1,10 @@
+from django.db import transaction
 from rest_framework import serializers
-from api.models.representante_legal import RepresentanteLegal
+
+from api.serializers.user import RepresentanteUserSerializer
 from api.serializers.endereco import EnderecoSerializer
 from api.serializers.farmacia import FarmaciaRepresentanteSerializer
-from api.serializers.user import RepresentanteUserSerializer
-from django.db import transaction
+from api.models.representante_legal import RepresentanteLegal
 
 
 class RepresentanteSerializer(serializers.ModelSerializer):

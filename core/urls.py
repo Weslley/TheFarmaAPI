@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import url
+
+from core.views.uf import *
 from core.views.base import *
 from core.views.posts import *
-from core.views.produto import *
-from core.views.usuarios import *
-from core.views.parceiro import *
-from core.views.atualizacao import *
-from core.views.estoque import *
-from core.views.farmacia import *
 from core.views.bairro import *
-from core.views.uf import *
+from core.views.estoque import *
+from core.views.produto import *
+from core.views.farmacia import *
+from core.views.parceiro import *
+from core.views.usuarios import *
+from core.views.atualizacao import *
 
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),

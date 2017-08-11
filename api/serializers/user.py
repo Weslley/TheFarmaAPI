@@ -1,13 +1,15 @@
-from datetime import datetime
-from django.contrib.auth.models import User
-from rest_framework import serializers
-from api.models.cliente import Cliente
-from rest_framework.validators import UniqueValidator
-from rest_framework.authtoken.models import Token
-from rest_framework.fields import empty
-from django.db import transaction
 import re
-from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
+from datetime import datetime
+
+from django.db import transaction
+from rest_framework import serializers
+from rest_framework.fields import empty
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+
+from api.models.cliente import Cliente
+from thefarmaapi.backends import FarmaciaBackend, EmailModelBackend
 
 
 class CreateUserClienteSerializer(serializers.ModelSerializer):
@@ -82,7 +84,6 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
         derived_username = '%s%s' % (truncated_part_of_email, highest_user_id + 1)
         return derived_username
 
-from api.models.cliente import Cliente
 
 
 class UserSerializer(serializers.ModelSerializer):

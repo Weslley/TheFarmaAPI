@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from rest_framework import generics
-from api.models.cidade import Cidade
-from api.pagination import SmallResultsSetPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from api.filters import OrderingFilter, CidadeFilter
+
+from api.filters import CidadeFilter, OrderingFilter
+from api.pagination import SmallResultsSetPagination
+from api.models.cidade import Cidade
 from api.serializers.cidade import CidadeSerializer, CoberturaCidadeSerializer
 
 

@@ -1,9 +1,10 @@
-from awesome_mixins.mixins.list import ListMixin
-from core.views.mixins import AdminBaseMixin
-from api.models.post import Post
-from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from awesome_mixins.mixins.list import ListMixin
+
 from api.utils import tipo_post
+from api.models.post import Post
+from core.views.mixins import AdminBaseMixin
 
 
 class PostList(ListMixin, AdminBaseMixin):

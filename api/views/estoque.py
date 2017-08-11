@@ -1,10 +1,11 @@
-from api.models.estoque import Estoque
-from api.serializers.estoque import *
+from django.db import transaction
+from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from rest_framework import status
+
+from api.models.estoque import Estoque
 from misc.pusher_message import Message
-from django.db import transaction
+from api.serializers.estoque import *
 
 
 class EstoqueCreateUpdate(CreateAPIView):

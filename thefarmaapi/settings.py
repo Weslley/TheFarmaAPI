@@ -11,9 +11,10 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-from dj_database_url import parse as parse_db_url
-from decouple import config
+
 import casting
+from decouple import config
+from dj_database_url import parse as parse_db_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -178,9 +179,9 @@ PYREBASE_CONFIG = {
    "serviceAccount": config('DB_FIREBASE_SERVICE_ACCOUNT')
 }
 
-LOGIN_URL = '/login/'
-LOGOUT_URL = '/logout/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/core/login/'
+LOGOUT_URL = '/core/logout/'
+LOGIN_REDIRECT_URL = '/core/'
 
 # Celery
 BROKER_URL = config('BROKER_URL_INI')

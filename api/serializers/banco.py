@@ -7,4 +7,3 @@ class BancoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banco
         fields = '__all__'
-

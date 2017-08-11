@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from pyrebase import pyrebase
+from django.conf import settings
 from rest_framework import generics
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
+from api.pagination import LargeResultsSetPagination, SmallResultsSetPagination
 from api.mixins.base import SyncApiMixin
 from api.models.fabricante import Fabricante
-from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
 from api.serializers.laboratorio import LaboratorioSerializer
 
 

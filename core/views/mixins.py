@@ -1,7 +1,7 @@
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.utils.decorators import method_decorator
-from django.views.generic.base import ContextMixin, View
+from django.views.generic.base import View, ContextMixin
+from django.contrib.auth.decorators import login_required
 
 
 class AdminBaseMixin(ContextMixin, View):

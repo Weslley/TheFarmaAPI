@@ -1,4 +1,5 @@
 import locale
+
 from rest_framework import serializers
 
 from api.models.conta_receber_farmacia import ContaReceberFarmacia

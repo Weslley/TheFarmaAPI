@@ -1,5 +1,5 @@
 from api.models.pedido import Pedido
-from api.utils.patterns.command import CommandPattern, CommandItem
+from api.utils.patterns.command import CommandItem, CommandPattern
 
 
 class PedidoControler(CommandPattern):

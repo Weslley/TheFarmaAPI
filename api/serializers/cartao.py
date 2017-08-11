@@ -1,12 +1,12 @@
-from django.core.exceptions import ValidationError as DjangoValidationError
+from pycards import CreditCard
 from rest_framework import serializers
-from rest_framework.compat import set_many
-from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import as_serializer_error, empty
 from rest_framework.utils import model_meta
+from rest_framework.compat import set_many
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import empty, as_serializer_error
 
 from api.models.cartao import Cartao
-from pycards import CreditCard
 
 
 class CartaoSerializer(serializers.ModelSerializer):

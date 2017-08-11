@@ -1,7 +1,7 @@
 from rest_framework import generics
 
-from api.models.secao import Secao
 from api.pagination import SmallResultsSetPagination
+from api.models.secao import Secao
 from api.serializers.secao import SecaoListSerializer, SecaoDetailSerializer
 
 

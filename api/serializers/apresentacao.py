@@ -1,11 +1,13 @@
+import locale
+from decimal import Decimal
+
 from rest_framework import serializers
-from api.models.apresentacao import Apresentacao, ImagemApresentacao
+
+from api.models.uf import Uf
 from api.models.estoque import Estoque
 from api.models.produto import Produto
-from api.models.uf import Uf
+from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.serializers.tabela_preco import TabelaPrecoSerializer
-from decimal import Decimal
-import locale
 
 
 class ApresentacaoListSerializer(serializers.ModelSerializer):

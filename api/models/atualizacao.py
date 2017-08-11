@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 from misc.validators import validate_file_extension
 
 

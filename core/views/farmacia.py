@@ -1,11 +1,13 @@
+import re
+
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView
 from awesome_mixins.mixins.list import ListMixin
+
+from core.forms import FarmaciaForm, RepresentanteFarmaciaForm
 from core.views.mixins import AdminBaseMixin
 from api.models.farmacia import Farmacia
-from django.views.generic import CreateView, DetailView
 from api.models.representante_legal import RepresentanteLegal
-from core.forms import RepresentanteFarmaciaForm, FarmaciaForm
-from django.urls import reverse_lazy
-import re
 
 
 class FarmaciaList(ListMixin, AdminBaseMixin):

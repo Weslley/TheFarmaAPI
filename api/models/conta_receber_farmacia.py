@@ -1,9 +1,9 @@
 from django.db import models
 
-from api.models.adiantamento import Adiantamento
 from api.models.enums import StatusContaReceber
-from api.models.farmacia import Farmacia
 from api.models.pedido import Pedido
+from api.models.farmacia import Farmacia
+from api.models.adiantamento import Adiantamento
 
 
 class ContaReceberFarmacia(models.Model):
@@ -35,4 +35,3 @@ class ContaReceberFarmacia(models.Model):
         :return: Número da parcela
         """
         return 0
-

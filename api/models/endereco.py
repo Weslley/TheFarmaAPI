@@ -1,6 +1,7 @@
 from django.db import models
-from api.models.cidade import Cidade
+
 from api.models.bairro import Bairro
+from api.models.cidade import Cidade
 
 
 class Endereco(models.Model):

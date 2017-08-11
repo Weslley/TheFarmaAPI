@@ -1,17 +1,20 @@
-from rest_framework import generics
-from rest_framework.response import Response
-import calendar
 import locale
+import calendar
 from datetime import date
-from django.db.models import Sum, F
 
-from api.models.enums.status_conta_receber import StatusContaReceber
-from api.models.enums.status_pedido import StatusPedido
-from api.models.pedido import Pedido
-from api.models.conta_receber_farmacia import ContaReceberFarmacia
+from rest_framework import generics
+from django.db.models import F, Sum
+from rest_framework.response import Response
+
 from api.mixins.base import IsAuthenticatedRepresentanteMixin
+from api.models.pedido import Pedido
 from api.serializers.pedido import PedidoSimplesSerializer
-from api.serializers.conta_receber_farmacia import ContaReceberFarmaciaSerializer
+from api.models.enums.status_pedido import StatusPedido
+from api.models.conta_receber_farmacia import ContaReceberFarmacia
+from api.models.enums.status_conta_receber import StatusContaReceber
+from api.serializers.conta_receber_farmacia import (
+    ContaReceberFarmaciaSerializer
+)
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 

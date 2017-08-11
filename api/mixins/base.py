@@ -1,12 +1,12 @@
-from rest_framework import authentication
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.authtoken.models import Token
+from datetime import datetime
+
+from rest_framework import status, permissions, authentication
+from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+
 from api.models.atualizacao import Atualizacao
-from datetime import datetime
 
 
 class IsAuthenticatedMixin(APIView):

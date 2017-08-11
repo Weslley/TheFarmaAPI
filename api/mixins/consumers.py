@@ -42,4 +42,3 @@ class BaseConsumer(object):
 
     def send(self, data):
         self.group.send({"text": json.dumps(data), })
-

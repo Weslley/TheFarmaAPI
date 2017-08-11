@@ -1,8 +1,10 @@
-from cieloApi3 import *
 import json
+
 from decouple import config
-from api.servico_pagamento.servicos.servico_abc import Servico
+from cieloApi3 import *
+
 from api.servico_pagamento import tipo_servicos
+from api.servico_pagamento.servicos.servico_abc import Servico
 
 SANDBOX = config('CIELO_SANDBOX', default=False, cast=bool)
 MERCHANT_ID = config('CIELO_MERCHANT_ID', default='')

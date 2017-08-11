@@ -1,5 +1,6 @@
 import enum
-from enum import IntEnum as _IntEnum, Enum as _Enum
+from enum import Enum as _Enum
+from enum import IntEnum as _IntEnum
 
 
 @enum.unique

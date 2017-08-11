@@ -1,6 +1,8 @@
-from django.db import models
-from api.utils import ufs
 from datetime import datetime
+
+from django.db import models
+
+from api.utils import ufs
 
 
 class Uf(models.Model):

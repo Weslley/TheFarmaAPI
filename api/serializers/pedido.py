@@ -1,4 +1,5 @@
 import locale
+
 from rest_framework import serializers
 
 from api.models.pedido import Pedido

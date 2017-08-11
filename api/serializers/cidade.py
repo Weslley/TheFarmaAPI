@@ -1,9 +1,11 @@
-from rest_framework import serializers
 from datetime import datetime
-from api.models.cidade import Cidade
-from api.models.farmacia import Farmacia
+
+from rest_framework import serializers
+
 from api.models.uf import Uf
+from api.models.cidade import Cidade
 from api.serializers.uf import UfSerializer
+from api.models.farmacia import Farmacia
 
 
 class CidadeSerializer(serializers.ModelSerializer):

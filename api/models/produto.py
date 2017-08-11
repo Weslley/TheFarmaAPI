@@ -1,12 +1,12 @@
 from django.db import models
 
-from api.models.enums import StatusProduto
 from api.utils import tipo_produto
-from api.models.principio_ativo import PrincipioAtivo
-from api.models.fabricante import Fabricante
+from api.models.enums import StatusProduto
 from api.models.secao import Secao
-from api.models.subsecao import Subsecao
 from api.models.sintoma import Sintoma
+from api.models.subsecao import Subsecao
+from api.models.fabricante import Fabricante
+from api.models.principio_ativo import PrincipioAtivo
 
 
 class Produto(models.Model):

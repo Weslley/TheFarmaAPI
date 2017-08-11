@@ -1,7 +1,8 @@
 from django.db import models
-from api.models.farmacia import Farmacia
 from django.contrib.auth.models import User
+
 from api.models.endereco import Endereco
+from api.models.farmacia import Farmacia
 
 
 class RepresentanteLegal(models.Model):

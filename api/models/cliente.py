@@ -1,8 +1,8 @@
-from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.auth.models import User
 
-from api.models.endereco import Endereco
 from api.utils import sexo
+from api.models.endereco import Endereco
 
 
 def generate_filename(self, filename):

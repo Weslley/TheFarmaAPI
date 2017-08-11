@@ -1,7 +1,7 @@
 """
 Classe para ser herdada nos outros servicos
 """
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 
 class Servico(ABC):

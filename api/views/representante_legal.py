@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from rest_framework import generics
+
+from api.mixins.base import (
+    IsAuthenticatedMixin,
+    IsAuthenticatedRepresentanteMixin
+)
 from api.models.representante_legal import RepresentanteLegal
-from api.mixins.base import IsAuthenticatedMixin, IsAuthenticatedRepresentanteMixin
 from api.serializers.representante_legal import RepresentanteSerializer
 
 

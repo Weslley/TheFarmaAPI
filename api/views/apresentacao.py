@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db.models import Count
 from pyrebase import pyrebase
-from rest_framework import generics
-from rest_framework import status
-from rest_framework.response import Response
+from django.conf import settings
+from rest_framework import status, generics
+from django.db.models import Count
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
+from api.filters import OrderingFilter, ApresentacaoFilter
+from api.pagination import LargeResultsSetPagination, SmallResultsSetPagination
 from api.mixins.base import SyncApiMixin
-from api.models.apresentacao import Apresentacao
 from api.models.cidade import Cidade
 from api.models.produto import Produto
-from api.pagination import SmallResultsSetPagination, LargeResultsSetPagination
+from api.models.apresentacao import Apresentacao
 from api.serializers.apresentacao import *
-from api.filters import ApresentacaoFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ApresentacaoRetrieve(generics.RetrieveAPIView):

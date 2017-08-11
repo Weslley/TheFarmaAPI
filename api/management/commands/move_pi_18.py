@@ -1,8 +1,10 @@
-from django.core.management.base import BaseCommand
-from api.models.tabela_preco import TabelaPreco
-from api.models.uf import Uf
-from datetime import datetime
 from decimal import Decimal
+from datetime import datetime
+
+from django.core.management.base import BaseCommand
+
+from api.models.uf import Uf
+from api.models.tabela_preco import TabelaPreco
 
 
 class Command(BaseCommand):
@@ -27,5 +29,3 @@ class Command(BaseCommand):
             tabela.ufs.add(uf)
             tabela.data_atualizacao = datetime.now()
             tabela.save()
-
-

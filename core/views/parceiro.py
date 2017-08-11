@@ -1,10 +1,12 @@
+import re
+
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView, UpdateView
 from awesome_mixins.mixins.list import ListMixin
+
+from core.forms import UsuarioParceiroForm
 from core.views.mixins import AdminBaseMixin
 from api.models.parceiro import Parceiro, UsuarioParceiro
-from django.views.generic import CreateView, DetailView, UpdateView
-from django.urls import reverse_lazy
-from core.forms import UsuarioParceiroForm
-import re
 
 
 class ParceiroList(ListMixin, AdminBaseMixin):

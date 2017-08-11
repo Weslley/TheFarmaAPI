@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from rest_framework import serializers
+
 from api.models.bairro import Bairro
 from api.serializers.cidade import CidadeBasicSerializer
-from datetime import datetime
 
 
 class BairroListSerializer(serializers.ModelSerializer):

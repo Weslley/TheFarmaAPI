@@ -1,8 +1,9 @@
-from django.contrib.auth.models import User
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from api import urls
+from rest_framework.reverse import reverse
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+
+from api.urls import urls
 
 
 class HomeApiView(APIView):
@@ -23,7 +24,7 @@ class HomeApiView(APIView):
         """
         context = {}
         for url in self.urls_names:
-            if url != 'produto-list':
+            if url != 'produto-list' and url != 'bairro-list':
                 context[url[:-5]] = reverse(url, request=request, format=format)
         return Response(context)
 

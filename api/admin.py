@@ -1,36 +1,34 @@
-# -*- coding: utf-8 -*-
-
 from django.contrib import admin
 
-from api.models.atualizacao import Atualizacao
-from api.models.banco import Banco
-from api.models.configuracao import Configuracao
-from api.models.conta_bancaria import ContaBancaria
-from api.models.conta_receber_farmacia import ContaReceberFarmacia
-from api.models.curtida import Curtida
-from api.models.cliente import Cliente, ClienteEndereco
+from api.models.uf import Uf
 from api.models.log import Log
 from api.models.post import Post
-from api.models.representante_legal import RepresentanteLegal
+from api.models.banco import Banco
 from api.models.secao import Secao
-from api.models.subsecao import Subsecao
-from api.models.tabela_preco import TabelaPreco
-from api.models.uf import Uf
-from api.models.apresentacao import Apresentacao, ImagemApresentacao, Unidade
 from api.models.bairro import Bairro
+from api.models.cartao import Cartao
 from api.models.cidade import Cidade
+from api.models.pedido import Pedido, ItemPedido, ItemPropostaPedido
+from api.models.cliente import Cliente, ClienteEndereco
+from api.models.curtida import Curtida
+from api.models.estoque import Estoque
+from api.models.produto import Produto
+from api.models.sintoma import Sintoma
 from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
-from api.models.fabricante import Fabricante
-from api.models.produto import Produto
-from api.models.principio_ativo import PrincipioAtivo
 from api.models.parceiro import Parceiro, UsuarioParceiro
-from api.models.estoque import Estoque
-from api.models.sintoma import Sintoma
-from api.models.pedido import Pedido, ItemPedido, ItemPropostaPedido
-from api.models.cartao import Cartao
+from api.models.subsecao import Subsecao
+from api.models.fabricante import Fabricante
+from api.models.atualizacao import Atualizacao
+from api.models.apresentacao import Unidade, Apresentacao, ImagemApresentacao
+from api.models.configuracao import Configuracao
+from api.models.tabela_preco import TabelaPreco
+from api.models.conta_bancaria import ContaBancaria
+from api.models.principio_ativo import PrincipioAtivo
+from api.models.representante_legal import RepresentanteLegal
+from api.models.conta_receber_farmacia import ContaReceberFarmacia
 
-
+from api.utils.reverse_admin import ReverseModelAdmin
 
 # class FarmaciaAdmin(admin.ModelAdmin):
 #     list_display = (
@@ -98,7 +96,6 @@ from api.models.cartao import Cartao
 #     )
 #     ordering = ('id',)
 
-from api.utils.reverse_admin import ReverseModelAdmin
 
 
 class FarmaciaAdmin(ReverseModelAdmin):

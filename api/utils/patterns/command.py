@@ -1,4 +1,6 @@
-import sys, inspect
+import sys
+import inspect
+
 from api.utils import Converter
 
 

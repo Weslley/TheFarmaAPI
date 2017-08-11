@@ -1,8 +1,9 @@
-from awesome_mixins.mixins.list import ListMixin
-from core.views.mixins import AdminBaseMixin
-from api.models.uf import Uf
-from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from awesome_mixins.mixins.list import ListMixin
+
+from api.models.uf import Uf
+from core.views.mixins import AdminBaseMixin
 from api.models.atualizacao import Atualizacao
 
 

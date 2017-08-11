@@ -1,5 +1,6 @@
 from django_ajax.decorators import ajax
 from django.views.decorators.csrf import csrf_exempt
+
 from api.models.bairro import Bairro
 
 
