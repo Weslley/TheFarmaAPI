@@ -19,13 +19,10 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework import urls as drf_urls
-from rest_framework_docs import urls as rest_framework_docs_urls
-from rest_framework_swagger.views import get_swagger_view
 
 from api.urls import urls as api_urls
+from api.views.root import schema_view
 from core import urls as core_urls
-
-schema_view = get_swagger_view(title='TheFarma API')
 
 urlpatterns = [
     url(r'^', include(api_urls)),

@@ -1,13 +1,12 @@
 from rest_framework import generics
 
-from api.mixins.base import IsAuthenticatedMixin
-from api.models.pedido import Pedido
 from api.pagination import SmallResultsSetPagination
-from api.permissions import IsOnlyCliente
-from api.serializers.pedido import PedidoCreateSerializer, PedidoSerializer
+from api.mixins.base import IsClienteAuthenticatedMixin
+from api.models.pedido import Pedido
+from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer
 
 
-class PedidoCreate(generics.ListCreateAPIView, IsAuthenticatedMixin):
+class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
     """
     Cria(POST)/Lista(GET) pedido(os)
 
@@ -18,7 +17,6 @@ class PedidoCreate(generics.ListCreateAPIView, IsAuthenticatedMixin):
 
     """
     pagination_class = SmallResultsSetPagination
-    permission_classes = (IsOnlyCliente, )
 
     def get_queryset(self):
         """
@@ -33,6 +31,9 @@ class PedidoCreate(generics.ListCreateAPIView, IsAuthenticatedMixin):
         Selecionando o serializer de acordo do o tipo de metodo HTTP
         :return: SerializerClass
         """
-        if self.request.method.lower() == 'get':
-            return PedidoSerializer
-        return PedidoCreateSerializer
+        try:
+            if self.request.method.lower() == 'get':
+                return PedidoSerializer
+            return PedidoCreateSerializer
+        except Exception as err:
+            return PedidoCreateSerializer
