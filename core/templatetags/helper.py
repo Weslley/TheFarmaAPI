@@ -1,4 +1,5 @@
 from django import template
+import markdown2
 
 register = template.Library()
 
@@ -44,3 +45,8 @@ def hasattr(obj, value):
 @register.filter
 def get_range(value):
     return range(value)
+
+
+@register.filter(name='from_markdown')
+def from_markdown(value):
+    return markdown2.markdown(value)
