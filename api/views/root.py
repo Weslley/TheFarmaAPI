@@ -1,10 +1,7 @@
 from django.contrib.auth.models import User
-from rest_framework import schemas
-from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
 
 from api.urls import urls
 
@@ -47,10 +44,3 @@ class HomeApiView(APIView):
                     self.urls_names.append(entry.name)
             if hasattr(entry, 'url_patterns'):
                 self.load_urls(entry.url_patterns)
-
-
-@api_view()
-@renderer_classes([SwaggerUIRenderer, OpenAPIRenderer])
-def schema_view(request):
-    generator = schemas.SchemaGenerator(title='API Docs', patterns=urls.urlpatterns, url='/')
-    return Response(generator.get_schema())

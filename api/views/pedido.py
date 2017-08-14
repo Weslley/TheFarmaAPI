@@ -16,6 +16,7 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
     **GET** Lista todos os pedidos do usuário autenticado
 
     """
+    serializer_class = PedidoCreateSerializer
     pagination_class = SmallResultsSetPagination
 
     def get_queryset(self):
@@ -31,9 +32,9 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
         Selecionando o serializer de acordo do o tipo de metodo HTTP
         :return: SerializerClass
         """
-        try:
-            if self.request.method.lower() == 'get':
-                return PedidoSerializer
-            return PedidoCreateSerializer
-        except Exception as err:
-            return PedidoCreateSerializer
+        # try:
+        if self.request.method.lower() == 'get':
+            return PedidoSerializer
+        return PedidoCreateSerializer
+        # except Exception as err:
+        #     return PedidoCreateSerializer

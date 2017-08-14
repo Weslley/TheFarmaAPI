@@ -19,18 +19,17 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework import urls as drf_urls
+from rest_framework_docs import urls as rest_framework_docs_urls
 
 from api.urls import urls as api_urls
-from api.views.root import schema_view
 from core import urls as core_urls
 
 urlpatterns = [
     url(r'^', include(api_urls)),
     url(r'^core/login/', auth_views.login, name='login'),
     url(r'^core/logout/', auth_views.logout_then_login, {'login_url': '/login'}, name='logout'),
-    # url(r'^a/docs/', include(rest_framework_docs_urls)),
+    url(r'^docs/', include(rest_framework_docs_urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^core/', include(core_urls)),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework')),
-    url(r'^docs/$', schema_view),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
