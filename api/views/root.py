@@ -1,9 +1,14 @@
 from django.contrib.auth.models import User
+from django.http.response import Http404
+from django.views.generic.base import TemplateView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+from rest_framework_docs.api_docs import ApiDocumentation
+from rest_framework_docs.settings import DRFSettings
 
 from api.urls import urls
+from core.views.mixins import AdminBaseMixin
 
 
 class HomeApiView(APIView):
@@ -44,3 +49,25 @@ class HomeApiView(APIView):
                     self.urls_names.append(entry.name)
             if hasattr(entry, 'url_patterns'):
                 self.load_urls(entry.url_patterns)
+
+
+class DRFDocsView(TemplateView, AdminBaseMixin):
+
+    template_name = "rest_framework_docs/home.html"
+
+    def get_context_data(self, **kwargs):
+        settings = DRFSettings().settings
+        if settings["HIDE_DOCS"]:
+            raise Http404("Django Rest Framework Docs are hidden. Check your settings.")
+
+        context = super(DRFDocsView, self).get_context_data(**kwargs)
+        docs = ApiDocumentation()
+        endpoints = docs.get_endpoints()
+
+        query = self.request.GET.get("search", "")
+        if query and endpoints:
+            endpoints = [endpoint for endpoint in endpoints if query in endpoint.path]
+
+        context['query'] = query
+        context['endpoints'] = endpoints
+        return context
