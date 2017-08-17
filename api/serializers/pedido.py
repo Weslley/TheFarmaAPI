@@ -3,7 +3,6 @@ import locale
 from django.db import transaction
 from rest_framework import serializers
 
-from api.models.apresentacao import Apresentacao
 from api.models.log import Log
 from api.models.pedido import ItemPedido, Pedido
 from api.serializers.apresentacao import ApresentacaoListSerializer

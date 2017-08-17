@@ -32,9 +32,7 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
         Selecionando o serializer de acordo do o tipo de metodo HTTP
         :return: SerializerClass
         """
-        # try:
         if self.request.method.lower() == 'get':
             return PedidoSerializer
         return PedidoCreateSerializer
-        # except Exception as err:
-        #     return PedidoCreateSerializer
+

@@ -1,4 +1,5 @@
 import re
+from types import MethodType
 
 
 class Converter:
@@ -46,3 +47,13 @@ def get_user_lookup(request, lookup):
     if hasattr(request.user, lookup):
         return getattr(request.user, lookup, None)
     return None
+
+
+def methodize(func, instance):
+    """
+    Set function in instance method of a class
+    :param func: Function
+    :param instance: Instance
+    :return: method function
+    """
+    return MethodType(func, instance)

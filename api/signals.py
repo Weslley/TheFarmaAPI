@@ -3,6 +3,9 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from pyrebase import pyrebase
 
+from api.models.pedido import Pedido
+from api.tasks.pedido import init_proposta
+
 # from api.models.cidade import Cidade
 from api.models.curtida import Curtida
 # from api.models.farmacia import Farmacia
@@ -68,3 +71,9 @@ def curtida_delete_signal(sender, **kwargs):
     serializer = PostExportSerializer(curtida.post)
     data = serializer.data
     update_model('post', data)
+
+
+@receiver(post_save, sender=Pedido)
+def make_proposta(sender, **kwargs):
+    if kwargs['created']:
+        init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas')
