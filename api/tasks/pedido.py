@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 def init_proposta(id_pedido):
     """
     Task para iniciar proposta
-    :param id: Id do pedido
+    :param id_pedido: Id do pedido
     :return:
     """
     try:
@@ -21,14 +21,15 @@ def init_proposta(id_pedido):
         duracao_proposta = timedelta(minutes=5)
 
     busca = True
-    farmacias = []
+    farmacias_enviadas = []
     while busca:
         # Atualizando pedido
         pedido = Pedido.objects.get(id=id_pedido)
         # gerando json da proposta
         proposta = {}
         # selecionando as farmacias proximas
-        farmacias = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias)
+        farmacias = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias_enviadas)
+        farmacias_enviadas.extend(farmacias)
         # enviando para as farmaias selecionadas
         FarmaciaConsumer.send_propostas(proposta, farmacias)
         # verificando se ainda da tempo de buscar mais farmacias

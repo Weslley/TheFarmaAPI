@@ -20,7 +20,7 @@ class FarmaciaManager(models.Manager):
         queryset = self.filter(**filter_queryset)
 
         if 'exclude_farmacias' in kwargs and kwargs['exclude_farmacias']:
-            queryset.exclude(id__in=kwargs['exclude_farmacias'])
+            queryset = queryset.exclude(id__in=[farmacia.id for farmacia in kwargs['exclude_farmacias']])
 
         try:
             raio_proposta = Configuracao.objects.first().raio_proposta
