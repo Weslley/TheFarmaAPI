@@ -1,0 +1,1 @@
+from .farmacia import FarmaciaConsumer

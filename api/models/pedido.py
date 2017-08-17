@@ -40,6 +40,14 @@ class Pedido(models.Model):
         return 'Pedido {}'.format(self.id)
 
     @property
+    def localizacao(self):
+        """
+        Localização do pedido
+        :return: tupla de latitude e longitude
+        """
+        return self.latitude, self.longitude
+
+    @property
     def valor_bruto(self):
         resultado = self.contas_receber_farmacia.aggregate(valor_bruto=Sum('valor_bruto'))
         return resultado['valor_bruto']
@@ -78,7 +86,6 @@ class Pedido(models.Model):
         if qs.exists():
             return qs.first()
         return None
-
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

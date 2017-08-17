@@ -57,3 +57,14 @@ def methodize(func, instance):
     :return: method function
     """
     return MethodType(func, instance)
+
+
+def calcula_distancia(point_1, point_2):
+    """
+    Calcula distancia entre coordenadas em quilometros
+    :param point_1: Tupla de latitude e longitude (lat, long)
+    :param point_2: Tupla de latitude e longitude (lat, long)
+    :return: distancia em quilomentros
+    """
+    from geopy.distance import vincenty
+    return vincenty(point_1, point_2).kilometers

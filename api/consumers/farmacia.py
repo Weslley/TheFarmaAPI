@@ -11,7 +11,7 @@ def send_propostas(self, proposta, farmacias):
     :return:
     """
     for farmacia in farmacias:
-        self.send(proposta, id=farmacia)
+        self.send(proposta, id=farmacia.id)
 
 
 class FarmaciaConsumer(BaseConsumer):

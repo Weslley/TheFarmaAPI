@@ -3,9 +3,36 @@ from datetime import time, timedelta
 from django.db import models
 from django.db.models import F, Sum
 
+from api.models.configuracao import Configuracao
 from api.models.conta_bancaria import ContaBancaria
 from api.models.endereco import Endereco
 from api.models.enums.status_item_proposta import StatusItemProposta
+from api.utils.generics import calcula_distancia
+
+
+class FarmaciaManager(models.Manager):
+
+    def proximas(self, pedido, **kwargs):
+        filter_queryset = {"representantes__usuario__auth_token__isnull": False}
+        if pedido.cidade_obj:
+            filter_queryset['endereco__cidade'] = pedido.cidade_obj
+
+        queryset = self.filter(**filter_queryset)
+
+        if 'exclude_farmacias' in kwargs and kwargs['exclude_farmacias']:
+            queryset.exclude(id__in=kwargs['exclude_farmacias'])
+
+        try:
+            raio_proposta = Configuracao.objects.first().raio_proposta
+        except AttributeError:
+            raio_proposta = 1.0
+        except Exception as err:
+            print(err)
+            raio_proposta = 1.0
+
+        result_list = [f for f in queryset if calcula_distancia(pedido.localizacao, f.localizacao) <= raio_proposta]
+
+        return result_list
 
 
 class Farmacia(models.Model):
@@ -13,8 +40,8 @@ class Farmacia(models.Model):
     nome_fantasia = models.CharField(max_length=100, blank=True, null=True)
     razao_social = models.CharField(max_length=100)
     telefone = models.CharField(max_length=11)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     logo = models.ImageField(upload_to='farmacias', null=True, blank=True)
     endereco = models.OneToOneField(Endereco)
     data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)
@@ -35,6 +62,7 @@ class Farmacia(models.Model):
     horario_funcionamento_domindo_final = models.TimeField(default=time(0, 0, 0))
     horario_funcionamento_feriado_inicial = models.TimeField(default=time(0, 0, 0))
     horario_funcionamento_feriado_final = models.TimeField(default=time(0, 0, 0))
+    objects = FarmaciaManager()
 
     class Meta:
         verbose_name = 'Farmácia'
@@ -42,6 +70,14 @@ class Farmacia(models.Model):
 
     def __str__(self):
         return self.razao_social
+
+    @property
+    def localizacao(self):
+        """
+        Localização do pedido
+        :return: tupla de latitude e longitude
+        """
+        return self.latitude, self.longitude
 
     def get_itens_proposta(self, pedido):
         """
