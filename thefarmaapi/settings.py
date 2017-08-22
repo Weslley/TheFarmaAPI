@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_extensions',
     'api',
     'rest_framework',
@@ -53,6 +54,8 @@ INSTALLED_APPS = [
     'core',
     'channels'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -200,3 +203,5 @@ CHANNEL_LAYERS = {
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }
 }
+
+HTTPS = config('HTTPS', default='http://')

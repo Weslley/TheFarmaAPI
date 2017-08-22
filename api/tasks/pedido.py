@@ -25,13 +25,15 @@ def init_proposta(id_pedido):
     while busca:
         # Atualizando pedido
         pedido = Pedido.objects.get(id=id_pedido)
-        # gerando json da proposta
-        proposta = {}
         # selecionando as farmacias proximas
         farmacias = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias_enviadas)
-        farmacias_enviadas.extend(farmacias)
-        # enviando para as farmaias selecionadas
-        FarmaciaConsumer.send_propostas(proposta, farmacias)
+        if farmacias:
+            farmacias_enviadas.extend(farmacias)
+            # gerando  propostas das farmacias
+            pedido.gerar_proposta(farmacias)
+            # enviando para as farmaias selecionadas
+            FarmaciaConsumer.send_propostas(pedido, farmacias)
+
         # verificando se ainda da tempo de buscar mais farmacias
         duracao = datetime.now() - pedido.log.data_criacao
         if duracao >= duracao_proposta or pedido.status != StatusPedido.ABERTO:

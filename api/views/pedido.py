@@ -1,9 +1,10 @@
+from django.contrib.sites.models import Site
 from rest_framework import generics
 
 from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin
 from api.models.pedido import Pedido
-from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer
+from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer
 
 
 class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -32,7 +33,11 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
         Selecionando o serializer de acordo do o tipo de metodo HTTP
         :return: SerializerClass
         """
+        Site.objects.get_current(request=self.request)
         if self.request.method.lower() == 'get':
             return PedidoSerializer
         return PedidoCreateSerializer
 
+class PropostasList(generics.ListAPIView):
+    queryset = Pedido.objects.all()
+    serializer_class = PropostaSerializer

@@ -1,6 +1,7 @@
 import locale
 from decimal import Decimal
 
+from django.contrib.sites.models import Site
 from rest_framework import serializers
 
 from api.models.apresentacao import Apresentacao, ImagemApresentacao
@@ -8,6 +9,7 @@ from api.models.estoque import Estoque
 from api.models.produto import Produto
 from api.models.uf import Uf
 from api.serializers.tabela_preco import TabelaPrecoSerializer
+from django.conf import settings
 
 
 class ApresentacaoSerializer(serializers.ModelSerializer):
@@ -205,10 +207,11 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
     imagem = serializers.SerializerMethodField()
     unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoSimplesSerializer()
+    pmc = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
-        fields = ('nome', 'id', 'imagem', 'unidade', 'produto')
+        fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc')
 
     def get_imagem(self, obj):
         qs = obj.imagens.order_by('-capa').first()
@@ -217,7 +220,33 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
 
         # verificando se tem um tipo caso não possua imagens
         if not data and obj.unidade:
-            request = self.context['request']
-            data = request.build_absolute_uri(obj.unidade.imagem.url)
+            if 'request' in self.context:
+                request = self.context['request']
+                return request.build_absolute_uri(obj.unidade.imagem.url)
+            else:
+                return '{}{}/{}/'.format(
+                    settings.HTTPS,
+                    Site.objects.get_current().domain,
+                    obj.unidade.imagem.url
+                )
+        else:
+            return '{}{}{}'.format(
+                settings.HTTPS,
+                Site.objects.get_current().domain,
+                data
+            )
 
-        return data
+    def get_pmc(self, obj):
+        cidade = self.context['cidade'] if 'cidade' in self.context else None
+        pmc = Decimal(0)
+
+        try:
+            tabela = obj.tabelas.get(icms=cidade.uf.icms)
+            pmc = tabela.pmc
+        except Exception as err:
+            pass
+
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        pmc = locale.currency(pmc, grouping=True, symbol=None)
+
+        return pmc

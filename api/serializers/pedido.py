@@ -1,14 +1,16 @@
 import locale
 
+from django.db import models
 from django.db import transaction
 from rest_framework import serializers
 
+from api.models.configuracao import Configuracao
 from api.models.log import Log
-from api.models.pedido import ItemPedido, Pedido
+from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.utils import get_client_browser, get_client_ip
 from api.utils.generics import get_user_lookup
-
+from datetime import datetime, timedelta
 from .log import LogSerializer
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -147,3 +149,94 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 
 class PedidoSerializer(PedidoCreateSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
+
+
+class ItemPropostaSerializer(serializers.ModelSerializer):
+    apresentacao = serializers.SerializerMethodField()
+
+    def get_apresentacao(self, obj):
+        return ApresentacaoListSerializer(read_only=True, instance=obj.apresentacao, context=self.context).data
+
+    class Meta:
+        model = ItemPropostaPedido
+        fields = (
+            "id",
+            "apresentacao",
+            "quantidade",
+            "valor_unitario",
+            "farmacia",
+            "status",
+            "possui"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'quantidade': {'read_only': True},
+            'apresentacao': {'read_only': True},
+            'status': {'read_only': True},
+            'farmacia': {'read_only': True},
+        }
+
+
+class PropostaSerializer(serializers.ModelSerializer):
+    tempo = serializers.SerializerMethodField(read_only=True)
+    cliente = serializers.CharField(read_only=True, source='cliente.usuario.get_full_name')
+    itens_proposta = serializers.SerializerMethodField(read_only=True)
+    log = LogSerializer(read_only=True)
+
+    def get_tempo(self, obj):
+        try:
+            duracao_proposta = Configuracao.objects.first().duracao_proposta
+        except:
+            duracao_proposta = timedelta(minutes=5)
+        return (duracao_proposta - (datetime.now() - obj.log.data_criacao)).total_seconds()
+
+    def get_itens_proposta(self, obj):
+        context = {
+            'cidade': self.context['farmacia'].endereco.cidade,
+        }
+        itens_proposta = ItemPropostaSerializer(
+            many=True,
+            instance=obj.itens_proposta.filter(farmacia=self.context['farmacia']),
+            context=context
+        )
+        return itens_proposta.data
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "valor_frete",
+            "status",
+            "log",
+            "forma_pagamento",
+            "cep",
+            "uf",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "nome_endereco",
+            "nome_destinatario",
+            "delivery",
+            "troco",
+            "itens_proposta",
+            "cliente",
+            "tempo"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'log': {'read_only': True},
+            'status': {'read_only': True},
+            'forma_pagamento': {'read_only': True},
+            'cep': {'read_only': True},
+            'uf': {'read_only': True},
+            'logradouro': {'read_only': True},
+            'cidade': {'read_only': True},
+            'bairro': {'read_only': True},
+            'nome_endereco': {'read_only': True},
+            'nome_destinatario': {'read_only': True},
+            'numero': {'read_only': True},
+            'delivery': {'read_only': True},
+            'troco': {'read_only': True},
+        }

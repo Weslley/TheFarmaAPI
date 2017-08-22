@@ -76,4 +76,4 @@ def curtida_delete_signal(sender, **kwargs):
 @receiver(post_save, sender=Pedido)
 def make_proposta(sender, **kwargs):
     if kwargs['created']:
-        init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas', countdown=5)
+        init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas', countdown=1)

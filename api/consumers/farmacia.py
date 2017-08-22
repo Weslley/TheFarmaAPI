@@ -1,17 +1,20 @@
 from api.mixins.consumers import BaseConsumer
 from api.models.farmacia import Farmacia
+from api.serializers.pedido import PropostaSerializer
 from api.utils import methodize
 
 
-def send_propostas(self, proposta, farmacias):
+def send_propostas(self, pedido, farmacias):
     """
     Metodo para envio das propostas para varias farmacias
-    :param proposta: Dados da proposta
+    :param pedido: Pedido da proposta
     :param farmacias: lista dos ids das farmacias
     :return:
     """
     for farmacia in farmacias:
-        self.send(proposta, id=farmacia.id)
+        # gerando json da proposta
+        proposta = PropostaSerializer(instance=pedido, context={'farmacia': farmacia})
+        self.send(proposta.data, id=farmacia.id)
 
 
 class FarmaciaConsumer(BaseConsumer):
@@ -34,10 +37,10 @@ class FarmaciaConsumer(BaseConsumer):
         print('Chegou')
 
     @classmethod
-    def send_propostas(cls, proposta, farmacias):
+    def send_propostas(cls, pedido, farmacias):
         """
         Metodo para envio das propostas para varias farmacias
-        :param proposta: Dados da proposta
+        :param pedido: Pedido da proposta
         :param farmacias: lista dos ids das farmacias
         """
-        cls(skip_group=True).send_propostas(proposta, farmacias)
+        cls(skip_group=True).send_propostas(pedido, farmacias)

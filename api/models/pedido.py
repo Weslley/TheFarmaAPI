@@ -87,6 +87,27 @@ class Pedido(models.Model):
             return qs.first()
         return None
 
+    def gerar_proposta(self, farmacias):
+        if type(farmacias) == Farmacia:
+            for item in self.itens.all():
+                ItemPropostaPedido.objects.create(
+                    pedido=self,
+                    valor_unitario=item.valor_unitario,
+                    quantidade=item.quantidade,
+                    apresentacao=item.apresentacao,
+                    farmacia=farmacias
+                )
+        elif type(farmacias) == list:
+            for farmacia in farmacias:
+                for item in self.itens.all():
+                    ItemPropostaPedido.objects.create(
+                        pedido=self,
+                        valor_unitario=item.valor_unitario,
+                        quantidade=item.quantidade,
+                        apresentacao=item.apresentacao,
+                        farmacia=farmacia
+                    )
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         if self.log:
