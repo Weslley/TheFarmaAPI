@@ -116,3 +116,15 @@ class IsRepresentanteAuthenticatedMixin(APIView):
     """
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated, IsOnlyRepresentante)
+
+
+class FarmaciaSerializerContext(GenericAPIView):
+    """
+    Mixin para adicionar a farmacia do representante da requisição no contexto do
+    serializer
+    """
+    def get_serializer_context(self):
+        """Colocando a farmacia no contexto do serializer"""
+        context = super(FarmaciaSerializerContext, self).get_serializer_context()
+        context['farmacia'] = self.request.user.representante_farmacia.farmacia
+        return context

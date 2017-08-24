@@ -2,9 +2,10 @@ from django.contrib.sites.models import Site
 from rest_framework import generics
 
 from api.pagination import SmallResultsSetPagination
-from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin
+from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
-from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer
+from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
+    PropostaUpdateSerializer
 
 
 class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -38,7 +39,7 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
         return PedidoCreateSerializer
 
 
-class PropostasList(generics.ListAPIView, IsRepresentanteAuthenticatedMixin):
+class PropostaList(generics.ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
     """
     Lista(GET) propostas
 
@@ -55,11 +56,23 @@ class PropostasList(generics.ListAPIView, IsRepresentanteAuthenticatedMixin):
         """
         queryset = Pedido.objects.filter(
             itens_proposta__farmacia=self.request.user.representante_farmacia.farmacia
-        ).order_by('status', 'log__data_criacao')
+        ).order_by('status', '-log__data_criacao')
         return queryset
 
-    def get_serializer_context(self):
-        """Colocando a farmacia no contexto do serializer"""
-        context = super(PropostasList, self).get_serializer_context()
-        context['farmacia'] = self.request.user.representante_farmacia.farmacia
-        return context
+
+class PropostaRetrieveUpdate(generics.RetrieveUpdateAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
+    """
+    Metodo para fazer o update ou o get das insformações de uma proposta
+    """
+    lookup_url_kwarg = 'id'
+    serializer_class = PropostaUpdateSerializer
+    queryset = Pedido.objects.all()
+
+    def get_serializer_class(self):
+        """
+        Selecionando o serializer de acordo do o tipo de metodo HTTP
+        :return: SerializerClass
+        """
+        if self.request.method.lower() == 'get':
+            return PropostaSerializer
+        return PropostaUpdateSerializer

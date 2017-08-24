@@ -240,3 +240,35 @@ class PropostaSerializer(serializers.ModelSerializer):
             'delivery': {'read_only': True},
             'troco': {'read_only': True},
         }
+
+
+class ItemPropostaUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemPropostaPedido
+        fields = (
+            "id",
+            "valor_unitario",
+            "possui"
+        )
+        extra_kwargs = {'id': {'read_only': True}, }
+
+
+class PropostaUpdateSerializer(serializers.ModelSerializer):
+    itens_proposta = ItemPropostaUpdateSerializer(many=True)
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "valor_frete",
+            "itens_proposta"
+        )
+        extra_kwargs = {'id': {'read_only': True}, }
+
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        itens_proposta = validated_data.pop('itens_proposta')
+
+        return super(PropostaUpdateSerializer, self).update(instance, validated_data)
