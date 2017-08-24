@@ -53,3 +53,13 @@ class IsOnlyCliente(permissions.BasePermission):
     def has_permission(self, request, view):
 
         return hasattr(request.user, 'cliente') and request.user.cliente
+
+
+class IsOnlyRepresentante(permissions.BasePermission):
+    """
+    Permissão para só ppermitir acesso de usuario que é cliente
+    """
+
+    def has_permission(self, request, view):
+
+        return hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models.atualizacao import Atualizacao
-from api.permissions import IsOnlyCliente
+from api.permissions import IsOnlyCliente, IsOnlyRepresentante
 
 
 class IsAuthenticatedMixin(APIView):
@@ -108,3 +108,11 @@ class IsClienteAuthenticatedMixin(APIView):
     """
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated, IsOnlyCliente)
+
+
+class IsRepresentanteAuthenticatedMixin(APIView):
+    """
+    Mixin para views que a autenticação é obrigatória
+    """
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, IsOnlyRepresentante)
