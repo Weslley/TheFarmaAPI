@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -9,18 +8,39 @@ from rest_framework.fields import empty
 from rest_framework.validators import UniqueValidator
 
 from api.models.cliente import Cliente
+from api.tasks.cliente import update_foto_facebook
+from api.utils import sexo
 from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
 
 
 class CreateUserClienteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    phone = serializers.CharField(max_length=11, required=False, write_only=True)
+    celular = serializers.CharField(max_length=11, required=False, write_only=True, allow_null=True, allow_blank=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
     cpf = serializers.CharField(max_length=11, write_only=True)
+    sexo = serializers.ChoiceField(choices=sexo.CHOICES, required=False, allow_blank=True, allow_null=True)
+    foto = serializers.URLField(required=False, allow_blank=True, allow_null=True)
+    facebook_id = serializers.IntegerField(required=False, allow_null=True)
+    nome = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    sobrenome = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    data_nascimento = serializers.DateField(required=False, allow_null=True, format='%d/%m/%Y', input_formats=['%d/%m/%Y'])
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'phone', 'id', 'token', 'cpf')
+        fields = (
+            'email',
+            'password',
+            'celular',
+            'id',
+            'token',
+            'cpf',
+            'sexo',
+            'foto',
+            'facebook_id',
+            'data_nascimento',
+            'nome',
+            'sobrenome'
+        )
         extra_kwargs = {
             'id': {'read_only': True},
             'email': {
@@ -45,7 +65,7 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
 
         return data
 
-    def validate_phone(self, data):
+    def validate_celular(self, data):
         if not data.isdigit():
             raise serializers.ValidationError('Número de celular inválido.')
 
@@ -57,23 +77,45 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
 
         return data
 
+    def validate_facebook_id(self, value):
+        try:
+            User.objects.exclude(representante_farmacia__isnull=False).get(cliente__facebook_id=value)
+            raise serializers.ValidationError('Usuário já cadastrado.')
+        except User.DoesNotExist:
+            return value
+
     def validate(self, attrs):
         attrs['username'] = self.create_username(attrs['email'])
         return attrs
 
     def create(self, validated_data):
         with transaction.atomic():
-            phone = None
-            if 'phone' in validated_data:
-                phone = validated_data.pop('phone')
+            cliente_kwargs = {}
+            user_kwargs = {}
+            foto = None
 
-            cpf = validated_data.pop('cpf')
+            if 'foto' in validated_data:
+                foto = validated_data.pop('foto')
+
+            for key in ['nome', 'sobrenome']:
+                if key in validated_data:
+                    user_kwargs[key] = validated_data.pop(key)
+
+            for key in ['celular', 'cpf', 'sexo', 'facebook_id', 'data_nascimento']:
+                if key in validated_data:
+                    cliente_kwargs[key] = validated_data.pop(key)
 
             user = super(CreateUserClienteSerializer, self).create(validated_data)
             user.set_password(validated_data['password'])
+            user.first_name = user_kwargs['nome'] if 'nome' in user_kwargs else ''
+            user.last_name = user_kwargs['sobrenome'] if 'sobrenome' in user_kwargs else ''
             user.save()
-            Cliente.objects.create(usuario=user, celular=phone, cpf=cpf)
+            cliente = Cliente.objects.create(usuario=user, **cliente_kwargs)
             Token.objects.create(user=user)
+
+            if foto:
+                update_foto_facebook.apply_async([cliente.id, foto], queue='update_cliente', countdown=1)
+
             return user
 
     def create_username(self, email):
@@ -83,7 +125,6 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
         truncated_part_of_email = leading_part_of_email[:3] + leading_part_of_email[-3:]
         derived_username = '%s%s' % (truncated_part_of_email, highest_user_id + 1)
         return derived_username
-
 
 
 class UserSerializer(serializers.ModelSerializer):

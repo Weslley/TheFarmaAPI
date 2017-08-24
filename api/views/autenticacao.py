@@ -1,25 +1,20 @@
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-from django.db.models import Q
-from rest_framework import generics, status
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
+from rest_framework import status, generics
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
-from api.mixins.base import (CustomJSONAPIView, IsAuthenticatedMixin,
-                             LogoutMixin)
-from api.models.cliente import Cliente
-from api.serializers.cliente import ClienteSerializer
-from api.serializers.user import (CreateUserClienteSerializer,
-                                  LoginDefautSerializer,
-                                  LoginFacebookSerializer,
-                                  LoginFarmaciaSerializer,
-                                  UserSerializer)
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from api.mixins.base import (
+    LogoutMixin,
+    CustomJSONAPIView,
+    IsAuthenticatedMixin
+)
+from api.serializers.user import (
+    LoginDefautSerializer,
+    LoginFacebookSerializer,
+    LoginFarmaciaSerializer,
+    CreateUserClienteSerializer
+)
 
 
 class LoginFacebook(APIView, CustomJSONAPIView):
@@ -67,6 +62,10 @@ class Logout(IsAuthenticatedMixin, LogoutMixin):
 
 
 class CreateUser(generics.CreateAPIView):
+    """
+    Metodo para criar cliente, mesmo metodo para cadastrar manualmente, e pelo facebook_id, o mesmo em é um dos campos
+    opcionais
+    """
     queryset = User.objects.all()
     serializer_class = CreateUserClienteSerializer
 
@@ -86,12 +85,6 @@ class LoginCliente(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LoginFarmacia(generics.GenericAPIView):
+class LoginFarmacia(LoginCliente):
     queryset = User.objects.all()
     serializer_class = LoginFarmaciaSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,4 +1,8 @@
+import urllib.request
+import os
+
 from django.contrib.auth.models import User
+from django.core.files.base import File
 from django.db import models
 
 from api.models.endereco import Endereco
@@ -17,8 +21,35 @@ class Cliente(models.Model):
     data_nascimento = models.DateField(blank=True, null=True)
     celular = models.CharField(max_length=11, null=True, blank=True, unique=True)
     cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
-    telefone = models.CharField(max_length=11, null=True, blank=False, unique=True)
     email_confirmado = models.BooleanField(default=False)
+
+    def get_remote_image(self, image_url):
+        """
+        Metodo para fazer o download e da imagem da url e salvar no campo foto
+        :param image_url: URL da imagem
+        :return:
+        """
+        if image_url:
+            foto_antiga = None
+            if self.foto:
+                foto_antiga = self.foto.path
+
+            extension = None
+            for e in ['.jpg', '.jpeg', '.png']:
+                if e in image_url:
+                    extension = e
+
+            if extension:
+                result = urllib.request.urlretrieve(image_url)
+                filename = '{}{}'.format(os.path.basename(image_url)[:5], extension)
+                self.foto.save(
+                    filename,
+                    File(open(result[0], 'rb'))
+                )
+                self.save()
+
+                if foto_antiga:
+                    os.remove(foto_antiga)
 
 
 class ClienteEndereco(models.Model):
