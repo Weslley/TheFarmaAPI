@@ -4,21 +4,13 @@ from api.urls import (apresentacao, atualizacao, auth, bairro, banco, cidade,
                       cliente, estoque, farmacia, laboratorio, pedido, post,
                       principio_ativo, produto, representante_legal, secao,
                       tabela_preco, uf)
-from api.views.autenticacao import Login, LoginFacebook, Logout, TesteLogin
 from api.views.financeiro import urls as financeiro_urls
-from api.views.root import HomeApiView
+
 
 urlpatterns = [
     url(r'^ultima_atualizacao/', include(atualizacao)),
 
-    # Login token
-    url(r'^login/$', TesteLogin.as_view(), name='login'),
-    url(r'^login_facebook/$', LoginFacebook.as_view(), name='login-facebook'),
-    url(r'^login/cliente/$', Login.as_view(), name='login'),
-    url(r'^logout/$', Logout.as_view(), name='logout'),
-
     url(r'^auth/', include(auth)),
-
 
     # Farmacias
     url(r'^farmacias/', include(farmacia)),
