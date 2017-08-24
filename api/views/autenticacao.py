@@ -13,7 +13,7 @@ from api.serializers.cliente import ClienteSerializer
 from api.serializers.user import (CreateUserClienteSerializer,
                                   LoginDefautSerializer,
                                   LoginFacebookSerializer,
-                                  LoginFarmaciaSerializer, LoginSerializer,
+                                  LoginFarmaciaSerializer,
                                   UserSerializer)
 
 
@@ -71,7 +71,11 @@ class CreateUser(generics.CreateAPIView):
     serializer_class = CreateUserClienteSerializer
 
 
-class LoginDefault(generics.GenericAPIView):
+class LoginCliente(generics.GenericAPIView):
+    """
+    URL de login do cliente, para login comum é obrigatório do email e senha, caso queira fazer o login
+    com facebook, basta ignorar os campos de email e password, deixando em branco ou pode preenche-los se quiser
+    """
     queryset = User.objects.all()
     serializer_class = LoginDefautSerializer
 

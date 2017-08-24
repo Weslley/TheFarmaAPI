@@ -101,35 +101,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('email', 'foto', 'nome')
 
 
-class LoginSerializer(serializers.Serializer):
-    password = serializers.CharField(max_length=60, write_only=True)
-    email_telefone = serializers.CharField(max_length=254)
-
-    def create(self, validated_data):
-        data = {'email_telefone': '', 'password': ''}
-        for key in validated_data:
-            data[key] = validated_data[key]
-        return data
-
-    def update(self, instance, validated_data):
-        instance['email_telefone'] = validated_data.get('email_telefone', instance['email_telefone'])
-        instance['password'] = validated_data.get('password', instance['password'])
-        return instance
-
-
-# class LoginFacebookSerializer(serializers.Serializer):
-#     facebook_id = serializers.CharField(max_length=255, write_only=True)
-#
-#     def create(self, validated_data):
-#         data = {'facebook_id': ''}
-#         for key in validated_data:
-#             data[key] = validated_data[key]
-#         return data
-#
-#     def update(self, instance, validated_data):
-#         instance['facebook_id'] = validated_data.get('facebook_id', instance['facebook_id'])
-#         return instance
-
 class LoginFacebookSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='first_name')
     sobrenome = serializers.CharField(source='last_name', required=False)
@@ -145,29 +116,49 @@ class LoginFacebookSerializer(serializers.ModelSerializer):
 
 
 class LoginDefautSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=True, allow_blank=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
-    email = serializers.CharField(max_length=250)
+    email = serializers.CharField(max_length=250, required=True, allow_blank=True)
+    facebook_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'id', 'token')
+        fields = ('facebook_id', 'email', 'password', 'id', 'token')
         extra_kwargs = {
             'id': {'read_only': True},
-            'email': {
-                'required': True,
-                'allow_blank': False
-            }
         }
 
+    def validate_password(self, value):
+        data = self._kwargs['data']
+
+        if 'facebook_id' in data and data['facebook_id']:
+            return value
+        elif not value:
+            raise serializers.ValidationError('Este campo é obrigatório.')
+
+        return value
+
+    def validate_facebook_id(self, value):
+        try:
+            User.objects.exclude(representante_farmacia__isnull=False).get(cliente__facebook_id=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Usuário não cadastrado.')
+
+        return value
+
     def validate_email(self, value):
+        data = self._kwargs['data']
+
+        if 'facebook_id' in data and data['facebook_id']:
+            return value
+
         if '@' in value:  # se tiver @ no nome do usuário  username vai ser o email
             kwargs = {'email': value}
         elif len(value) <= 11 and value.isdigit():
             kwargs = {'cliente__celular': value}
         elif len(value) > 11 and value.isdigit():
             raise serializers.ValidationError('Certifique-se de que este campo não tenha mais de 11 caracteres.')
-        elif len(value) > 11 and not value.isdigit():
+        elif len(value) > 0 and not value.isdigit():
             raise serializers.ValidationError('Insira um endereço de email válido.')
         else:
             raise serializers.ValidationError('Este campo é obrigatório.')
@@ -184,9 +175,13 @@ class LoginDefautSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         email = attrs['email']
         password = attrs['password']
+        facebook_id = attrs['facebook_id'] if 'facebook_id' in attrs and attrs['facebook_id'] else None
 
-        back = EmailModelBackend()
-        self.user = back.authenticate(email, password)
+        if facebook_id:
+            self.user = User.objects.exclude(representante_farmacia__isnull=False).get(cliente__facebook_id=facebook_id)
+        else:
+            back = EmailModelBackend()
+            self.user = back.authenticate(email, password)
 
         if not self.user:
             raise serializers.ValidationError('Email ou senha incorretos.')
