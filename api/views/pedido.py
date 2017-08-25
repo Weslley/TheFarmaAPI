@@ -1,4 +1,3 @@
-from django.contrib.sites.models import Site
 from rest_framework import generics
 
 from api.pagination import SmallResultsSetPagination
@@ -37,6 +36,12 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
         if self.request.method.lower() == 'get':
             return PedidoSerializer
         return PedidoCreateSerializer
+
+
+class PedidoRetrieve(generics.RetrieveAPIView, IsClienteAuthenticatedMixin):
+    lookup_url_kwarg = 'id'
+    serializer_class = PedidoSerializer
+    queryset = Pedido.objects.all()
 
 
 class PropostaList(generics.ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):

@@ -54,6 +54,12 @@ class IsOnlyCliente(permissions.BasePermission):
 
         return hasattr(request.user, 'cliente') and request.user.cliente
 
+    def has_object_permission(self, request, view, obj):
+        if hasattr(request.user, 'cliente') and request.user.cliente and obj.cliente == request.user.cliente:
+            return True
+
+        return False
+
 
 class IsOnlyRepresentante(permissions.BasePermission):
     """
