@@ -4,7 +4,7 @@ from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
-    PropostaUpdateSerializer
+    PropostaUpdateSerializer, PedidoDetalhadoSerializer
 
 
 class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -40,7 +40,7 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
 
 class PedidoRetrieve(generics.RetrieveAPIView, IsClienteAuthenticatedMixin):
     lookup_url_kwarg = 'id'
-    serializer_class = PedidoSerializer
+    serializer_class = PedidoDetalhadoSerializer
     queryset = Pedido.objects.all()
 
 

@@ -9,6 +9,7 @@ from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.log import Log
 from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
 from api.serializers.apresentacao import ApresentacaoListSerializer
+from api.serializers.farmacia import FarmaciaListSerializer
 from api.utils import get_client_browser, get_client_ip
 from api.utils.generics import get_user_lookup
 from datetime import datetime, timedelta
@@ -150,6 +151,67 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 
 class PedidoSerializer(PedidoCreateSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
+
+
+class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemPropostaPedido
+        fields = (
+            "apresentacao",
+            "quantidade",
+            "valor_unitario",
+            "possui"
+        )
+        extra_kwargs = {
+            "quantidade": {'read_only': True},
+            'apresentacao': {'read_only': True},
+            'valor_unitario': {'read_only': True},
+            'possui': {'read_only': True},
+        }
+
+
+class PedidoDetalhadoSerializer(PedidoSerializer):
+    propostas = serializers.SerializerMethodField()
+
+    def get_propostas(self, obj):
+        propostas = obj.propostas
+        for proposta in propostas:
+            proposta['itens'] = ItemPropostaSimplificadoSerializer(instance=proposta['itens'], many=True).data
+            proposta['farmacia'] = FarmaciaListSerializer(instance=proposta['farmacia']).data
+
+        return propostas
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "valor_frete",
+            "numero_parcelas",
+            "status",
+            "log",
+            "forma_pagamento",
+            "cep",
+            "uf",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "nome_endereco",
+            "nome_destinatario",
+            "latitude",
+            "longitude",
+            "delivery",
+            "troco",
+            "itens",
+            "propostas"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'log': {'read_only': True},
+            'status': {'read_only': True},
+            'valor_frete': {'read_only': True},
+        }
 
 
 class ItemPropostaSerializer(serializers.ModelSerializer):
