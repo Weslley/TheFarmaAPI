@@ -5,6 +5,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from api.models.configuracao import Configuracao
+from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.log import Log
 from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
 from api.serializers.apresentacao import ApresentacaoListSerializer
@@ -260,7 +261,6 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         model = Pedido
         fields = (
             "id",
-            "valor_frete",
             "itens_proposta"
         )
         extra_kwargs = {'id': {'read_only': True}, }
@@ -269,6 +269,15 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         raise NotImplementedError()
 
     def update(self, instance, validated_data):
-        itens_proposta = validated_data.pop('itens_proposta')
+        validated_data.pop('itens_proposta')
+
+        itens_proposta = [item for item in self.initial_data['itens_proposta']]
+
+        for item in itens_proposta:
+            item_proposta = instance.itens_proposta.get(id=item['id'])
+            item_proposta.status = StatusItemProposta.ENVIADO
+            serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
+            if serializer.is_valid():
+                serializer.save()
 
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
