@@ -1,8 +1,6 @@
-FROM python:3.5-alpine
+FROM python:3.5-slim
 
 MAINTAINER Lucas Cardoso <mr.lucascardoso@gmail.com>
-
-RUN sh
 
 ADD ./ /thefarmaapi
 
@@ -10,8 +8,10 @@ WORKDIR /thefarmaapi
 
 EXPOSE 8000
 
-VOLUME ["postgres"]
+RUN apt-get update
 
-RUN apk add post
+RUN apt-get install postgresql-contrib openssl -y
+
+RUN apt-get install git -y
 
 RUN pip install -r requirements.txt

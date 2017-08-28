@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView , ListAPIView, RetrieveUpdateAPIView
 
 from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
@@ -7,7 +7,7 @@ from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, Pro
     PropostaUpdateSerializer, PedidoDetalhadoSerializer
 
 
-class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
+class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
     """
     Cria(POST)/Lista(GET) pedido(os)
 
@@ -38,13 +38,13 @@ class PedidoCreate(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
         return PedidoCreateSerializer
 
 
-class PedidoRetrieve(generics.RetrieveAPIView, IsClienteAuthenticatedMixin):
+class PedidoRetrieve(RetrieveAPIView, IsClienteAuthenticatedMixin):
     lookup_url_kwarg = 'id'
     serializer_class = PedidoDetalhadoSerializer
     queryset = Pedido.objects.all()
 
 
-class PropostaList(generics.ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
+class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
     """
     Lista(GET) propostas
 
@@ -65,7 +65,7 @@ class PropostaList(generics.ListAPIView, IsRepresentanteAuthenticatedMixin, Farm
         return queryset
 
 
-class PropostaRetrieveUpdate(generics.RetrieveUpdateAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
+class PropostaRetrieveUpdate(RetrieveUpdateAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
     """
     Metodo para fazer o update ou o get das insformações de uma proposta
     """
@@ -81,3 +81,5 @@ class PropostaRetrieveUpdate(generics.RetrieveUpdateAPIView, IsRepresentanteAuth
         if self.request.method.lower() == 'get':
             return PropostaSerializer
         return PropostaUpdateSerializer
+
+
