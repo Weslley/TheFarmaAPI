@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from api.mixins.base import IsRepresentanteAuthenticatedMixin, IsClienteAuthenticatedMixin
 from api.mixins.edit import (ClienteQuerysetOnly,
                              RetrieveUpdateDestroyAPIViewNoPatch)
+from api.models.cartao import Cartao
 
 from api.models.cliente import ClienteEndereco, Cliente
 from api.models.endereco import Endereco
@@ -122,7 +123,7 @@ class EnderecoUpdateDelete(RetrieveUpdateDestroyAPIView, IsClienteAuthenticatedM
                 instance.save()
 
 
-class CartaoCreate(ListCreateAPIView, ClienteQuerysetOnly):
+class CartaoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
     """
     Listagem e criação de cartões do cliente
 
@@ -131,10 +132,12 @@ class CartaoCreate(ListCreateAPIView, ClienteQuerysetOnly):
     **POST** Criação de cartão para o cliente autenticado
     """
     serializer_class = CartaoSerializer
-    permission_classes = (IsAuthenticated, IsOnlyCliente)
+
+    def get_queryset(self):
+        return Cartao.objects.filter(cliente=self.request.user.cliente)
 
 
-class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, ClienteQuerysetOnly):
+class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, IsClienteAuthenticatedMixin):
     """
     Recupera, atualiza e remove dados do cartão do cliente
 
@@ -147,5 +150,7 @@ class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, ClienteQuerysetOnl
     **DELETE** Remove cartão
     """
     serializer_class = CartaoSerializer
-    permission_classes = (IsAuthenticated, IsOnlyCliente, IsOwnerClienteCartao)
     lookup_url_kwarg = 'id'
+
+    def get_queryset(self):
+        return Cartao.objects.filter(cliente=self.request.user.cliente)

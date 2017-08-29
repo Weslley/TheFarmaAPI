@@ -57,7 +57,30 @@ class IsOnlyCliente(permissions.BasePermission):
         if request.user.is_superuser:
             return True
 
-        return hasattr(request.user, 'cliente') and request.user.cliente
+        if hasattr(request.user, 'cliente') and request.user.cliente:
+            if 'id_cliente' in view.kwargs and 'id' in view.kwargs:
+                try:
+                    cliente = Cliente.objects.get(id=view.kwargs['id_cliente'])
+                    return request.user.cliente == cliente
+                except Cliente.DoesNotExist:
+                    return False
+
+            if 'id_cliente' in view.kwargs:
+                try:
+                    cliente = Cliente.objects.get(id=view.kwargs['id_cliente'])
+                    return request.user.cliente == cliente
+                except Cliente.DoesNotExist:
+                    return False
+
+            if 'id' in view.kwargs:
+                try:
+                    cliente = Cliente.objects.get(id=view.kwargs['id'])
+                    return request.user.cliente == cliente
+                except Cliente.DoesNotExist:
+                    return False
+
+        else:
+            return False
 
     def has_object_permission(self, request, view, obj):
         if request.user.is_superuser:
