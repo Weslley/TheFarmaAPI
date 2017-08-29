@@ -4,7 +4,7 @@ services:
     image: nginx:alpine
     container_name: thefarma_api_nginx
     ports:
-      - "80:8000"
+      - "880:8000"
     volumes:
       - ./config/nginx:/etc/nginx/conf.d
     depends_on:
@@ -23,6 +23,7 @@ services:
     image: postgres:alpine
     container_name: postgres_thefarma
     volumes:
-      - vol_postgres
+      - vol_postgres:/var/lib/postgresql/data
 
-
+volumes:
+  vol_postgres:
