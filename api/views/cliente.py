@@ -145,8 +145,6 @@ class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, IsClienteAuthentic
 
     **PUT** Atualiza dados do cartão (obrigátório enviar todos os campos)
 
-    **PATCH** Atualiza parcialmente dados do cartão
-
     **DELETE** Remove cartão
     """
     serializer_class = CartaoSerializer
