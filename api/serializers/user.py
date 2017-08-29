@@ -300,6 +300,19 @@ class DetailUserSerializer(serializers.ModelSerializer):
         }
 
 
+class DetailUserNoTokenSerializer(serializers.ModelSerializer):
+    nome = serializers.CharField(source='first_name')
+    sobrenome = serializers.CharField(source='last_name')
+
+    class Meta:
+        model = User
+        fields = ('nome', 'sobrenome', 'email')
+        extra_kwargs = {
+            'email': {'read_only': True},
+        }
+
+
+
 class RepresentanteUserSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(source='first_name', required=False, max_length=30)
     sobrenome = serializers.CharField(source='last_name', required=False, max_length=30)

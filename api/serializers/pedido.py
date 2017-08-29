@@ -254,15 +254,17 @@ class PropostaSerializer(serializers.ModelSerializer):
         return (duracao_proposta - (datetime.now() - obj.log.data_criacao)).total_seconds()
 
     def get_itens_proposta(self, obj):
-        context = {
-            'cidade': self.context['farmacia'].endereco.cidade,
-        }
-        itens_proposta = ItemPropostaSerializer(
-            many=True,
-            instance=obj.itens_proposta.filter(farmacia=self.context['farmacia']),
-            context=context
-        )
-        return itens_proposta.data
+        if 'farmacia' in self.context:
+            context = {
+                'cidade': self.context['farmacia'].endereco.cidade,
+            }
+            itens_proposta = ItemPropostaSerializer(
+                many=True,
+                instance=obj.itens_proposta.filter(farmacia=self.context['farmacia']),
+                context=context
+            )
+            return itens_proposta.data
+        return []
 
     class Meta:
         model = Pedido

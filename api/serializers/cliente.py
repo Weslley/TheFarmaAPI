@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from api.models.cliente import Cliente
-from api.serializers.user import DetailUserSerializer
+from api.serializers.user import DetailUserSerializer, DetailUserNoTokenSerializer
 
 
 class ClienteSerializer(serializers.ModelSerializer):
@@ -17,6 +17,26 @@ class ClienteSerializer(serializers.ModelSerializer):
             'cpf',
             'celular',
             'facebook_id',
+            'usuario'
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }
+
+
+class ClienteNoTokenSerializer(serializers.ModelSerializer):
+    usuario = DetailUserNoTokenSerializer()
+    data_nascimento = serializers.DateField(required=False, allow_null=True, format='%d/%m/%Y', input_formats=['%d/%m/%Y'])
+
+    class Meta:
+        model = Cliente
+        fields = (
+            'id',
+            'data_nascimento',
+            'sexo',
+            'foto',
+            'cpf',
+            'celular',
             'usuario'
         )
         extra_kwargs = {

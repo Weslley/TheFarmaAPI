@@ -1,18 +1,14 @@
 from rest_framework import status, generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
 
 from api.mixins.base import (
     LogoutMixin,
-    CustomJSONAPIView,
     IsAuthenticatedMixin
 )
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.user import (
     LoginDefautSerializer,
-    LoginFacebookSerializer,
     LoginFarmaciaSerializer,
     CreateUserClienteSerializer
 )

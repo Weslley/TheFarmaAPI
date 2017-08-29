@@ -1,6 +1,9 @@
 from rest_framework import permissions
 from rest_framework.compat import is_authenticated
 
+from api.models.cliente import Cliente
+from api.models.representante_legal import RepresentanteLegal
+
 
 class IsAuthenticatedInGetPut(permissions.BasePermission):
     """
@@ -51,11 +54,22 @@ class IsOnlyCliente(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
+        if request.user.is_superuser:
+            return True
 
         return hasattr(request.user, 'cliente') and request.user.cliente
 
     def has_object_permission(self, request, view, obj):
-        if hasattr(request.user, 'cliente') and request.user.cliente and obj.cliente == request.user.cliente:
+        if request.user.is_superuser:
+            return True
+
+        if hasattr(request.user, 'cliente') and request.user.cliente:
+            if type(obj) == Cliente:
+                return obj == request.user.cliente
+
+            if hasattr(obj, 'cliente') and obj.cliente:
+                return obj.cliente == request.user.cliente
+
             return True
 
         return False
@@ -67,5 +81,20 @@ class IsOnlyRepresentante(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-
+        if request.user.is_superuser:
+            return True
         return hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
+
+        if hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia:
+            if type(obj) == RepresentanteLegal and obj == request.user.representante_farmacia:
+                return True
+            if hasattr(obj, 'representante_farmacia') and obj.representante_farmacia \
+                    and obj.representante_farmacia == request.user.representante_farmacia:
+                return True
+            return True
+
+        return False
