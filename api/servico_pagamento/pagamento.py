@@ -2,7 +2,6 @@
 Módulo responsável para gerenciar pagamentos
 """
 import inspect
-
 from api.servico_pagamento import servicos as _servicos
 from api.servico_pagamento.servicos.servico_abc import Servico
 
@@ -18,18 +17,33 @@ class Pagamento:
         servicos.extend(_servicos)
 
     @classmethod
-    def pagar(cls, tipo_servico, **kwargs):
+    def pagar(cls, tipo_servico, data):
         """
         Método que realiza o pagamento baseado nos servico selecionado
         """
 
         try:
             servico = [_class for _class in cls.servicos if _class.tipo_servico() == tipo_servico][0]
-            return servico.realizar_pagamento(**kwargs)
+            return servico.realizar_pagamento(data)
         except IndexError:
             raise ServicoNaoImplementado()
 
-        return False
+        return None
+
+
+    @classmethod
+    def cancelar(cls, tipo_servico, data):
+        """
+        Método que realiza o cancelamento baseado nos servico selecionado
+        """
+
+        try:
+            servico = [_class for _class in cls.servicos if _class.tipo_servico() == tipo_servico][0]
+            return servico.realizar_cancelamento(data)
+        except IndexError:
+            raise ServicoNaoImplementado()
+
+        return None
 
 
 class ServicoNaoImplementado(Exception):
