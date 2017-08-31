@@ -55,6 +55,12 @@ class LoginCliente(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LoginFarmacia(LoginCliente):
+class LoginFarmacia(generics.GenericAPIView):
     queryset = User.objects.all()
     serializer_class = LoginFarmaciaSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
