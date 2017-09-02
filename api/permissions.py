@@ -58,13 +58,6 @@ class IsOnlyCliente(permissions.BasePermission):
             return True
 
         if hasattr(request.user, 'cliente') and request.user.cliente:
-            if 'id_cliente' in view.kwargs and 'id' in view.kwargs:
-                try:
-                    cliente = Cliente.objects.get(id=view.kwargs['id_cliente'])
-                    return request.user.cliente == cliente
-                except Cliente.DoesNotExist:
-                    return False
-
             if 'id_cliente' in view.kwargs:
                 try:
                     cliente = Cliente.objects.get(id=view.kwargs['id_cliente'])
@@ -72,12 +65,7 @@ class IsOnlyCliente(permissions.BasePermission):
                 except Cliente.DoesNotExist:
                     return False
 
-            if 'id' in view.kwargs:
-                try:
-                    cliente = Cliente.objects.get(id=view.kwargs['id'])
-                    return request.user.cliente == cliente
-                except Cliente.DoesNotExist:
-                    return False
+            return True
 
         else:
             return False
