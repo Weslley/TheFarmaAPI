@@ -5,7 +5,7 @@ from rest_framework.compat import set_many
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import as_serializer_error, empty
 from rest_framework.utils import model_meta
-
+from api.servico_pagamento.servicos.cielo import ServicoCielo
 from api.models.cartao import Cartao
 
 
@@ -37,10 +37,8 @@ class CartaoSerializer(serializers.ModelSerializer):
         request = self.context['request']
         attrs['bandeira'] = self.card.brand
         attrs['cliente'] = request.user.cliente
+        attrs['token'] = ServicoCielo.create_token(attrs)
         attrs['numero_cartao'] = attrs['numero_cartao'][-4:]
-
-        # gerar token
-
         return attrs
 
     def create(self, validated_data):

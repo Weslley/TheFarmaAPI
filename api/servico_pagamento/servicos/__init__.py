@@ -4,5 +4,5 @@ BASE_DIR = os.path.join(BASE_DIR, 'servicos')
 modules = [mod[:-3] for mod in os.listdir(BASE_DIR) if not mod.startswith('__') ]
 
 for module in modules:
-    command = 'from core.servico_pagamento.servicos import {}'.format(module)
+    command = 'from api.servico_pagamento.servicos import {}'.format(module)
     exec(command)

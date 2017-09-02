@@ -1,21 +1,15 @@
 """
 Classe para ser herdada nos outros servicos
 """
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 
 class Servico(ABC):
 
     @classmethod
     @abstractmethod
-    def realizar_pagamento(cls, data):
+    def realizar_pagamento(cls, **kwargs):
         """Metodo para realizar o pagamento"""
-
-
-    @classmethod
-    @abstractmethod
-    def realizar_cancelamento(cls, data):
-        """Metodo para realizar o cancelamento"""
 
     @classmethod
     def tipo_servico(cls):

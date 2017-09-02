@@ -14,3 +14,5 @@ def update_foto_facebook(id_cliente, url):
     """
     cliente = Cliente.objects.get(id=id_cliente)
     cliente.get_remote_image(url)
+
+

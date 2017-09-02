@@ -37,7 +37,6 @@ class ResponseCieloException(Exception):
         return 'Erro inesperado.'
 
 
-
 class ServicoCielo(Servico):
 
     @classmethod
