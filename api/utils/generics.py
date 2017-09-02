@@ -1,5 +1,8 @@
 import re
+from datetime import timedelta, datetime
 from types import MethodType
+
+from api.models.configuracao import Configuracao
 
 
 class Converter:
@@ -68,3 +71,18 @@ def calcula_distancia(point_1, point_2):
     """
     from geopy.distance import vincenty
     return vincenty(point_1, point_2).kilometers
+
+
+def get_tempo_proposta(pedido):
+    """
+    Metodo que retorna o tempo que falta para pedido ser definido nas farmacias
+    :param pedido: Pedido
+    :return: Tempo em segundos
+    """
+    try:
+        duracao_proposta = Configuracao.objects.first().duracao_proposta
+    except Exception:
+        duracao_proposta = timedelta(minutes=5)
+
+    tempo = (duracao_proposta - (datetime.now() - pedido.log.data_criacao)).total_seconds()
+    return tempo if tempo >= 0 else 0

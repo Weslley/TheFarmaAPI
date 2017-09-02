@@ -11,7 +11,7 @@ from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.serializers.farmacia import FarmaciaListSerializer
 from api.utils import get_client_browser, get_client_ip
-from api.utils.generics import get_user_lookup
+from api.utils import get_user_lookup, get_tempo_proposta
 from datetime import datetime, timedelta
 from .log import LogSerializer
 
@@ -247,11 +247,7 @@ class PropostaSerializer(serializers.ModelSerializer):
     log = LogSerializer(read_only=True)
 
     def get_tempo(self, obj):
-        try:
-            duracao_proposta = Configuracao.objects.first().duracao_proposta
-        except:
-            duracao_proposta = timedelta(minutes=5)
-        return (duracao_proposta - (datetime.now() - obj.log.data_criacao)).total_seconds()
+        return get_tempo_proposta(obj)
 
     def get_itens_proposta(self, obj):
         if 'farmacia' in self.context:
@@ -328,6 +324,19 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
             "itens_proposta"
         )
         extra_kwargs = {'id': {'read_only': True}, }
+
+    def validate(self, attrs):
+        itens_proposta = [item for item in self.initial_data['itens_proposta']]
+        for item in itens_proposta:
+            try:
+                self.instance.itens_proposta.get(id=item['id'])
+            except ItemPropostaPedido.DoesNotExist:
+                raise serializers.ValidationError('Item não encontrado')
+
+        if get_tempo_proposta(self.instance) == 0:
+            raise serializers.ValidationError('Tempo para submeter proposta excedido.')
+
+        return attrs
 
     def create(self, validated_data):
         raise NotImplementedError()
