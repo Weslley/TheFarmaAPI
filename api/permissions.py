@@ -97,9 +97,6 @@ class IsOnlyRepresentante(permissions.BasePermission):
         return hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia
 
     def has_object_permission(self, request, view, obj):
-        if request.user.is_superuser:
-            return True
-
         if hasattr(request.user, 'representante_farmacia') and request.user.representante_farmacia:
             if type(obj) == RepresentanteLegal and obj == request.user.representante_farmacia:
                 return True

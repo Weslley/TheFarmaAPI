@@ -34,7 +34,7 @@ class Pedido(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     delivery = models.BooleanField(default=True)
-    troco = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    troco = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(0), ])
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)
@@ -87,6 +87,15 @@ class Pedido(models.Model):
             return qs.first()
         return None
 
+    def farmacia_esta_nas_propostas(self, farmacia):
+        """
+        Metodo que retorna se a farmacia esta entra as farmacias que fizeram propostas
+        :param farmacia: Farmacia a ser verificada
+        :return: Booleano informando se a farmacia esta ou não nas propostas
+        """
+        farmacias = [item.farmacia for item in self.itens_proposta.select_related('farmacia').distinct('farmacia')]
+        return farmacia in farmacias
+
     def gerar_proposta(self, farmacias):
         if type(farmacias) == Farmacia:
             for item in self.itens.all():
@@ -131,9 +140,9 @@ class ItemPedido(models.Model):
 
 
 class PagamentoCartao(models.Model):
-    pedido = models.ForeignKey(Pedido, related_name='cartoes')
+    pedido = models.ForeignKey(Pedido, related_name='pagamentos')
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
-    valor = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    valor = models.DecimalField(max_digits=15, decimal_places=2, default=1,  validators=[MinValueValidator(1), ])
     status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.IDENTIFICACAO)
 
 

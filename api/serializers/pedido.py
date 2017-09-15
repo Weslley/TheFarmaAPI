@@ -1,18 +1,16 @@
 import locale
-
-from django.db import models
 from django.db import transaction
 from rest_framework import serializers
 
-from api.models.configuracao import Configuracao
+from api.models.enums.forma_pagamento import FormaPagamento
 from api.models.enums.status_item_proposta import StatusItemProposta
+from api.models.farmacia import Farmacia
 from api.models.log import Log
-from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
+from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, PagamentoCartao
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.serializers.farmacia import FarmaciaListSerializer
 from api.utils import get_client_browser, get_client_ip
 from api.utils import get_user_lookup, get_tempo_proposta
-from datetime import datetime, timedelta
 from .log import LogSerializer
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -352,5 +350,84 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
             serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
             if serializer.is_valid():
                 serializer.save()
+
+        return super(PropostaUpdateSerializer, self).update(instance, validated_data)
+
+
+class PagamentoCartaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PagamentoCartao
+        fields = (
+            "id",
+            "cartao",
+            "valor",
+            "status"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'status': {'read_only': True},
+        }
+
+    def validate_cartao(self, data):
+        pedido = self.context['view'].get_object()
+        if data not in pedido.cliente.cartoes.all():
+            raise serializers.ValidationError('Cartão não encontrado.')
+        return data
+
+
+class PedidoCheckoutSerializer(serializers.ModelSerializer):
+    pagamentos = PagamentoCartaoSerializer(many=True, required=False)
+    farmacia_selecionada = serializers.PrimaryKeyRelatedField(queryset=Farmacia.objects.all())
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "forma_pagamento",
+            "pagamentos",
+            "farmacia_selecionada",
+            "troco"
+        )
+
+    def validate(self, attrs):
+        # If para verificar se os pagamentos estão inseridos corretamente
+        if (
+            'forma_pagamento' not in attrs and (
+                ('pagamentos' not in attrs) or ('pagamentos' in attrs and len(attrs['pagamentos']) == 0)
+            )
+           ) or \
+           (
+            'forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO and (
+                ('pagamentos' not in attrs) or ('pagamentos' in attrs and len(attrs['pagamentos']) == 0)
+            )
+           ):
+            raise serializers.ValidationError('Em pagamentos com cartão é necessário informar pelo menos um cartão')
+
+        # definindo a forma de pagamento
+        if ('forma_pagamento' not in attrs) or \
+           ('forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO):
+            attrs['forma_pagamento'] = FormaPagamento.CARTAO
+
+            # validando se o valor esta completo, ou se esta excedendo
+
+        else:
+            attrs['forma_pagamento'] = FormaPagamento.DINHEIRO
+
+        return attrs
+
+    def validate_farmacia_selecionada(self, data):
+        if not self.instance.farmacia_esta_nas_propostas(data):
+            raise serializers.ValidationError('Farmacia não realizou proposta para este pedido.')
+        return data
+
+    def update(self, instance, validated_data):
+
+        if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
+            pagamentos = validated_data.pop('pagamentos')
+            for item in pagamentos:
+                item_proposta = instance.itens_proposta.get(id=item['id'])
+                item_proposta.status = StatusItemProposta.ENVIADO
+                serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
+                if serializer.is_valid():
+                    serializer.save()
 
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)

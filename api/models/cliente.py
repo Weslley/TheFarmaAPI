@@ -23,6 +23,9 @@ class Cliente(models.Model):
     cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
     email_confirmado = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.usuario.get_full_name()
+
     def get_remote_image(self, image_url):
         """
         Metodo para fazer o download e da imagem da url e salvar no campo foto

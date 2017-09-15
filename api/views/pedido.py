@@ -1,10 +1,12 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView , ListAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView, \
+    UpdateAPIView
 
+from api.mixins.edit import UpdateAPIViewNoPatch
 from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
-    PropostaUpdateSerializer, PedidoDetalhadoSerializer
+    PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -82,4 +84,13 @@ class PropostaRetrieveUpdate(RetrieveUpdateAPIView, IsRepresentanteAuthenticated
             return PropostaSerializer
         return PropostaUpdateSerializer
 
+
+class PedidoCheckout(UpdateAPIViewNoPatch, IsClienteAuthenticatedMixin):
+    """
+    Metodo para o cliente fazer o checkout do pedido informando
+    a farmacia selecionada, e os pagamentos
+    """
+    lookup_url_kwarg = 'id'
+    serializer_class = PedidoCheckoutSerializer
+    queryset = Pedido.objects.all()
 
