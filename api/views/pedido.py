@@ -1,7 +1,10 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView, \
-    UpdateAPIView
+    GenericAPIView
+from rest_framework.response import Response
 
 from api.mixins.edit import UpdateAPIViewNoPatch
+from api.models.enums.status_pedido import StatusPedido
 from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
@@ -94,3 +97,41 @@ class PedidoCheckout(UpdateAPIViewNoPatch, IsClienteAuthenticatedMixin):
     serializer_class = PedidoCheckoutSerializer
     queryset = Pedido.objects.all()
 
+
+class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
+    """
+    Cancelamento de pedido por parte do cliente
+
+    **POST** Cancelamento de pedido
+    """
+    lookup_url_kwarg = 'id'
+    queryset = Pedido.objects.all()
+    serializer_class = PedidoSerializer
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or \
+            instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
+            raise ValidationError({'detail': 'Pedido já foi cancelado.'})
+
+        if instance.status == StatusPedido.TIMEOUT:
+            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
+
+        if instance.status == StatusPedido.SEM_PROPOSTA:
+            raise ValidationError({'detail': 'Não houve propostas para este pedido.'})
+
+        if instance.status == StatusPedido.ENVIADO:
+            raise ValidationError({'detail': 'Pedido já foi enviado.'})
+
+        if instance.status == StatusPedido.ENTREGUE:
+            raise ValidationError({'detail': 'Pedido já foi entregue.'})
+
+        # Cancelando o pedido
+        instance.status = StatusPedido.CANCELADO_PELO_CLIENTE
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class PedidoCancelamentoFarmacia():
+    pass

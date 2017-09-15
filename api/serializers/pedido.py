@@ -431,3 +431,5 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                     serializer.save()
 
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
+
+

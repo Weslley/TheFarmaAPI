@@ -54,8 +54,6 @@ class IsOnlyCliente(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        if request.user.is_superuser:
-            return True
 
         if hasattr(request.user, 'cliente') and request.user.cliente:
             if 'id_cliente' in view.kwargs:
@@ -71,9 +69,6 @@ class IsOnlyCliente(permissions.BasePermission):
             return False
 
     def has_object_permission(self, request, view, obj):
-        if request.user.is_superuser:
-            return True
-
         if hasattr(request.user, 'cliente') and request.user.cliente:
             if type(obj) == Cliente:
                 return obj == request.user.cliente
@@ -106,3 +101,4 @@ class IsOnlyRepresentante(permissions.BasePermission):
             return True
 
         return False
+
