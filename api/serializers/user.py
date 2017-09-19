@@ -294,9 +294,10 @@ class DetailUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('nome', 'sobrenome', 'email', 'token')
+        fields = ('id', 'nome', 'sobrenome', 'email', 'token')
         extra_kwargs = {
             'email': {'read_only': True},
+            'id': {'read_only': True},
         }
 
 
