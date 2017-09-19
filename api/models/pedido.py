@@ -17,7 +17,6 @@ from api.models.log import Log
 
 class Pedido(models.Model):
     valor_frete = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     cliente = models.ForeignKey(Cliente)
     status = models.IntegerField(default=StatusPedido.ABERTO, choices=StatusPedido.choices())
     log = models.OneToOneField(Log)
@@ -144,6 +143,7 @@ class PagamentoCartao(models.Model):
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
     valor = models.DecimalField(max_digits=15, decimal_places=2, default=1,  validators=[MinValueValidator(1), ])
     status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.IDENTIFICACAO)
+    numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
 
 
 class ItemPropostaPedido(models.Model):

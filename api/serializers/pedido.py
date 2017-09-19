@@ -80,7 +80,6 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "valor_frete",
-            "numero_parcelas",
             "status",
             "log",
             "forma_pagamento",
@@ -184,7 +183,6 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
         fields = (
             "id",
             "valor_frete",
-            "numero_parcelas",
             "status",
             "log",
             "forma_pagamento",
@@ -361,6 +359,7 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
             "id",
             "cartao",
             "valor",
+            "numero_parcelas",
             "status"
         )
         extra_kwargs = {
