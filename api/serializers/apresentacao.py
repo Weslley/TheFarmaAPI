@@ -63,7 +63,7 @@ class ApresentacaoBusca(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         pmc = locale.currency(pmc, grouping=True, symbol=None)
 
         return pmc
@@ -155,7 +155,7 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         ).order_by('valor').first()
         if estoque:
             preco = estoque.valor
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         preco = locale.currency(preco, grouping=True, symbol=None)
         return preco
 
@@ -193,7 +193,7 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         pmc = locale.currency(pmc, grouping=True, symbol=None)
 
         return pmc
@@ -246,7 +246,7 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
         pmc = locale.currency(pmc, grouping=True, symbol=None)
 
         return pmc
