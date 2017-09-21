@@ -13,6 +13,7 @@ class Apresentacao(models.Model):
     ativo = models.BooleanField(default=True)
     unidade = models.ForeignKey(Unidade, null=True, blank=True)
     quantidade = models.IntegerField(default=0)
+    classe_terapeutica = models.CharField(max_length=254, null=True, blank=True)
 
     def __str__(self):
         return self.nome if self.nome else self.produto.nome

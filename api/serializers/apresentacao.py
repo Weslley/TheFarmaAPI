@@ -17,7 +17,7 @@ class ApresentacaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('codigo_barras', 'nome', 'registro_ms', 'tabelas', 'ativo')
+        fields = ('codigo_barras', 'nome', 'registro_ms', 'tabelas', 'ativo', 'classe_terapeutica')
 
 
 class ApresentacaoExportSerializer(serializers.ModelSerializer):
@@ -48,7 +48,7 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem', 'pmc', 'data_atualizacao')
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem', 'pmc', 'data_atualizacao', 'classe_terapeutica')
 
     def get_data_atualizacao(self, obj):
         return int(obj.data_atualizacao.timestamp() * 1000)
@@ -143,7 +143,7 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto', 'imagem', 'pmc', 'quantidade')
+        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto', 'imagem', 'pmc', 'quantidade', 'classe_terapeutica')
 
     def get_preco(self, obj):
         cidade = self.context['cidade']
@@ -211,7 +211,7 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc')
+        fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc', 'classe_terapeutica')
 
     def get_imagem(self, obj):
         qs = obj.imagens.order_by('-capa').first()
