@@ -68,6 +68,7 @@ class Pedido(models.Model):
         return [
             {
                 'farmacia': farmacia,
+                'possui_todos_itens': farmacia.possui_todos_itens(self),
                 'itens': farmacia.get_itens_proposta(self),
                 'status': farmacia.get_status_proposta(self),
                 'valor_total': farmacia.get_valor_proposta(self)

@@ -87,6 +87,15 @@ class Farmacia(models.Model):
         """
         return self.itens_proposta.filter(pedido=pedido)
 
+    def possui_todos_itens(self, pedido):
+        """
+        Informa se a proposta possui todos os itens
+        :param pedido: Pedido proposto
+        :return: Retorna um boolean
+        """
+        itens = self.get_itens_proposta(pedido)
+        return itens.count() == itens.filter(possui=True).count()
+
     def get_status_proposta(self, pedido):
         """
         Retorna o status da proposta
