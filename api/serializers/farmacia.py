@@ -3,12 +3,33 @@ from rest_framework import serializers
 
 from api.models.farmacia import Farmacia
 from api.serializers.conta_bancaria import ContaBancariaSerializer
+from datetime import datetime
 
 
 class FarmaciaListSerializer(serializers.ModelSerializer):
+    horario_funcionamento = serializers.SerializerMethodField()
+    distancia = serializers.SerializerMethodField()
+
     class Meta:
         model = Farmacia
-        fields = ('id', 'cnpj', 'nome_fantasia', 'razao_social', 'tempo_entrega')
+        fields = (
+            'id',
+            'cnpj',
+            'nome_fantasia',
+            'razao_social',
+            'tempo_entrega',
+            'servico_entregador',
+            'horario_funcionamento',
+            'distancia'
+        )
+
+    def get_distancia(self, obj):
+        print(self)
+        return 0
+
+    def get_horario_funcionamento(self, obj):
+        print(self)
+        return datetime.now().time().strftime('%H:%M:%S')
 
 
 class FarmaciaSerializer(serializers.ModelSerializer):
