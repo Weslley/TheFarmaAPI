@@ -1,4 +1,4 @@
-FROM python-slim-postgres
+FROM mrlucascardoso/python-slim-postgres
 
 MAINTAINER Lucas Cardoso <mr.lucascardoso@gmail.com>
 
