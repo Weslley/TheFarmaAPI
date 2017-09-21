@@ -8,7 +8,7 @@ from api.serializers.conta_bancaria import ContaBancariaSerializer
 class FarmaciaListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Farmacia
-        fields = ('id', 'cnpj', 'nome_fantasia', 'razao_social')
+        fields = ('id', 'cnpj', 'nome_fantasia', 'razao_social', 'tempo_entrega')
 
 
 class FarmaciaSerializer(serializers.ModelSerializer):
