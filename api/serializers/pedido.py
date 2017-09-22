@@ -13,7 +13,7 @@ from api.utils import get_client_browser, get_client_ip
 from api.utils import get_user_lookup, get_tempo_proposta
 from .log import LogSerializer
 
-locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 
 class PedidoSimplesSerializer(serializers.ModelSerializer):
