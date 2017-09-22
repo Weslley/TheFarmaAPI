@@ -12,6 +12,6 @@ RUN locale-gen pt_BR.UTF-8
 
 RUN echo -e 'LC_ALL="pt_BR.UTF-8"\nLANG="pt_BR.UTF-8"\nLANGUAGE="pt_BR:pt"\n' > /etc/default/locale
 
-RUN update-locale LANG=pt_BR.UTF-8
+RUN LANG=pt_BR.UTF-8
 
 RUN pip install -r requirements.txt
