@@ -119,7 +119,10 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
             return user
 
     def create_username(self, email):
-        highest_user_id = User.objects.all().order_by('-id')[0].id  # or something more efficient
+        try:
+            highest_user_id = User.objects.all().order_by('-id')[0].id  # or something more efficient
+        except:
+            highest_user_id = 1
         leading_part_of_email = email.split('@', 1)[0]
         leading_part_of_email = re.sub(r'[^a-zA-Z0-9+]', '', leading_part_of_email)  # remove non-alphanumerics
         truncated_part_of_email = leading_part_of_email[:3] + leading_part_of_email[-3:]
