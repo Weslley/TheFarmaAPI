@@ -8,8 +8,10 @@ WORKDIR /thefarmaapi
 
 EXPOSE 8000
 
-RUN locale-gen pt_BR.UTF-8
+RUN sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
-RUN LANG='pt_BR.UTF-8'
+ENV LANG pt_BR.UTF-8
+ENV LANGUAGE pt_BR:pt
+ENV LC_ALL pt_BR.UTF-8
 
 RUN pip install -r requirements.txt
