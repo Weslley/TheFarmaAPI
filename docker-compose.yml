@@ -39,7 +39,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=5,3 --loglevel=INFO --queues=default --hostname=worker_default"
+    command: bash -c "celery --app=thefarmaapi._celery:app worker --loglevel=INFO --queues=default --hostname=worker_default"
     volumes:
       - media-data:/thefarmaapi/media
     environment:
@@ -81,7 +81,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=5,3 --loglevel=INFO --queues=propostas --hostname=worker_propostas"
+    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=INFO --queues=propostas --hostname=worker_propostas"
     volumes:
       - media-data:/thefarmaapi/media
     environment:
