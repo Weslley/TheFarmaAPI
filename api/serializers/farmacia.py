@@ -5,6 +5,8 @@ from api.models.farmacia import Farmacia
 from api.serializers.conta_bancaria import ContaBancariaSerializer
 from datetime import datetime
 
+from api.utils.generics import calcula_distancia
+
 
 class FarmaciaListSerializer(serializers.ModelSerializer):
     horario_funcionamento = serializers.SerializerMethodField()
@@ -24,7 +26,10 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         )
 
     def get_distancia(self, obj):
-        print(self)
+        farmacia = (obj.latitude, obj.longitude)
+        cliente = (self.context['pedido'].latitude, self.context['pedido'].longitude)
+        if all(farmacia) and all(cliente):
+            return round(calcula_distancia(farmacia, cliente), 2)
         return 0
 
     def get_horario_funcionamento(self, obj):

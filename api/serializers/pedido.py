@@ -174,7 +174,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
         propostas = obj.propostas
         for proposta in propostas:
             proposta['itens'] = ItemPropostaSimplificadoSerializer(instance=proposta['itens'], many=True).data
-            proposta['farmacia'] = FarmaciaListSerializer(instance=proposta['farmacia']).data
+            proposta['farmacia'] = FarmaciaListSerializer(instance=proposta['farmacia'], context={'pedido': obj}).data
 
         return propostas
 
