@@ -15,6 +15,7 @@ from api.models.endereco import Endereco
 from api.models.estoque import Estoque
 from api.models.fabricante import Fabricante
 from api.models.farmacia import Farmacia
+from api.models.feriado import Feriado
 from api.models.log import Log
 from api.models.parceiro import Parceiro, UsuarioParceiro
 from api.models.pedido import ItemPedido, ItemPropostaPedido, Pedido
@@ -213,3 +214,4 @@ admin.site.register(Log)
 admin.site.register(ContaReceberFarmacia)
 admin.site.register(ItemPropostaPedido)
 admin.site.register(Configuracao)
+admin.site.register(Feriado)

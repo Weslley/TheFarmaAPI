@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from api.models.farmacia import Farmacia
+from api.models.feriado import Feriado
 from api.serializers.conta_bancaria import ContaBancariaSerializer
 from datetime import datetime
 
@@ -33,8 +34,26 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         return 0
 
     def get_horario_funcionamento(self, obj):
-        print(self)
-        return datetime.now().time().strftime('%H:%M:%S')
+        hoje = datetime.now()
+
+        # Feriado nacional
+        if Feriado.objects.filter(dia=hoje.day, mes=hoje.month, uf__isnull=True).exists():
+            return obj.horario_funcionamento_feriado_final.strftime('%H:%M:%S')
+
+        # Feriado estadual
+        if Feriado.objects.filter(dia=hoje.day, mes=hoje.month, uf=obj.endereco.cidade.uf).exists():
+            return obj.horario_funcionamento_feriado_final.strftime('%H:%M:%S')
+
+        # Domingo
+        if hoje.weekday() == 6:
+            return obj.horario_funcionamento_domingo_final.strftime('%H:%M:%S')
+
+        # Sabado
+        if hoje.weekday() == 5:
+            return obj.horario_funcionamento_sabado_final.strftime('%H:%M:%S')
+
+        # Segunda a sexta
+        return obj.horario_funcionamento_segunda_sexta_final.strftime('%H:%M:%S')
 
 
 class FarmaciaSerializer(serializers.ModelSerializer):

@@ -9,5 +9,8 @@ class Feriado(models.Model):
     mes = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     uf = models.ForeignKey(Uf, null=True, blank=True)
 
+    class Meta:
+        unique_together = ('dia', 'mes', 'uf')
+
     def __str__(self):
         return self.descricao
