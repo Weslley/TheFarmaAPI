@@ -1,8 +1,8 @@
 from cieloApi3 import *
 from decouple import config
-from api.servico_pagamento.servicos.servico_abc import Servico
-from api.servico_pagamento import tipo_servicos
-from api.utils import erros_cielo, status_transacao_cartao_cielo
+from core.servico_pagamento.servicos.servico_abc import Servico
+from core.servico_pagamento import tipo_servicos
+from core.util import erros_cielo, status_transacao_cartao_cielo
 
 
 SANDBOX = config('CIELO_SANDBOX', default=False, cast=bool)
@@ -35,6 +35,7 @@ class ResponseCieloException(Exception):
                 return value
 
         return 'Erro inesperado.'
+
 
 
 class ServicoCielo(Servico):
