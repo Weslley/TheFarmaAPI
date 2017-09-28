@@ -373,6 +373,11 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Cartão não encontrado.')
         return data
 
+    def create(self, validated_data):
+        instance = super(PagamentoCartaoSerializer, self).create(validated_data)
+        # Realizar pagamento com cartão
+        return instance
+
 
 class PedidoCheckoutSerializer(serializers.ModelSerializer):
     pagamentos = PagamentoCartaoSerializer(many=True, required=False)
@@ -423,12 +428,10 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
             pagamentos = validated_data.pop('pagamentos')
             for item in pagamentos:
-                item_proposta = instance.itens_proposta.get(id=item['id'])
-                item_proposta.status = StatusItemProposta.ENVIADO
-                serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
+                serializer = PagamentoCartaoSerializer(data=item)
                 if serializer.is_valid():
                     serializer.save()
 
-        return super(PropostaUpdateSerializer, self).update(instance, validated_data)
+        return super(PedidoCheckoutSerializer, self).update(instance, validated_data)
 
 
