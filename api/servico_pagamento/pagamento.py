@@ -2,8 +2,8 @@
 Módulo responsável para gerenciar pagamentos
 """
 import inspect
-from core.servico_pagamento import servicos as _servicos
-from core.servico_pagamento.servicos.servico_abc import Servico
+from api.servico_pagamento import servicos as _servicos
+from api.servico_pagamento.servicos.servico_abc import Servico
 
 
 class Pagamento:

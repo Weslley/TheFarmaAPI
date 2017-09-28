@@ -1,8 +1,8 @@
 from cieloApi3 import *
 from decouple import config
-from core.servico_pagamento.servicos.servico_abc import Servico
-from core.servico_pagamento import tipo_servicos
-from core.util import erros_cielo, status_transacao_cartao_cielo
+from api.servico_pagamento.servicos.servico_abc import Servico
+from api.servico_pagamento import tipo_servicos
+from api.utils import erros_cielo, status_transacao_cartao_cielo
 
 
 SANDBOX = config('CIELO_SANDBOX', default=False, cast=bool)
@@ -35,7 +35,6 @@ class ResponseCieloException(Exception):
                 return value
 
         return 'Erro inesperado.'
-
 
 
 class ServicoCielo(Servico):
@@ -207,6 +206,10 @@ class ServicoCielo(Servico):
     @classmethod
     def load_creditcard(cls, kwargs):
         credit_card = CreditCard(kwargs['cvv'], kwargs['bandeira'])
+        if 'token' in kwargs:
+            credit_card.card_token = kwargs['token']
+            return credit_card
+
         credit_card.expiration_date = kwargs['validade']
         credit_card.card_number = kwargs['numero_cartao']
         return credit_card
