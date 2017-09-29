@@ -34,6 +34,8 @@ services:
      - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
      - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
      - CIELO_SANDBOX=True
+     - REDIS_CHANNELS_HOST=api.thefarma.com.br
+     - REDIS_CHANNELS_PORT=32769
 
   worker_default:
     build:
@@ -55,6 +57,8 @@ services:
      - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
      - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
      - CIELO_SANDBOX=True
+     - REDIS_CHANNELS_HOST=api.thefarma.com.br
+     - REDIS_CHANNELS_PORT=32769
 
   channels:
     build:
@@ -78,6 +82,8 @@ services:
      - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
      - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
      - CIELO_SANDBOX=True
+     - REDIS_CHANNELS_HOST=api.thefarma.com.br
+     - REDIS_CHANNELS_PORT=32769
 
 volumes:
   static-data:

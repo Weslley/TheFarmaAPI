@@ -202,7 +202,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('localhost', 6379)],
+            'hosts': [(config('REDIS_CHANNELS_HOST'), config('REDIS_CHANNELS_PORT'))],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }
