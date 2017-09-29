@@ -60,7 +60,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "daphne -b 0.0.0.0 -p 8001 thefarmaapi.asgi:channel_layer && python manage.py runworker"
+    command: bash -c "daphne -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer && python manage.py runworker"
     volumes:
       - media-data:/thefarmaapi/media
     expose:
