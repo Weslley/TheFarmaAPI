@@ -40,3 +40,11 @@ def init_proposta(id_pedido):
             busca = False
         else:
             sleep(5)
+
+    pedido = Pedido.objects.get(id=id_pedido)
+    if len(pedido.propostas) and pedido.status == StatusPedido.ABERTO:
+        pedido.status = StatusPedido.TIMEOUT
+    elif not len(pedido.propostas):
+        pedido.status = StatusPedido.SEM_PROPOSTA
+
+    pedido.save()
