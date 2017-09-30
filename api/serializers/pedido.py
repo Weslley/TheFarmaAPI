@@ -2,6 +2,7 @@ import locale
 from django.db import transaction
 from rest_framework import serializers
 
+from api.models.endereco import Endereco
 from api.models.enums.forma_pagamento import FormaPagamento
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.farmacia import Farmacia
@@ -74,24 +75,17 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
 class PedidoCreateSerializer(serializers.ModelSerializer):
     log = LogSerializer(read_only=True)
     itens = ItemPedidoCreateSerializer(many=True)
+    endereco = serializers.PrimaryKeyRelatedField(queryset=Endereco.objects.all(), required=False, write_only=True)
 
     class Meta:
         model = Pedido
         fields = (
             "id",
+            "endereco",
             "valor_frete",
             "status",
             "log",
             "forma_pagamento",
-            "cep",
-            "uf",
-            "logradouro",
-            "numero",
-            "complemento",
-            "cidade",
-            "bairro",
-            "nome_endereco",
-            "nome_destinatario",
             "latitude",
             "longitude",
             "delivery",
@@ -104,6 +98,11 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             'status': {'read_only': True},
             'valor_frete': {'read_only': True},
         }
+
+    def validate(self, attrs):
+        if ('delivery' not in attrs or attrs['delivery']) and ('endereco' not in attrs or attrs['endereco'] == None):
+            raise serializers.ValidationError('Endereço é obrigatório quando utilizar serviço de entrega.')
+        return attrs
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -118,6 +117,23 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                 browser=get_client_browser(request),
                 remote_ip=get_client_ip(request)
             )
+
+            # Adicionando endereco selecionado
+            endereco = validated_data.pop('endereco') if 'endereco' in validated_data else None
+            if validated_data['delivery'] and endereco:
+                endereco_props = (
+                    "cep",
+                    "uf",
+                    "logradouro",
+                    "numero",
+                    "complemento",
+                    "cidade",
+                    "bairro",
+                    "nome_endereco",
+                    "nome_destinatario"
+                )
+                for prop in endereco_props:
+                    validated_data[prop] = getattr(endereco, prop, None)
 
             # pegando o cliente da requisição
             cliente = get_user_lookup(request, 'cliente')
@@ -148,6 +164,36 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 
 class PedidoSerializer(PedidoCreateSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "valor_frete",
+            "status",
+            "log",
+            "forma_pagamento",
+            "cep",
+            "uf",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "nome_endereco",
+            "nome_destinatario",
+            "latitude",
+            "longitude",
+            "delivery",
+            "troco",
+            "itens"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'log': {'read_only': True},
+            'status': {'read_only': True},
+            'valor_frete': {'read_only': True},
+        }
 
 
 class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
