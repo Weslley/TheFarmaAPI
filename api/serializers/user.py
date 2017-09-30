@@ -17,7 +17,7 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     celular = serializers.CharField(max_length=11, required=False, write_only=True, allow_null=True, allow_blank=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
-    cpf = serializers.CharField(max_length=11, write_only=True)
+    cpf = serializers.CharField(max_length=11, write_only=True, required=False)
     sexo = serializers.ChoiceField(choices=sexo.CHOICES, required=False, allow_blank=True, allow_null=True)
     foto = serializers.URLField(required=False, allow_blank=True, allow_null=True)
     facebook_id = serializers.IntegerField(required=False, allow_null=True)
