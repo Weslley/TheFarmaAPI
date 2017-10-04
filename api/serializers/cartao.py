@@ -18,6 +18,7 @@ class CartaoSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'id': {'read_only': True},
             'bandeira': {'allow_blank': True, 'allow_null': True, 'required': False},
+            'cvv': {'write_only': True}
         }
 
     def validate(self, attrs):
