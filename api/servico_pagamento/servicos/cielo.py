@@ -95,10 +95,11 @@ class ServicoCielo(Servico):
 
             return {'venda': json_venda, 'captura': json_captura}
         except Exception as err:
-            error_codes = get_codigo_erros(str(err))
-            if error_codes:
-                raise ResponseCieloException(error_codes, **{'venda': json_venda, 'captura': json_captura})
-            raise err
+            return {'venda': json_venda, 'captura': json_captura}
+            # error_codes = get_codigo_erros(str(err))
+            # if error_codes:
+                # raise ResponseCieloException(error_codes, **{'venda': json_venda, 'captura': json_captura})
+            # raise err
 
     @classmethod
     def status_pagamento(cls, payment_id):
@@ -191,7 +192,7 @@ class ServicoCielo(Servico):
 
     @classmethod
     def load_customer(cls, kwargs):
-        return Customer('CLIENTE RADIO TAXI')
+        return Customer('CLIENTE THEFARMA')
 
     @classmethod
     def load_transacao(cls):
@@ -217,7 +218,7 @@ class ServicoCielo(Servico):
     @classmethod
     def load_sale(cls, kwargs):
         # Crie uma instância de Sale informando o ID do pagamento
-        sale = Sale(kwargs['venda'].id)
+        sale = Sale(kwargs['pedido_id'])
 
         # Crie uma instância de Customer informando o nome do cliente
         sale.customer = cls.load_customer(kwargs)

@@ -13,6 +13,7 @@ from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
                               StatusPagamentoCartao, StatusPedido)
 from api.models.farmacia import Farmacia
 from api.models.log import Log
+from django.contrib.postgres.fields import JSONField
 
 
 class Pedido(models.Model):
@@ -143,8 +144,12 @@ class PagamentoCartao(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='pagamentos')
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
     valor = models.DecimalField(max_digits=15, decimal_places=2, default=1,  validators=[MinValueValidator(1), ])
-    status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.IDENTIFICACAO)
+    status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NOT_FINISHED)
     numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
+    json_venda = JSONField(null=True)
+    json_captura = JSONField(null=True)
+    pagamento_status = models.IntegerField(null=True, blank=True)
+    captura_status = models.IntegerField(null=True, blank=True)
 
 
 class ItemPropostaPedido(models.Model):

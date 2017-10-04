@@ -10,9 +10,13 @@ from api.models.log import Log
 from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, PagamentoCartao
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.serializers.farmacia import FarmaciaListSerializer
-from api.utils import get_client_browser, get_client_ip
+from api.servico_pagamento import tipo_servicos
+from api.servico_pagamento.pagamento import Pagamento
+from api.servico_pagamento.servicos.cielo import ServicoCielo, ResponseCieloException
+from api.utils import get_client_browser, get_client_ip, status_transacao_cartao_cielo
 from api.utils import get_user_lookup, get_tempo_proposta
 from .log import LogSerializer
+from datetime import datetime
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -421,7 +425,58 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = super(PagamentoCartaoSerializer, self).create(validated_data)
-        # Realizar pagamento com cartão
+        try:
+            with transaction.atomic():
+                # venda = object
+                # data['venda'] = venda = VendaCartao.objects.create(
+                #     motorista=data['unidade'].motorista,
+                #     unidade=data['unidade'],
+                #     descricao='RADIO TAXI',
+                #     valor=data['valor'],
+                #     bandeira=self.translate_brand(data['bandeira'])
+                # )
+
+                venda = {
+                    'pedido_id': instance.pedido.id,
+                    'valor': instance.valor,
+                    'cvv:': instance.cartao.cvv,
+                    'bandeira': instance.cartao.bandeira,
+                    'token': instance.cartao.token
+                }
+
+                data = Pagamento.pagar(tipo_servicos.CIELO, venda)
+
+                json_venda, json_captura = data['venda'], data['captura']
+
+                instance.pagamento_status = int(json_venda['Payment']['Status'])
+                # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
+                #                                                                                   json_venda[
+                #                                                                                       'Payment'] else None
+                pagamento_id = json_venda['Payment']['PaymentId']
+                # venda.pagamento_data_recebimento = datetime.strptime(json_venda['Payment']['ReceivedDate'],
+                #                                                      '%Y-%m-%d %H:%M:%S')
+                # venda.pagamento_codigo_autorizacao = json_venda['Payment'][
+                #     'AuthorizationCode'] if 'AuthorizationCode' in \
+                #                             json_venda[
+                #                                 'Payment'] else None
+                # venda.pagamento_tid = str(json_venda['Payment']['Tid'])
+                # venda.pagamento_mensagem_retorno = json_venda['Payment']['ReturnMessage']
+                # venda.pagamento_codigo_retorno = json_venda['Payment']['ReturnCode']
+
+                if json_captura:
+                    # venda.capturado = True
+                    instance.captura_status = int(json_captura['Status'])
+                    # venda.captura_codigo_retorno = json_captura['ReturnCode']
+                    # venda.captura_mensagem_retorno = json_captura['ReturnMessage']
+
+                    instance.status = ServicoCielo.status_pagamento(pagamento_id)
+                    instance.save()
+
+        except ResponseCieloException as err:
+            print(err)
+        except Exception as e:
+            print(e)
+            print(type(e))
         return instance
 
 
