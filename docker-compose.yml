@@ -7,6 +7,7 @@ services:
       - "80:8000"
     volumes:
       - ./config/nginx:/etc/nginx/conf.d
+      - ./config/nginx/gsdv.txt:/cert/gsdv.txt
       - static-data:/staticfiles
       - media-data:/mediafiles
     depends_on:
