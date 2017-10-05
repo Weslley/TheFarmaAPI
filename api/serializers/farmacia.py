@@ -6,12 +6,14 @@ from api.models.feriado import Feriado
 from api.serializers.conta_bancaria import ContaBancariaSerializer
 from datetime import datetime
 
+from api.serializers.endereco import EnderecoClienteCreateSerializer
 from api.utils.generics import calcula_distancia
 
 
 class FarmaciaListSerializer(serializers.ModelSerializer):
     horario_funcionamento = serializers.SerializerMethodField()
     distancia = serializers.SerializerMethodField()
+    endereco = EnderecoClienteCreateSerializer()
 
     class Meta:
         model = Farmacia
@@ -23,7 +25,10 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
             'tempo_entrega',
             'servico_entregador',
             'horario_funcionamento',
-            'distancia'
+            'distancia',
+            'endereco',
+            'latitude',
+            'longitude'
         )
 
     def get_distancia(self, obj):
