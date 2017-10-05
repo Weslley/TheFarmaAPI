@@ -11,7 +11,11 @@ from api.urls import urls
 from core.views.mixins import AdminBaseMixin
 
 
-class HomeApiView(APIView):
+class HomeApiView(TemplateView):
+    template_name = 'indexapi.html'
+
+
+class HomeApiViewOld(APIView):
     """
     View to list all users in the system.
 

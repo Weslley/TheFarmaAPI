@@ -5,9 +5,11 @@ from api.urls import (apresentacao, atualizacao, auth, bairro, banco, cidade,
                       principio_ativo, produto, representante_legal, secao,
                       tabela_preco, uf)
 from api.views.financeiro import urls as financeiro_urls
-
+from api.views.root import HomeApiView
 
 urlpatterns = [
+    url(r'^$', HomeApiView.as_view(), name='home-api'),
+
     url(r'^ultima_atualizacao/', include(atualizacao)),
 
     url(r'^auth/', include(auth)),

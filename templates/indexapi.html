@@ -7,8 +7,9 @@
   <link rel="apple-touch-icon" sizes="76x76" href="{% static 'material-kit/img/apple-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<meta name="_globalsign-domain-verification" content="EJSiJu9-rNgup2HmmrTOWziZbG76FWYEbrOtN68IbZ" />
-  <title>API TheFarma - Login</title>
+    <meta name="_globalsign-domain-verification" content="EJSiJu9-rNgup2HmmrTOWziZbG76FWYEbrOtN68IbZ" />
+
+  <title>API TheFarma</title>
 
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
 
@@ -40,32 +41,11 @@
                 </div>
                 <div class="content">
 
-                  {% if form.non_field_errors  or form.username.errors%}
-                    <div class="input-group has-error">
-                  {% else %}
-                    <div class="input-group">
-                  {% endif %}
-
-                    <span class="input-group-addon">
-                      <i class="material-icons">email</i>
-                    </span>
-                    {{ form.username|addplaceclass:"Email...|form-control" }}
-                  </div>
-
-                  {% if form.non_field_errors  or form.password.errors%}
-                    <div class="input-group has-error">
-                  {% else %}
-                    <div class="input-group">
-                  {% endif %}
-                    <span class="input-group-addon">
-                      <i class="material-icons">lock_outline</i>
-                    </span>
-                    {{ form.password|addplaceclass:"Senha...|form-control" }}
-                  </div>
+                 <h2 style="text-align: center">TheFarma</h2>
 
                 </div>
                 <div class="footer text-center">
-                  <button type="submit" class="btn btn-simple btn-info btn-lg btn-block">Login</button>
+                    <br>
                 </div>
               </form>
             </div>
