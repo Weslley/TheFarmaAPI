@@ -1,4 +1,7 @@
 import locale
+
+from api.consumers.farmacia import FarmaciaConsumer
+from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.utils.generics import print_exception
 
 from django.db import transaction
@@ -544,6 +547,11 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                     serializer.save()
 
         farmacia = validated_data.pop('farmacia_selecionada')
+
+        # FAZER CHECKOUT DA FORMA CORRETA
+        # if instance.pagamentos.filter(status=StatusPagamentoCartao)
+        # if instance.status == StatusPagamentoCartao.PAYMENT_CONFIRMED:
+        FarmaciaConsumer.checkout(instance, farmacia)
         instance.itens.update(farmacia=farmacia)
         proposta = [_ for _ in instance.propostas if _['farmacia'].id == farmacia.id][0]
         itens_proposta = proposta['itens']

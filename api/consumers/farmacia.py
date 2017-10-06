@@ -1,7 +1,101 @@
+from rest_framework import serializers
+
 from api.mixins.consumers import BaseConsumer
 from api.models.farmacia import Farmacia
-from api.serializers.pedido import PropostaSerializer
+from api.models.pedido import Pedido, ItemPropostaPedido
+from api.serializers.apresentacao import ApresentacaoListSerializer
+from api.serializers.log import LogSerializer
 from api.utils import methodize
+from api.utils.generics import get_tempo_proposta
+
+
+class ItemPropostaSerializer(serializers.ModelSerializer):
+    apresentacao = serializers.SerializerMethodField()
+
+    def get_apresentacao(self, obj):
+        return ApresentacaoListSerializer(read_only=True, instance=obj.apresentacao, context=self.context).data
+
+    class Meta:
+        model = ItemPropostaPedido
+        fields = (
+            "id",
+            "apresentacao",
+            "quantidade",
+            "valor_unitario",
+            "farmacia",
+            "status",
+            "possui"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'quantidade': {'read_only': True},
+            'apresentacao': {'read_only': True},
+            'status': {'read_only': True},
+            'farmacia': {'read_only': True},
+        }
+
+
+class PropostaSerializer(serializers.ModelSerializer):
+    tempo = serializers.SerializerMethodField(read_only=True)
+    cliente = serializers.CharField(read_only=True, source='cliente.usuario.get_full_name')
+    itens_proposta = serializers.SerializerMethodField(read_only=True)
+    log = LogSerializer(read_only=True)
+
+    def get_tempo(self, obj):
+        return get_tempo_proposta(obj)
+
+    def get_itens_proposta(self, obj):
+        if 'farmacia' in self.context:
+            context = {
+                'cidade': self.context['farmacia'].endereco.cidade,
+            }
+            itens_proposta = ItemPropostaSerializer(
+                many=True,
+                instance=obj.itens_proposta.filter(farmacia=self.context['farmacia']),
+                context=context
+            )
+            return itens_proposta.data
+        return []
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "valor_frete",
+            "status",
+            "log",
+            "forma_pagamento",
+            "cep",
+            "uf",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "nome_endereco",
+            "nome_destinatario",
+            "delivery",
+            "troco",
+            "itens_proposta",
+            "cliente",
+            "tempo"
+        )
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'log': {'read_only': True},
+            'status': {'read_only': True},
+            'forma_pagamento': {'read_only': True},
+            'cep': {'read_only': True},
+            'uf': {'read_only': True},
+            'logradouro': {'read_only': True},
+            'cidade': {'read_only': True},
+            'bairro': {'read_only': True},
+            'nome_endereco': {'read_only': True},
+            'nome_destinatario': {'read_only': True},
+            'numero': {'read_only': True},
+            'delivery': {'read_only': True},
+            'troco': {'read_only': True},
+        }
 
 
 def send_propostas(self, pedido, farmacias):
@@ -24,7 +118,8 @@ def checkout(self, pedido, farmacia):
     :param farmacia: farmacia selecionada
     :return:
     """
-    self.send({'pedido': {'id': pedido.id}}, id=farmacia.id)
+    # Tipo 1 checkout
+    self.send({'pedido': {'id': pedido.id}, 'tipo': 1}, id=farmacia.id)
 
 
 def notifica_cancelamento(self, pedido, farmacias):
@@ -34,8 +129,9 @@ def notifica_cancelamento(self, pedido, farmacias):
     :param farmacias: lista de farmacias
     :return:
     """
+    # Tipo 0 cancelamento
     for farmacia in farmacias:
-        self.send({'pedido': {'id': pedido.id}}, id=farmacia.id)
+        self.send({'pedido': {'id': pedido.id}, 'tipo': 0}, id=farmacia.id)
 
 
 class FarmaciaConsumer(BaseConsumer):
@@ -46,6 +142,8 @@ class FarmaciaConsumer(BaseConsumer):
     def __init__(self, message=None, data=None, **kwargs):
         super(FarmaciaConsumer, self).__init__(message, data, **kwargs)
         self.send_propostas = methodize(send_propostas, self)
+        self.checkout = methodize(checkout, self)
+        self.notifica_cancelamento = methodize(notifica_cancelamento, self)
 
     def dispatch(self, *args, **kwargs):
         """

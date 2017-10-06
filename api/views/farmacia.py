@@ -2,7 +2,6 @@
 
 from rest_framework import generics
 
-from api.consumers.farmacia import FarmaciaConsumer
 from api.mixins.base import IsAuthenticatedMixin
 from api.models.farmacia import Farmacia
 from api.pagination import SmallResultsSetPagination
