@@ -17,6 +17,27 @@ def send_propostas(self, pedido, farmacias):
         self.send(proposta.data, id=farmacia.id)
 
 
+def checkout(self, pedido, farmacia):
+    """
+    Metodo para envio de confirmação de checkout(Proposta aceita)
+    :param pedido: Pedido da proposta
+    :param farmacia: farmacia selecionada
+    :return:
+    """
+    self.send({'pedido': {'id': pedido.id}}, id=farmacia.id)
+
+
+def notifica_cancelamento(self, pedido, farmacias):
+    """
+    Metodo para envio de notificação de cancelamento
+    :param pedido: Pedido da proposta
+    :param farmacias: lista de farmacias
+    :return:
+    """
+    for farmacia in farmacias:
+        self.send({'pedido': {'id': pedido.id}}, id=farmacia.id)
+
+
 class FarmaciaConsumer(BaseConsumer):
     group_name = r'farmacias-{id}'
     authenticated = True
@@ -44,3 +65,23 @@ class FarmaciaConsumer(BaseConsumer):
         :param farmacias: lista dos ids das farmacias
         """
         cls(skip_group=True).send_propostas(pedido, farmacias)
+
+    @classmethod
+    def checkout(cls, pedido, farmacia):
+        """
+        Metodo para envio de confirmação de checkout(Proposta aceita)
+        :param pedido: Pedido da proposta
+        :param farmacia: farmacia selecionada
+        :return:
+        """
+        cls(skip_group=True).checkout(pedido, farmacia)
+
+    @classmethod
+    def notifica_cancelamento(cls, pedido, farmacias):
+        """
+        Metodo para envio de notificação de cancelamento
+        :param pedido: Pedido da proposta
+        :param farmacias: lista de farmacias
+        :return:
+        """
+        cls(skip_group=True).notifica_cancelamento(pedido, farmacias)
