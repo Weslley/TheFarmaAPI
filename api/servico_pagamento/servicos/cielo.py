@@ -3,7 +3,7 @@ from decouple import config
 from api.servico_pagamento.servicos.servico_abc import Servico
 from api.servico_pagamento import tipo_servicos
 from api.utils import erros_cielo, status_transacao_cartao_cielo
-
+from api.utils.generics import print_exception
 
 SANDBOX = config('CIELO_SANDBOX', default=False, cast=bool)
 MERCHANT_ID = config('CIELO_MERCHANT_ID', default='')
@@ -51,9 +51,10 @@ class ServicoCielo(Servico):
 
     @classmethod
     def checkout_kwargs(cls, kwargs):
-        validade = kwargs['validade']
-        mes, ano = validade.split('/')
-        kwargs['validade'] = '{}/20{}'.format(mes.rjust(2, '0'), ano.rjust(2, '0'))
+        if 'token' not in kwargs:
+            validade = kwargs['validade']
+            mes, ano = validade.split('/')
+            kwargs['validade'] = '{}/20{}'.format(mes.rjust(2, '0'), ano.rjust(2, '0'))
 
         for nome, valor in TRANSLATE_BRANDS:
             if nome == kwargs['bandeira']:
@@ -95,6 +96,7 @@ class ServicoCielo(Servico):
 
             return {'venda': json_venda, 'captura': json_captura}
         except Exception as err:
+            print_exception()
             return {'venda': json_venda, 'captura': json_captura}
             # error_codes = get_codigo_erros(str(err))
             # if error_codes:

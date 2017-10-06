@@ -1,9 +1,12 @@
 import locale
+from api.utils.generics import print_exception
+
 from django.db import transaction
 from rest_framework import serializers
 
 from api.models.endereco import Endereco
 from api.models.enums.forma_pagamento import FormaPagamento
+from api.models.enums.status_item import StatusItem
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.farmacia import Farmacia
 from api.models.log import Log
@@ -418,12 +421,15 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
         }
 
     def validate_cartao(self, data):
+        if 'view' not in self.context:
+            raise serializers.ValidationError('Erro de validação')
         pedido = self.context['view'].get_object()
         if data not in pedido.cliente.cartoes.all():
             raise serializers.ValidationError('Cartão não encontrado.')
         return data
 
     def create(self, validated_data):
+        validated_data['pedido'] = self.context['view'].get_object()
         instance = super(PagamentoCartaoSerializer, self).create(validated_data)
         try:
             with transaction.atomic():
@@ -439,7 +445,7 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
                 venda = {
                     'pedido_id': instance.pedido.id,
                     'valor': instance.valor,
-                    'cvv:': instance.cartao.cvv,
+                    'cvv': instance.cartao.cvv,
                     'bandeira': instance.cartao.bandeira,
                     'token': instance.cartao.token
                 }
@@ -447,7 +453,8 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
                 data = Pagamento.pagar(tipo_servicos.CIELO, venda)
 
                 json_venda, json_captura = data['venda'], data['captura']
-
+                instance.json_venda = json_venda
+                instance.json_captura = json_captura
                 instance.pagamento_status = int(json_venda['Payment']['Status'])
                 # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
                 #                                                                                   json_venda[
@@ -470,19 +477,21 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
                     # venda.captura_mensagem_retorno = json_captura['ReturnMessage']
 
                     instance.status = ServicoCielo.status_pagamento(pagamento_id)
-                    instance.save()
+
+                instance.save()
 
         except ResponseCieloException as err:
             print(err)
         except Exception as e:
             print(e)
             print(type(e))
+            print_exception()
         return instance
 
 
 class PedidoCheckoutSerializer(serializers.ModelSerializer):
     pagamentos = PagamentoCartaoSerializer(many=True, required=False)
-    farmacia_selecionada = serializers.PrimaryKeyRelatedField(queryset=Farmacia.objects.all())
+    farmacia_selecionada = serializers.PrimaryKeyRelatedField(queryset=Farmacia.objects.all(), write_only=True)
 
     class Meta:
         model = Pedido
@@ -529,9 +538,20 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
             pagamentos = validated_data.pop('pagamentos')
             for item in pagamentos:
-                serializer = PagamentoCartaoSerializer(data=item)
-                if serializer.is_valid():
+                item['cartao'] = item['cartao'].id
+                serializer = PagamentoCartaoSerializer(data=item, context=self.context)
+                if serializer.is_valid(raise_exception=True):
                     serializer.save()
+
+        farmacia = validated_data.pop('farmacia_selecionada')
+        instance.itens.update(farmacia=farmacia)
+        proposta = [_ for _ in instance.propostas if _['farmacia'].id == farmacia.id][0]
+        itens_proposta = proposta['itens']
+        for item in instance.itens.all():
+            item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
+            item.valor_unitario = item_proposta.valor_unitario
+            item.status = StatusItem.ABERTO if item_proposta.possui else StatusItem.CANCELADO
+            item.save()
 
         return super(PedidoCheckoutSerializer, self).update(instance, validated_data)
 

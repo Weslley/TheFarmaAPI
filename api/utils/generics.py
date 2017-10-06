@@ -1,6 +1,9 @@
+import linecache
 import re
 from datetime import timedelta, datetime
 from types import MethodType
+
+import sys
 
 from api.models.configuracao import Configuracao
 
@@ -86,3 +89,13 @@ def get_tempo_proposta(pedido):
 
     tempo = (duracao_proposta - (datetime.now() - pedido.log.data_criacao)).total_seconds()
     return tempo if tempo >= 0 else 0
+
+
+def print_exception():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
