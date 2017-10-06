@@ -66,7 +66,7 @@ class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSeria
         """
         queryset = Pedido.objects.filter(
             itens_proposta__farmacia=self.request.user.representante_farmacia.farmacia
-        ).order_by('status', '-log__data_criacao')
+        ).order_by('status', '-log__data_criacao').distinct()
         return queryset
 
 
