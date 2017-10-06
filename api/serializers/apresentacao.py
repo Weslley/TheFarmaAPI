@@ -222,19 +222,21 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
         if not data and obj.unidade:
             if 'request' in self.context:
                 request = self.context['request']
-                return request.build_absolute_uri(obj.unidade.imagem.url)
+                return request.build_absolute_uri(obj.unidade.imagem.url) if obj.unidade.imagem.url else None
             else:
                 return '{}{}/{}/'.format(
                     settings.HTTPS,
                     Site.objects.get_current().domain,
                     obj.unidade.imagem.url
                 )
-        else:
+        elif data:
             return '{}{}{}'.format(
                 settings.HTTPS,
                 Site.objects.get_current().domain,
                 data
             )
+        else:
+            return None
 
     def get_pmc(self, obj):
         cidade = self.context['cidade'] if 'cidade' in self.context else None
