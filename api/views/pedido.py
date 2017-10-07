@@ -1,3 +1,5 @@
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView, \
     GenericAPIView
@@ -47,6 +49,20 @@ class PedidoRetrieve(RetrieveAPIView, IsClienteAuthenticatedMixin):
     lookup_url_kwarg = 'id'
     serializer_class = PedidoDetalhadoSerializer
     queryset = Pedido.objects.all()
+
+
+class UltimoPedido(RetrieveAPIView, IsClienteAuthenticatedMixin):
+    lookup_url_kwarg = 'id'
+    serializer_class = PedidoDetalhadoSerializer
+    queryset = Pedido.objects.all()
+
+    def get_object(self):
+        cliente = self.request.user.cliente
+        instance = self.get_queryset().filter(cliente=cliente).last()
+        if not instance:
+            raise Http404('Nenhum pedido encontrado.')
+
+        return instance
 
 
 class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext):
@@ -133,5 +149,5 @@ class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
         return Response(serializer.data)
 
 
-class PedidoCancelamentoFarmacia():
+class PedidoCancelamentoFarmacia(object):
     pass

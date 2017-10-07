@@ -5,15 +5,15 @@ class StatusPagamentoCartao(IntEnum):
     """
     Representação do status do pedido
     """
-    NOT_FINISHED = 0
-    AUTHORIZED = 1
-    PAYMENT_CONFIRMED = 2
-    DENIED = 3
-    VOIDED = 10
-    REFUNDED = 11
-    PENDING = 12
-    ABORTED = 13
-    SCHEDULED = 20
+    NAO_FINALIZADO = 0
+    AUTORIZADO = 1
+    PAGAMENTO_CONFIRMADO = 2
+    NEGADO = 3
+    CANCELADO = 10
+    ESTORNADO = 11
+    PENDENTE = 12
+    ABORTADA = 13
+    AGENDADA = 20
 
 # CHOICES = (
 #     (IDENTIFICACAO, 'IDENTIFICAÇÃO'),

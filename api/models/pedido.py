@@ -144,7 +144,7 @@ class PagamentoCartao(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='pagamentos')
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
     valor = models.DecimalField(max_digits=15, decimal_places=2, default=1,  validators=[MinValueValidator(1), ])
-    status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NOT_FINISHED)
+    status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NAO_FINALIZADO)
     numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     json_venda = JSONField(null=True)
     json_captura = JSONField(null=True)
