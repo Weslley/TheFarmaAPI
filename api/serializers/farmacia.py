@@ -35,8 +35,16 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         farmacia = (obj.latitude, obj.longitude)
         cliente = (self.context['pedido'].latitude, self.context['pedido'].longitude)
         if all(farmacia) and all(cliente):
-            return round(calcula_distancia(farmacia, cliente), 2)
-        return 0
+            distancia = round(calcula_distancia(farmacia, cliente), 2)
+        else:
+            distancia = 0
+
+        if distancia == 0:
+            return '0'
+        if distancia >= 1:
+            return 'x quilometros'
+        else:
+            return 'x metros'
 
     def get_horario_funcionamento(self, obj):
         hoje = datetime.now()

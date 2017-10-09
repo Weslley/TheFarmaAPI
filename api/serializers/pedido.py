@@ -560,10 +560,15 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             item.save()
 
         instance = super(PedidoCheckoutSerializer, self).update(instance, validated_data)
-        # FAZER CHECKOUT DA FORMA CORRETA
-        # if instance.pagamentos.filter(status=StatusPagamentoCartao)
-        # if instance.status == StatusPagamentoCartao.PAYMENT_CONFIRMED:
-        FarmaciaConsumer.checkout(instance, farmacia)
+        if instance.forma_pagamento == FormaPagamento.DINHEIRO:
+            FarmaciaConsumer.checkout(instance, farmacia)
+        else:
+            if instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO).count():
+                pagamentos = instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO)
+                total_pago = sum(p.valor for p in pagamentos)
+                total = sum(item.valor_unitario * item.quantidade for item in instance.itens.filter(status=StatusItem.ENVIADO))
+                if total == total_pago:
+                    FarmaciaConsumer.checkout(instance, farmacia)
         return instance
 
 
