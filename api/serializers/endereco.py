@@ -14,14 +14,20 @@ from api.serializers.cidade import CidadeCreateUpdateSerializer
 
 
 class EnderecoClienteCreateSerializer(serializers.ModelSerializer):
+    data_atualizacao = serializers.SerializerMethodField()
+
     class Meta:
         model = Endereco
         fields = '__all__'
+
+    def get_data_atualizacao(self, obj):
+        return int(obj.data_atualizacao.timestamp() * 1000)
 
 
 class EnderecoSerializer(serializers.ModelSerializer):
     cidade = CidadeCreateUpdateSerializer()
     bairro = BairroCreateUpdateSerializer()
+    data_atualizacao = serializers.SerializerMethodField()
 
     def validate_cidade(self, value):
         cidade = Cidade.objects.get(ibge=value['ibge'])
@@ -38,6 +44,9 @@ class EnderecoSerializer(serializers.ModelSerializer):
             'id': {'read_only': True},
             'data_atualizacao': {'read_only': True},
         }
+
+    def get_data_atualizacao(self, obj):
+        return int(obj.data_atualizacao.timestamp() * 1000)
 
     def create(self, validated_data):
         ModelClass = self.Meta.model

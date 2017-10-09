@@ -4,6 +4,8 @@ from api.models.log import Log
 
 
 class LogSerializer(serializers.ModelSerializer):
+    data_criacao = serializers.SerializerMethodField()
+    data_atualizacao = serializers.SerializerMethodField()
 
     class Meta:
         model = Log
@@ -14,3 +16,9 @@ class LogSerializer(serializers.ModelSerializer):
             "remote_ip": {"read_only": True},
             "browser": {"read_only": True}
         }
+
+    def get_data_criacao(self, obj):
+        return int(obj.data_criacao.timestamp() * 1000)
+
+    def get_data_atualizacao(self, obj):
+        return int(obj.data_atualizacao.timestamp() * 1000)

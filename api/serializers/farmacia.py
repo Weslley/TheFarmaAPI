@@ -14,6 +14,8 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
     horario_funcionamento = serializers.SerializerMethodField()
     distancia = serializers.SerializerMethodField()
     endereco = EnderecoClienteCreateSerializer()
+    tempo_entrega = serializers.SerializerMethodField()
+    horarios = serializers.SerializerMethodField()
 
     class Meta:
         model = Farmacia
@@ -28,8 +30,63 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
             'distancia',
             'endereco',
             'latitude',
-            'longitude'
+            'longitude',
+            'horarios',
+            'telefone'
         )
+
+    def get_horarios(self, obj):
+        dias_semana = ['segunda', 'terca', 'quarta', 'quinta', 'sexta']
+        horario_format = '{:%H:%M} até {:%H:%M}'
+        horarios = [
+            {
+                'dia_semana': dia, 'horario': horario_format.format(
+                    obj.horario_funcionamento_segunda_sexta_inicial,
+                    obj.horario_funcionamento_segunda_sexta_final
+                )
+            } for dia in dias_semana
+        ]
+        horarios.append(
+            {
+                'dia_semana': 'sabado', 'horario': horario_format.format(
+                    obj.horario_funcionamento_sabado_inicial,
+                    obj.horario_funcionamento_sabado_final
+                )
+            }
+        )
+        horarios.append(
+            {
+                'dia_semana': 'domingo', 'horario': horario_format.format(
+                    obj.horario_funcionamento_domingo_inicial,
+                    obj.horario_funcionamento_domingo_final
+                )
+            }
+        )
+        horarios.append(
+            {
+                'dia_semana': 'feriado', 'horario': horario_format.format(
+                    obj.horario_funcionamento_feriado_inicial,
+                    obj.horario_funcionamento_feriado_final
+                )
+            }
+        )
+        return horarios
+
+    def get_tempo_entrega(self, obj):
+        tempo = int(obj.tempo_entrega.total_seconds())
+
+        if tempo < 60:
+            return '{} segundo{}'.format(tempo, 's' if tempo > 1 else '')
+
+        tempo = int(tempo / 60)
+
+        if tempo < 60:
+            return '{} minuto{}'.format(tempo, 's' if tempo > 1 else '')
+
+        horas = int(tempo / 60)
+        minutos = int(tempo % 60)
+        str_minutos = ' e {} minuto{}'.format(minutos, 's' if minutos > 1 else '')
+        return '{} hora{}{}'.format(horas, 's' if horas > 1 else '', str_minutos if minutos > 0 else '')
 
     def get_distancia(self, obj):
         farmacia = (obj.latitude, obj.longitude)
@@ -51,22 +108,22 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
 
         # Feriado nacional
         if Feriado.objects.filter(dia=hoje.day, mes=hoje.month, uf__isnull=True).exists():
-            return obj.horario_funcionamento_feriado_final.strftime('%H:%M:%S')
+            return obj.horario_funcionamento_feriado_final.strftime('%H:%M')
 
         # Feriado estadual
         if Feriado.objects.filter(dia=hoje.day, mes=hoje.month, uf=obj.endereco.cidade.uf).exists():
-            return obj.horario_funcionamento_feriado_final.strftime('%H:%M:%S')
+            return obj.horario_funcionamento_feriado_final.strftime('%H:%M')
 
         # Domingo
         if hoje.weekday() == 6:
-            return obj.horario_funcionamento_domingo_final.strftime('%H:%M:%S')
+            return obj.horario_funcionamento_domingo_final.strftime('%H:%M')
 
         # Sabado
         if hoje.weekday() == 5:
-            return obj.horario_funcionamento_sabado_final.strftime('%H:%M:%S')
+            return obj.horario_funcionamento_sabado_final.strftime('%H:%M')
 
         # Segunda a sexta
-        return obj.horario_funcionamento_segunda_sexta_final.strftime('%H:%M:%S')
+        return obj.horario_funcionamento_segunda_sexta_final.strftime('%H:%M')
 
 
 class FarmaciaSerializer(serializers.ModelSerializer):
