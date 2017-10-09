@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 
 from api.mixins.edit import UpdateAPIViewNoPatch
 from api.models.enums.status_item_proposta import StatusItemProposta
+from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pedido import StatusPedido
 from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
@@ -84,8 +86,9 @@ class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSeria
         queryset = Pedido.objects.filter(
             itens_proposta__farmacia=self.request.user.representante_farmacia.farmacia,
         ).exclude(
+            Q(status=StatusPedido.ABERTO) | Q(status=StatusPedido.ACEITO),
             itens_proposta__status=StatusItemProposta.ENVIADO,
-            status=StatusPedido.ABERTO
+            status_pagamento=StatusPagamento.ABERTO
         ).order_by('status', '-log__data_criacao').distinct()
         return queryset
 

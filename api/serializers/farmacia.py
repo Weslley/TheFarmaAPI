@@ -40,11 +40,11 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
             distancia = 0
 
         if distancia == 0:
-            return '0'
+            return '0m'
         if distancia >= 1:
-            return 'x quilometros'
+            return '{distancia}km'.format(distancia=distancia)
         else:
-            return 'x metros'
+            return '{distancia}m'.format(distancia=distancia * 1000)
 
     def get_horario_funcionamento(self, obj):
         hoje = datetime.now()
