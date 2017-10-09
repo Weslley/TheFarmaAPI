@@ -2,6 +2,7 @@ import locale
 
 from api.consumers.farmacia import FarmaciaConsumer
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
+from api.models.enums.status_pedido import StatusPedido
 from api.utils.generics import print_exception
 
 from django.db import transaction
@@ -227,7 +228,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
     propostas = serializers.SerializerMethodField()
 
     def get_propostas(self, obj):
-        propostas = obj.propostas
+        propostas = [_ for _ in obj.propostas if _['status'] == StatusItemProposta.ENVIADO]
         for proposta in propostas:
             proposta['itens'] = ItemPropostaSimplificadoSerializer(instance=proposta['itens'], many=True).data
             proposta['farmacia'] = FarmaciaListSerializer(instance=proposta['farmacia'], context={'pedido': obj}).data
@@ -547,20 +548,22 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                     serializer.save()
 
         farmacia = validated_data.pop('farmacia_selecionada')
-
-        # FAZER CHECKOUT DA FORMA CORRETA
-        # if instance.pagamentos.filter(status=StatusPagamentoCartao)
-        # if instance.status == StatusPagamentoCartao.PAYMENT_CONFIRMED:
-        FarmaciaConsumer.checkout(instance, farmacia)
         instance.itens.update(farmacia=farmacia)
         proposta = [_ for _ in instance.propostas if _['farmacia'].id == farmacia.id][0]
         itens_proposta = proposta['itens']
+        instance.status = StatusPedido.ACEITO
+        instance.save()
         for item in instance.itens.all():
             item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
             item.valor_unitario = item_proposta.valor_unitario
             item.status = StatusItem.ABERTO if item_proposta.possui else StatusItem.CANCELADO
             item.save()
 
-        return super(PedidoCheckoutSerializer, self).update(instance, validated_data)
+        instance = super(PedidoCheckoutSerializer, self).update(instance, validated_data)
+        # FAZER CHECKOUT DA FORMA CORRETA
+        # if instance.pagamentos.filter(status=StatusPagamentoCartao)
+        # if instance.status == StatusPagamentoCartao.PAYMENT_CONFIRMED:
+        FarmaciaConsumer.checkout(instance, farmacia)
+        return instance
 
 

@@ -119,7 +119,8 @@ def checkout(self, pedido, farmacia):
     :return:
     """
     # Tipo 1 checkout
-    self.send({'pedido': {'id': pedido.id}, 'tipo': 1}, id=farmacia.id)
+    proposta = PropostaSerializer(instance=pedido, context={'farmacia': farmacia})
+    self.send({'pedido': proposta.data, 'tipo': 1}, id=farmacia.id)
 
 
 def notifica_cancelamento(self, pedido, farmacias):
