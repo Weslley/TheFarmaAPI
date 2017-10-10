@@ -208,4 +208,4 @@ CHANNEL_LAYERS = {
     }
 }
 
-HTTPS = config('HTTPS', default='http://')
+HTTPS = config('HTTPS', default='https://')
