@@ -71,7 +71,7 @@ services:
     volumes:
       - media-data:/thefarmaapi/media
     expose:
-      - "8000"
+      - "443"
     environment:
      - DEBUG=False
      - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
