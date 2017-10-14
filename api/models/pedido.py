@@ -41,6 +41,7 @@ class Pedido(models.Model):
     def __str__(self):
         return 'Pedido {}'.format(self.id)
 
+
     @property
     def localizacao(self):
         """
@@ -119,6 +120,13 @@ class Pedido(models.Model):
                         apresentacao=item.apresentacao,
                         farmacia=farmacia
                     )
+
+    def get_total_farmacia(self, farmacia_id):
+        valor = 0
+        for item in self.itens_proposta.filter(farmacia_id=farmacia_id, possui=True):
+            valor += item.quantidade * item.valor_unitario
+        return valor
+
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

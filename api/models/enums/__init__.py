@@ -5,3 +5,4 @@ from .status_item_proposta import StatusItemProposta
 from .status_pagamento_cartao import StatusPagamentoCartao
 from .status_pedido import StatusPedido
 from .status_produto import StatusProduto
+from .status_pagamento import StatusPagamento

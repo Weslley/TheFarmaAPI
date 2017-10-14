@@ -1,6 +1,7 @@
 import locale
 
 from api.consumers.farmacia import FarmaciaConsumer
+from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.models.enums.status_pedido import StatusPedido
 from api.utils.generics import print_exception
@@ -535,6 +536,38 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         else:
             attrs['forma_pagamento'] = FormaPagamento.DINHEIRO
 
+        pedido = getattr(self, 'instance', None)
+
+        if pedido:
+            if pedido.status_pagamento == StatusPagamento.PAGO:
+                raise serializers.ValidationError('Pedido ja está pago.')
+            elif pedido.status_pagamento == StatusPagamento.CANCELADO:
+                raise serializers.ValidationError('Status de pagamento está cancelado.')
+
+            if attrs['forma_pagamento'] == FormaPagamento.CARTAO:
+                pagamentos = attrs['pagamentos']
+                valor_pedido = pedido.get_total_farmacia(attrs['farmacia_selecionada'])
+                total_a_pagar = sum(_['valor'] for _ in pagamentos)
+
+                if pedido.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO).count():
+                    pagamentos = pedido.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO)
+                    total_pago = sum(p.valor for p in pagamentos)
+                    divida = valor_pedido - total_pago
+                    if total_a_pagar > divida:
+                        raise serializers.ValidationError('Total pago superior ao resto do pedido.')
+
+                    if total_a_pagar < divida:
+                        raise serializers.ValidationError('Total pago inferior ao resto do pedido.')
+                else:
+                    if total_a_pagar > valor_pedido:
+                        raise serializers.ValidationError('Total pago superior ao valor do pedido.')
+
+                    if total_a_pagar < valor_pedido:
+                        raise serializers.ValidationError('Total pago inferior ao valor do pedido.')
+
+        else:
+            raise serializers.ValidationError('Deve haver pedido no checkout.')
+
         return attrs
 
     def validate_farmacia_selecionada(self, data):
@@ -567,13 +600,17 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
         instance = super(PedidoCheckoutSerializer, self).update(instance, validated_data)
         if instance.forma_pagamento == FormaPagamento.DINHEIRO:
+            instance.status_pagamento = StatusPagamento.PAGO
+            instance.save()
             FarmaciaConsumer.checkout(instance, farmacia)
         else:
             if instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO).count():
                 pagamentos = instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO)
                 total_pago = sum(p.valor for p in pagamentos)
-                total = sum(item.valor_unitario * item.quantidade for item in instance.itens.filter(status=StatusItem.ENVIADO))
+                total = sum(item.valor_unitario * item.quantidade_atendida for item in instance.itens.filter(status=StatusItem.ENVIADO))
                 if total == total_pago:
+                    instance.status_pagamento = StatusPagamento.PAGO
+                    instance.save()
                     FarmaciaConsumer.checkout(instance, farmacia)
         return instance
 
