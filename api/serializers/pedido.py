@@ -362,6 +362,7 @@ class ItemPropostaUpdateSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "valor_unitario",
+            "quantidade",
             "possui"
         )
         extra_kwargs = {'id': {'read_only': True}, }
@@ -404,7 +405,11 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
             item_proposta.status = StatusItemProposta.ENVIADO
             serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
             if serializer.is_valid():
-                serializer.save()
+                _item = serializer.save()
+                # Caso a quantidade seja zero coloca como não possui
+                if not _item.quantidade:
+                    _item.possui = False
+                    _item.save()
 
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
 
@@ -556,6 +561,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         for item in instance.itens.all():
             item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
             item.valor_unitario = item_proposta.valor_unitario
+            item.quantidade_atendida = item_proposta.quantidade
             item.status = StatusItem.ABERTO if item_proposta.possui else StatusItem.CANCELADO
             item.save()
 

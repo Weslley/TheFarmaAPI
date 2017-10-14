@@ -134,6 +134,7 @@ class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens')
     apresentacao = models.ForeignKey(Apresentacao, related_name='itens_vendidos')
     quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
+    quantidade_atendida = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2)
     farmacia = models.ForeignKey(Farmacia, null=True, related_name='apresentacoes_vendidos')
     status = models.IntegerField(choices=StatusItem.choices(), default=StatusItem.ABERTO)
@@ -157,7 +158,7 @@ class PagamentoCartao(models.Model):
 class ItemPropostaPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens_proposta')
     apresentacao = models.ForeignKey(Apresentacao, related_name='itens_propostos')
-    quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
+    quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     farmacia = models.ForeignKey(Farmacia, related_name='itens_proposta')
     status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
