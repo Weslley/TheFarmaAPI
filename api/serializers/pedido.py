@@ -21,10 +21,10 @@ from api.serializers.farmacia import FarmaciaListSerializer
 from api.servico_pagamento import tipo_servicos
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento.servicos.cielo import ServicoCielo, ResponseCieloException
-from api.utils import get_client_browser, get_client_ip, status_transacao_cartao_cielo
+from api.utils import get_client_browser, get_client_ip  # , status_transacao_cartao_cielo
 from api.utils import get_user_lookup, get_tempo_proposta
 from .log import LogSerializer
-from datetime import datetime
+
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -150,8 +150,11 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             # pegando o cliente da requisição
             cliente = get_user_lookup(request, 'cliente')
 
+            validated_data['log'] = log
+            validated_data['cliente'] = cliente
+
             # Gerando pedido
-            pedido = Pedido.objects.create(**validated_data, log=log, cliente=cliente)
+            pedido = Pedido.objects.create(**validated_data)
 
             cidade = pedido.cidade_obj
 
@@ -467,8 +470,7 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
                 instance.json_captura = json_captura
                 instance.pagamento_status = int(json_venda['Payment']['Status'])
                 # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
-                #                                                                                   json_venda[
-                #                                                                                       'Payment'] else None
+                #                                                         json_venda['Payment'] else None
                 pagamento_id = json_venda['Payment']['PaymentId']
                 # venda.pagamento_data_recebimento = datetime.strptime(json_venda['Payment']['ReceivedDate'],
                 #                                                      '%Y-%m-%d %H:%M:%S')
@@ -518,12 +520,12 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             'forma_pagamento' not in attrs and (
                 ('pagamentos' not in attrs) or ('pagamentos' in attrs and len(attrs['pagamentos']) == 0)
             )
-           ) or \
-           (
+        ) or \
+            (
             'forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO and (
                 ('pagamentos' not in attrs) or ('pagamentos' in attrs and len(attrs['pagamentos']) == 0)
             )
-           ):
+        ):
             raise serializers.ValidationError('Em pagamentos com cartão é necessário informar pelo menos um cartão')
 
         # definindo a forma de pagamento
@@ -607,11 +609,12 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             if instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO).count():
                 pagamentos = instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO)
                 total_pago = sum(p.valor for p in pagamentos)
-                total = sum(item.valor_unitario * item.quantidade_atendida for item in instance.itens.filter(status=StatusItem.ENVIADO))
+                total = sum(
+                    item.valor_unitario * item.quantidade_atendida
+                    for item in instance.itens.filter(status=StatusItem.ENVIADO)
+                )
                 if total == total_pago:
                     instance.status_pagamento = StatusPagamento.PAGO
                     instance.save()
                     FarmaciaConsumer.checkout(instance, farmacia)
         return instance
-
-
