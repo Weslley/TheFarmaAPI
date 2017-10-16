@@ -302,6 +302,7 @@ class PropostaSerializer(serializers.ModelSerializer):
     cliente = serializers.CharField(read_only=True, source='cliente.usuario.get_full_name')
     itens_proposta = serializers.SerializerMethodField(read_only=True)
     log = LogSerializer(read_only=True)
+    status_submissao = serializers.SerializerMethodField()
 
     def get_tempo(self, obj):
         return get_tempo_proposta(obj)
@@ -318,6 +319,12 @@ class PropostaSerializer(serializers.ModelSerializer):
             )
             return itens_proposta.data
         return []
+
+    def get_status_submissao(self, obj):
+        if 'farmacia' in self.context:
+            farmacia = self.context['farmacia']
+            return farmacia.get_status_proposta(obj).value
+        return StatusItemProposta.ABERTO.value
 
     class Meta:
         model = Pedido
@@ -340,7 +347,9 @@ class PropostaSerializer(serializers.ModelSerializer):
             "troco",
             "itens_proposta",
             "cliente",
-            "tempo"
+            "tempo",
+            "farmacia_selecionada",
+            "status_submissao"
         )
         extra_kwargs = {
             'id': {'read_only': True},

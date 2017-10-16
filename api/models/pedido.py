@@ -89,6 +89,13 @@ class Pedido(models.Model):
             return qs.first()
         return None
 
+    @property
+    def farmacia_selecionada(self):
+        item = self.itens.exclude(status=StatusItem.CANCELADO).first()
+        if not item:
+            return None
+        return item.farmacia.id
+
     def farmacia_esta_nas_propostas(self, farmacia):
         """
         Metodo que retorna se a farmacia esta entra as farmacias que fizeram propostas
