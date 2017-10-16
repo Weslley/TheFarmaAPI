@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.http.response import Http404
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView, \
     GenericAPIView
@@ -13,6 +13,7 @@ from api.models.enums.status_pedido import StatusPedido
 from api.pagination import SmallResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
+from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
     PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer
 
@@ -133,8 +134,8 @@ class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or \
-            instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
+        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
+                instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Pedido já foi cancelado.'})
 
         if instance.status == StatusPedido.TIMEOUT:
@@ -153,6 +154,7 @@ class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
         instance.status = StatusPedido.CANCELADO_PELO_CLIENTE
         instance.save()
         serializer = self.get_serializer(instance)
+        FarmaciaConsumer.notifica_cancelamento(instance, instance.farmacias)
         return Response(serializer.data)
 
 

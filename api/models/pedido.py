@@ -66,7 +66,6 @@ class Pedido(models.Model):
         Property que retorna todas as propostas
         :return:
         """
-        farmacias = [item.farmacia for item in self.itens_proposta.select_related('farmacia').distinct('farmacia')]
         return [
             {
                 'farmacia': farmacia,
@@ -75,8 +74,12 @@ class Pedido(models.Model):
                 'status': farmacia.get_status_proposta(self),
                 'valor_total': farmacia.get_valor_proposta(self)
             }
-            for farmacia in farmacias
+            for farmacia in self.farmacias
         ]
+
+    @property
+    def farmacias(self):
+        return [item.farmacia for item in self.itens_proposta.select_related('farmacia').distinct('farmacia')]
 
     @property
     def cidade_obj(self):

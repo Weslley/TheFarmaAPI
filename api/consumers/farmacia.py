@@ -141,7 +141,8 @@ def notifica_cancelamento(self, pedido, farmacias):
     """
     # Tipo 0 cancelamento
     for farmacia in farmacias:
-        self.send({'pedido': {'id': pedido.id}, 'tipo': 0}, id=farmacia.id)
+        proposta = PropostaSerializer(instance=pedido, context={'farmacia': farmacia})
+        self.send({'pedido': proposta.data, 'tipo': 0}, id=farmacia.id)
 
 
 class FarmaciaConsumer(BaseConsumer):
