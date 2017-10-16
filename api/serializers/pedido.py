@@ -585,7 +585,9 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                 item['cartao'] = item['cartao'].id
                 serializer = PagamentoCartaoSerializer(data=item, context=self.context)
                 if serializer.is_valid(raise_exception=True):
-                    serializer.save()
+                    pagamento = serializer.save()
+                    if pagamento.status != StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
+                        raise serializers.ValidationError()
 
         farmacia = validated_data.pop('farmacia_selecionada')
         instance.itens.update(farmacia=farmacia)

@@ -5,7 +5,6 @@ from django.db import models
 from django.db.models import F, Sum
 
 from api.models.apresentacao import Apresentacao
-from api.models.bairro import Bairro
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
 from api.models.cliente import Cliente
@@ -40,7 +39,6 @@ class Pedido(models.Model):
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)
-
 
     @property
     def localizacao(self):
@@ -127,7 +125,6 @@ class Pedido(models.Model):
             valor += item.quantidade * item.valor_unitario
         return valor
 
-
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         if self.log:
@@ -154,7 +151,7 @@ class ItemPedido(models.Model):
 class PagamentoCartao(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='pagamentos')
     cartao = models.ForeignKey(Cartao, related_name='pagamentos')
-    valor = models.DecimalField(max_digits=15, decimal_places=2, default=1,  validators=[MinValueValidator(1), ])
+    valor = models.DecimalField(max_digits=15, decimal_places=2, default=1, validators=[MinValueValidator(1), ])
     status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NAO_FINALIZADO)
     numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     json_venda = JSONField(null=True)
