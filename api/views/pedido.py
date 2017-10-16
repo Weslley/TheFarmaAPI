@@ -87,10 +87,10 @@ class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSeria
         queryset = Pedido.objects.filter(
             itens_proposta__farmacia=self.request.user.representante_farmacia.farmacia,
         ).exclude(
-            Q(status=StatusPedido.ABERTO) | Q(status=StatusPedido.ACEITO),
+            Q(status=StatusPedido.ABERTO) | Q(status=StatusPedido.AGUARDANDO_ENVIO_FARMACIA) | Q(status=StatusPedido.AGUARDANDO_RETIRADA_CLIENTE),
             itens_proposta__status=StatusItemProposta.ENVIADO,
             status_pagamento=StatusPagamento.ABERTO
-        ).order_by('status', '-log__data_criacao').distinct()
+        ).order_by('-log__data_criacao').distinct()
         return queryset
 
 
@@ -174,9 +174,7 @@ class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedM
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
 
-        if instance.status == StatusPedido.ACEITO or\
-                instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or\
-                instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
+        if instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
             raise ValidationError({'detail': 'Proposta ja foi aceito.'})
 
         if instance.status == StatusPedido.TIMEOUT:
@@ -191,6 +189,71 @@ class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedM
         # Cancelando o proposta
         farmacia = request.user.representante_farmacia.farmacia
         instance.itens_proposta.filter(farmacia=farmacia).update(status=StatusItemProposta.CANCELADO)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
+    """
+    Confirmar envio do pedido
+
+    **POST** Confirmar envio do pedido
+    """
+    lookup_url_kwarg = 'id'
+    queryset = Pedido.objects.all()
+    serializer_class = PedidoSerializer
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
+                instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
+            raise ValidationError({'detail': 'Proposta já foi cancelado.'})
+
+        if instance.status == StatusPedido.TIMEOUT:
+            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
+
+        if instance.status == StatusPedido.ENTREGUE:
+            raise ValidationError({'detail': 'Proposta já foi entregue.'})
+
+        if instance.status == StatusPedido.ENVIADO:
+            # Confirmando também a entrega
+            instance.status = StatusPedido.ENTREGUE
+            instance.save()
+        else:
+            # confirmando envio
+            instance.status = StatusPedido.ENVIADO
+            instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin):
+    """
+    Confirmar entrega/retirada do pedido
+
+    **POST** Confirmar entrega/retirada do pedido
+    """
+    lookup_url_kwarg = 'id'
+    queryset = Pedido.objects.all()
+    serializer_class = PedidoSerializer
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
+                instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
+            raise ValidationError({'detail': 'Proposta já foi cancelado.'})
+
+        if instance.status == StatusPedido.TIMEOUT:
+            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
+
+        if instance.status == StatusPedido.ENTREGUE:
+            raise ValidationError({'detail': 'Proposta já foi entregue.'})
+
+        # confirmando envio
+        instance.status = StatusPedido.ENTREGUE
+        instance.save()
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)

@@ -602,7 +602,12 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         instance.itens.update(farmacia=farmacia)
         proposta = [_ for _ in instance.propostas if _['farmacia'].id == farmacia.id][0]
         itens_proposta = proposta['itens']
-        instance.status = StatusPedido.ACEITO
+
+        if instance.delivery:
+            instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
+        else:
+            instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+
         instance.save()
         for item in instance.itens.all():
             item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
