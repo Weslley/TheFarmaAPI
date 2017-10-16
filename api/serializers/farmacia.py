@@ -36,7 +36,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         )
 
     def get_horarios(self, obj):
-        dias_semana = ['segunda', 'terca', 'quarta', 'quinta', 'sexta']
+        dias_semana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira']
         horario_format = '{:%H:%M} até {:%H:%M}'
         horarios = [
             {
@@ -48,7 +48,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         ]
         horarios.append(
             {
-                'dia_semana': 'sabado', 'horario': horario_format.format(
+                'dia_semana': 'Sábado', 'horario': horario_format.format(
                     obj.horario_funcionamento_sabado_inicial,
                     obj.horario_funcionamento_sabado_final
                 )
@@ -56,7 +56,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         )
         horarios.append(
             {
-                'dia_semana': 'domingo', 'horario': horario_format.format(
+                'dia_semana': 'Domingo', 'horario': horario_format.format(
                     obj.horario_funcionamento_domingo_inicial,
                     obj.horario_funcionamento_domingo_final
                 )
@@ -64,7 +64,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         )
         horarios.append(
             {
-                'dia_semana': 'feriado', 'horario': horario_format.format(
+                'dia_semana': 'Feriado', 'horario': horario_format.format(
                     obj.horario_funcionamento_feriado_inicial,
                     obj.horario_funcionamento_feriado_final
                 )
