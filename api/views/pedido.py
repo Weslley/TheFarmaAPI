@@ -158,5 +158,39 @@ class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
         return Response(serializer.data)
 
 
-class PedidoCancelamentoFarmacia(object):
-    pass
+class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedMixin):
+    """
+    Cancelamento de proposta da farmacia
+
+    **POST** Cancelamento de proposta
+    """
+    lookup_url_kwarg = 'id'
+    queryset = Pedido.objects.all()
+    serializer_class = PedidoSerializer
+
+    def post(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
+                instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
+            raise ValidationError({'detail': 'Proposta já foi cancelado.'})
+
+        if instance.status == StatusPedido.ACEITO or\
+                instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or\
+                instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
+            raise ValidationError({'detail': 'Proposta ja foi aceito.'})
+
+        if instance.status == StatusPedido.TIMEOUT:
+            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
+
+        if instance.status == StatusPedido.ENVIADO:
+            raise ValidationError({'detail': 'Proposta já foi enviado.'})
+
+        if instance.status == StatusPedido.ENTREGUE:
+            raise ValidationError({'detail': 'Proposta já foi entregue.'})
+
+        # Cancelando o proposta
+        farmacia = request.user.representante_farmacia.farmacia
+        instance.itens_proposta.filter(farmacia=farmacia).update(status=StatusItemProposta.CANCELADO)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

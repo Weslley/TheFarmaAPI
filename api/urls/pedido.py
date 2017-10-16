@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from api.views.pedido import PedidoCreate, PropostaList, PropostaRetrieveUpdate, PedidoRetrieve, PedidoCheckout, \
-    PedidoCancelamentoCliente, UltimoPedido
+    PedidoCancelamentoCliente, UltimoPedido, PropostaCancelamentoFarmacia
 
 urlpatterns = [
     # Pedidos
@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^(?P<id>[0-9]+)/propostas/$', PropostaRetrieveUpdate.as_view()),
     url(r'^(?P<id>[0-9]+)/checkout/$', PedidoCheckout.as_view()),
     url(r'^(?P<id>[0-9]+)/cancelamento_cliente/$', PedidoCancelamentoCliente.as_view()),
+    url(r'^(?P<id>[0-9]+)/cancelamento_proposta/$', PropostaCancelamentoFarmacia.as_view()),
 ]
