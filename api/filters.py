@@ -4,7 +4,16 @@ from rest_framework.filters import BaseFilterBackend
 from api.models.apresentacao import Apresentacao
 from api.models.bairro import Bairro
 from api.models.cidade import Cidade
+from api.models.pedido import Pedido
 from api.models.produto import Produto
+
+
+class PropostaFilter(django_filters.FilterSet):
+    status = django_filters.NumberFilter(name="status")
+
+    class Meta:
+        model = Pedido
+        fields = ['status']
 
 
 class MedicamentoFilter(django_filters.FilterSet):

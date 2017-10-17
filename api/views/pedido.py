@@ -2,10 +2,12 @@ from django.db.models import Q
 from django.http.response import Http404
 # from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
+from rest_framework.filters import DjangoFilterBackend
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView, \
     GenericAPIView
 from rest_framework.response import Response
 
+from api.filters import OrderingFilter, PropostaFilter
 from api.mixins.edit import UpdateAPIViewNoPatch
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums.status_pagamento import StatusPagamento
@@ -78,6 +80,10 @@ class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSeria
     """
     serializer_class = PropostaSerializer
     pagination_class = SmallResultsSetPagination
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_class = PropostaFilter
+    ordering_fields = ('log__data_criacao', '-log__data_criacao')
+    ordering = ('-log__data_criacao',)
 
     def get_queryset(self):
         """
