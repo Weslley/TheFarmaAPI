@@ -2,6 +2,7 @@ amqp==2.2.1
 anyjson==0.3.3
 asgi-redis==1.4.2
 asgiref==1.1.2
+asn1crypto==0.23.0
 attrs==17.2.0
 autobahn==17.7.1
 Automat==0.6.0
@@ -77,6 +78,7 @@ pytz==2017.2
 redis==2.10.5
 requests==2.18.3
 rsa==3.4.2
+service-identity==17.0.0
 simplejson==3.11.1
 six==1.11.0
 sseclient==0.0.12
