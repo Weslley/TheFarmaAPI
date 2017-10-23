@@ -55,13 +55,11 @@ class ItemPedidoCreateSerializer(serializers.ModelSerializer):
             "apresentacao",
             "quantidade",
             "valor_unitario",
-            "farmacia",
             "status"
         )
         extra_kwargs = {
             'valor_unitario': {'read_only': True},
             'status': {'read_only': True},
-            'farmacia': {'read_only': True},
         }
 
 
@@ -74,7 +72,6 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
             "apresentacao",
             "quantidade",
             "valor_unitario",
-            "farmacia",
             "status"
         )
         extra_kwargs = {
@@ -82,7 +79,6 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
             'apresentacao': {'read_only': True},
             'valor_unitario': {'read_only': True},
             'status': {'read_only': True},
-            'farmacia': {'read_only': True},
         }
 
 
@@ -350,7 +346,7 @@ class PropostaSerializer(serializers.ModelSerializer):
             "itens_proposta",
             "cliente",
             "tempo",
-            "farmacia_selecionada",
+            "farmacia",
             "status_submissao"
         )
         extra_kwargs = {
@@ -513,38 +509,40 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
 
 
 class PedidoCheckoutSerializer(serializers.ModelSerializer):
-    pagamentos = PagamentoCartaoSerializer(many=True, required=False)
-    farmacia_selecionada = serializers.PrimaryKeyRelatedField(queryset=Farmacia.objects.all(), write_only=True)
-
     class Meta:
         model = Pedido
         fields = (
             "forma_pagamento",
-            "pagamentos",
-            "farmacia_selecionada",
-            "troco"
+            "farmacia",
+            "troco",
+            "cartao",
+            "numero_parcelas",
         )
+
+    def validate_farmacia(self, data):
+        if not self.instance.farmacia_esta_nas_propostas(data):
+            raise serializers.ValidationError('Farmacia não realizou proposta para este pedido.')
+        return data
+
+    def validate_cartao(self, data):
+        if 'view' not in self.context:
+            raise serializers.ValidationError('Erro de validação')
+        pedido = self.context['view'].get_object()
+        if data not in pedido.cliente.cartoes.all():
+            raise serializers.ValidationError('Cartão não encontrado.')
+        return data
 
     def validate(self, attrs):
         # If para verificar se os pagamentos estão inseridos corretamente
-        if (
-            'forma_pagamento' not in attrs and (
-                ('pagamentos' not in attrs) or ('pagamentos' in attrs and len(attrs['pagamentos']) == 0)
-            )
-        ) or \
-            (
-            'forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO and (
-                ('pagamentos' not in attrs) or ('pagamentos' in attrs and len(attrs['pagamentos']) == 0)
-            )
-        ):
+        if 'forma_pagamento' not in attrs or (
+                'forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO) and (
+                ('cartao' not in attrs) or ('cartao' in attrs and not attrs['cartao'])):
             raise serializers.ValidationError('Em pagamentos com cartão é necessário informar pelo menos um cartão')
 
         # definindo a forma de pagamento
         if ('forma_pagamento' not in attrs) or \
            ('forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO):
             attrs['forma_pagamento'] = FormaPagamento.CARTAO
-
-            # validando se o valor esta completo, ou se esta excedendo
 
         else:
             attrs['forma_pagamento'] = FormaPagamento.DINHEIRO
@@ -557,60 +555,93 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             elif pedido.status_pagamento == StatusPagamento.CANCELADO:
                 raise serializers.ValidationError('Status de pagamento está cancelado.')
 
-            if attrs['forma_pagamento'] == FormaPagamento.CARTAO:
-                pagamentos = attrs['pagamentos']
-                valor_pedido = pedido.get_total_farmacia(attrs['farmacia_selecionada'])
-                total_a_pagar = sum(_['valor'] for _ in pagamentos)
-
-                if pedido.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO).count():
-                    pagamentos = pedido.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO)
-                    total_pago = sum(p.valor for p in pagamentos)
-                    divida = valor_pedido - total_pago
-                    if total_a_pagar > divida:
-                        raise serializers.ValidationError('Total pago superior ao resto do pedido.')
-
-                    if total_a_pagar < divida:
-                        raise serializers.ValidationError('Total pago inferior ao resto do pedido.')
-                else:
-                    if total_a_pagar > valor_pedido:
-                        raise serializers.ValidationError('Total pago superior ao valor do pedido.')
-
-                    if total_a_pagar < valor_pedido:
-                        raise serializers.ValidationError('Total pago inferior ao valor do pedido.')
-
         else:
             raise serializers.ValidationError('Deve haver pedido no checkout.')
 
         return attrs
 
-    def validate_farmacia_selecionada(self, data):
-        if not self.instance.farmacia_esta_nas_propostas(data):
-            raise serializers.ValidationError('Farmacia não realizou proposta para este pedido.')
-        return data
-
     def update(self, instance, validated_data):
+        instance = self.valida_pagamento(instance, validated_data)
+        self.gerar_fluxo_caixa(instance)
+        return instance
+
+    def gerar_fluxo_caixa(self, pedido):
+        self.gerar_contas_pagar(pedido)
+        self.gerar_contas_receber(pedido)
+
+    def gerar_contas_pagar(self, pedido):
+        pass
+
+    def gerar_contas_receber(self, pedido):
+        pass
+
+    def valida_pagamento(self, instance, validated_data):
+        farmacia = validated_data['farmacia']
+        valor_total = instance.get_total_farmacia(farmacia)
+        validated_data['valor_total'] = valor_total
 
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
-            pagamentos = validated_data.pop('pagamentos')
-            for item in pagamentos:
-                item['cartao'] = item['cartao'].id
-                serializer = PagamentoCartaoSerializer(data=item, context=self.context)
-                if serializer.is_valid(raise_exception=True):
-                    pagamento = serializer.save()
-                    if pagamento.status != StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
-                        raise serializers.ValidationError('')
+            cartao = validated_data['cartao']
+            try:
+                with transaction.atomic():
+                    # venda = object
+                    # data['venda'] = venda = VendaCartao.objects.create(
+                    #     motorista=data['unidade'].motorista,
+                    #     unidade=data['unidade'],
+                    #     descricao='RADIO TAXI',
+                    #     valor=data['valor'],
+                    #     bandeira=self.translate_brand(data['bandeira'])
+                    # )
 
-        farmacia = validated_data.pop('farmacia_selecionada')
-        instance.itens.update(farmacia=farmacia)
+                    venda = {
+                        'pedido_id': instance.id,
+                        'valor': valor_total,
+                        'cvv': cartao.cvv,
+                        'bandeira': cartao.bandeira,
+                        'token': cartao.token
+                    }
+
+                    data = Pagamento.pagar(tipo_servicos.CIELO, venda)
+
+                    json_venda, json_captura = data['venda'], data['captura']
+                    instance.json_venda = json_venda
+                    instance.json_captura = json_captura
+                    instance.pagamento_status = int(json_venda['Payment']['Status'])
+                    # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
+                    #                                                         json_venda['Payment'] else None
+                    pagamento_id = json_venda['Payment']['PaymentId']
+                    # venda.pagamento_data_recebimento = datetime.strptime(json_venda['Payment']['ReceivedDate'],
+                    #                                                      '%Y-%m-%d %H:%M:%S')
+                    # venda.pagamento_codigo_autorizacao = json_venda['Payment'][
+                    #     'AuthorizationCode'] if 'AuthorizationCode' in \
+                    #                             json_venda[
+                    #                                 'Payment'] else None
+                    # venda.pagamento_tid = str(json_venda['Payment']['Tid'])
+                    # venda.pagamento_mensagem_retorno = json_venda['Payment']['ReturnMessage']
+                    # venda.pagamento_codigo_retorno = json_venda['Payment']['ReturnCode']
+
+                    if json_captura:
+                        # venda.capturado = True
+                        instance.captura_status = int(json_captura['Status'])
+                        # venda.captura_codigo_retorno = json_captura['ReturnCode']
+                        # venda.captura_mensagem_retorno = json_captura['ReturnMessage']
+
+                        instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
+
+                    instance.save()
+            except ResponseCieloException as err:
+                print(err)
+            except Exception as e:
+                print(e)
+                print(type(e))
+                print_exception()
+
+            if instance.status_cartao != StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
+                raise serializers.ValidationError('')
+
         proposta = [_ for _ in instance.propostas if _['farmacia'].id == farmacia.id][0]
         itens_proposta = proposta['itens']
 
-        if instance.delivery:
-            instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
-        else:
-            instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
-
-        instance.save()
         for item in instance.itens.all():
             item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
             item.valor_unitario = item_proposta.valor_unitario
@@ -619,20 +650,24 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             item.save()
 
         instance = super(PedidoCheckoutSerializer, self).update(instance, validated_data)
+
         if instance.forma_pagamento == FormaPagamento.DINHEIRO:
             instance.status_pagamento = StatusPagamento.PAGO
+            if instance.delivery:
+                instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
+            else:
+                instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+
             instance.save()
             FarmaciaConsumer.checkout(instance, farmacia)
-        else:
-            if instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO).count():
-                pagamentos = instance.pagamentos.filter(status=StatusPagamentoCartao.PAGAMENTO_CONFIRMADO)
-                total_pago = sum(p.valor for p in pagamentos)
-                total = sum(
-                    item.valor_unitario * item.quantidade_atendida
-                    for item in instance.itens.filter(status=StatusItem.ENVIADO)
-                )
-                if total == total_pago:
-                    instance.status_pagamento = StatusPagamento.PAGO
-                    instance.save()
-                    FarmaciaConsumer.checkout(instance, farmacia)
+        elif instance.status_cartao == StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
+            instance.status_pagamento = StatusPagamento.PAGO
+            if instance.delivery:
+                instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
+            else:
+                instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+
+            instance.save()
+            FarmaciaConsumer.checkout(instance, farmacia)
+
         return instance
