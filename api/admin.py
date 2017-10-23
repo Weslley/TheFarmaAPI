@@ -18,7 +18,7 @@ from api.models.farmacia import Farmacia
 from api.models.feriado import Feriado
 from api.models.log import Log
 from api.models.parceiro import Parceiro, UsuarioParceiro
-from api.models.pedido import ItemPedido, ItemPropostaPedido, Pedido, PagamentoCartao
+from api.models.pedido import ItemPedido, ItemPropostaPedido, Pedido
 from api.models.post import Post
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.produto import Produto
@@ -215,4 +215,3 @@ admin.site.register(ContaPagar)
 admin.site.register(ItemPropostaPedido)
 admin.site.register(Configuracao)
 admin.site.register(Feriado)
-admin.site.register(PagamentoCartao)

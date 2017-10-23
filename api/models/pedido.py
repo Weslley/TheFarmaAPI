@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Sum
 
+from api.models.administradora import Administradora
 from api.models.apresentacao import Apresentacao
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
@@ -36,6 +37,16 @@ class Pedido(models.Model):
     longitude = models.FloatField()
     delivery = models.BooleanField(default=True)
     troco = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(0), ])
+    administradora_cartao = models.ForeignKey(Administradora, null=True, related_name='pedidos_pagos')
+    farmacia = models.ForeignKey(Farmacia, null=True, related_name='pedidos')
+    cartao = models.ForeignKey(Cartao, related_name='pedidos', null=True)
+    valor_total = models.DecimalField(max_digits=15, decimal_places=2, default=1, validators=[MinValueValidator(1), ])
+    status_cartao = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NAO_FINALIZADO)
+    numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
+    json_venda = JSONField(null=True)
+    json_captura = JSONField(null=True)
+    pagamento_status = models.IntegerField(null=True, blank=True)
+    captura_status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)
@@ -138,7 +149,7 @@ class Pedido(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         if self.log:
-            self.log.data_criacao = datetime.now()
+            self.log.data_atualizacao = datetime.now()
             self.log.save(using=using)
         return super(Pedido, self).save(
             force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
@@ -151,23 +162,10 @@ class ItemPedido(models.Model):
     quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
     quantidade_atendida = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2)
-    farmacia = models.ForeignKey(Farmacia, null=True, related_name='apresentacoes_vendidos')
     status = models.IntegerField(choices=StatusItem.choices(), default=StatusItem.ABERTO)
 
     class Meta:
-        unique_together = ('pedido', 'apresentacao', 'farmacia')
-
-
-class PagamentoCartao(models.Model):
-    pedido = models.ForeignKey(Pedido, related_name='pagamentos')
-    cartao = models.ForeignKey(Cartao, related_name='pagamentos')
-    valor = models.DecimalField(max_digits=15, decimal_places=2, default=1, validators=[MinValueValidator(1), ])
-    status = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NAO_FINALIZADO)
-    numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
-    json_venda = JSONField(null=True)
-    json_captura = JSONField(null=True)
-    pagamento_status = models.IntegerField(null=True, blank=True)
-    captura_status = models.IntegerField(null=True, blank=True)
+        unique_together = ('pedido', 'apresentacao')
 
 
 class ItemPropostaPedido(models.Model):
