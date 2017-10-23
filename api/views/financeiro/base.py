@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from api.mixins.base import IsAuthenticatedRepresentanteMixin
-from api.models.conta_receber_farmacia import ContaReceberFarmacia
+from api.models.conta_pagar import ContaPagar
 from api.models.enums.status_conta_receber import StatusContaReceber
 from api.models.enums.status_pedido import StatusPedido
 from api.models.pedido import Pedido
@@ -29,13 +29,13 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
         ).distinct('id').order_by('-id')[:4]
 
         # Filtrando as 4 ultimas contas recebidas
-        contas_recebidas = ContaReceberFarmacia.objects.filter(
+        contas_recebidas = ContaPagar.objects.filter(
             status=StatusContaReceber.PAGA,
             farmacia__representantes=representante
         ).order_by('-data_credito')[:4]
 
         # Filtrando as próximas 4 contas a receber
-        contas_a_receber = ContaReceberFarmacia.objects.filter(
+        contas_a_receber = ContaPagar.objects.filter(
             status=StatusContaReceber.ABERTA,
             farmacia__representantes=representante
         ).order_by('data_vencimento')[:4]

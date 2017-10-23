@@ -2,7 +2,7 @@ import locale
 
 from rest_framework import serializers
 
-from api.models.conta_receber_farmacia import ContaReceberFarmacia
+from api.models.conta_pagar import ContaPagar
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -12,7 +12,7 @@ class ContaReceberFarmaciaSerializer(serializers.ModelSerializer):
     valor_liquido = serializers.SerializerMethodField()
 
     class Meta:
-        model = ContaReceberFarmacia
+        model = ContaPagar
         fields = ('id', 'data_credito', 'data_vencimento', 'valor_bruto', 'valor_liquido', 'status')
 
     def get_valor_bruto(self, obj):

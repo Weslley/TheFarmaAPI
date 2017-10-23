@@ -6,7 +6,7 @@ from api.models.farmacia import Farmacia
 from api.models.pedido import Pedido
 
 
-class ContaReceberFarmacia(models.Model):
+class ContaPagar(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='contas_receber_farmacia')
     status = models.IntegerField(choices=StatusContaReceber.choices(), default=StatusContaReceber.ABERTA)
     farmacia = models.ForeignKey(Farmacia, related_name='contas_receber')

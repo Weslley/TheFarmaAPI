@@ -9,7 +9,7 @@ from api.models.cidade import Cidade
 from api.models.cliente import Cliente, ClienteEndereco
 from api.models.configuracao import Configuracao
 from api.models.conta_bancaria import ContaBancaria
-from api.models.conta_receber_farmacia import ContaReceberFarmacia
+from api.models.conta_pagar import ContaPagar
 from api.models.curtida import Curtida
 from api.models.endereco import Endereco
 from api.models.estoque import Estoque
@@ -211,7 +211,7 @@ admin.site.register(Cartao)
 admin.site.register(Banco)
 admin.site.register(ContaBancaria)
 admin.site.register(Log)
-admin.site.register(ContaReceberFarmacia)
+admin.site.register(ContaPagar)
 admin.site.register(ItemPropostaPedido)
 admin.site.register(Configuracao)
 admin.site.register(Feriado)
