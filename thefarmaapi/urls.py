@@ -27,10 +27,10 @@ from core import urls as core_urls
 
 urlpatterns = [
     url(r'^', include(api_urls)),
-    url(r'^core/login/', auth_views.login, name='login'),
-    url(r'^core/logout/', auth_views.logout_then_login, {'login_url': '/login'}, name='logout'),
+    url(r'^admin/login/', auth_views.login, name='login'),
+    url(r'^admin/logout/', auth_views.logout_then_login, {'login_url': '/admin/login'}, name='logout'),
     url(r'^docs/$', DRFDocsView.as_view(), name='drfdocs'),
-    url(r'^admin/', admin.site.urls),
-    url(r'^core/', include(core_urls)),
+    url(r'^lucas-admin/', admin.site.urls),
+    url(r'^admin/', include(core_urls)),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

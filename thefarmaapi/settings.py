@@ -184,9 +184,9 @@ PYREBASE_CONFIG = {
    "serviceAccount": config('DB_FIREBASE_SERVICE_ACCOUNT')
 }
 
-LOGIN_URL = '/core/login/'
-LOGOUT_URL = '/core/logout/'
-LOGIN_REDIRECT_URL = '/core/'
+LOGIN_URL = '/admin/login/'
+LOGOUT_URL = '/admin/logout/'
+LOGIN_REDIRECT_URL = '/admin/'
 
 # Celery
 BROKER_URL = config('BROKER_URL_INI')
