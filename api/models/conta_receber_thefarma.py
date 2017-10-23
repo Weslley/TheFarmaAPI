@@ -12,6 +12,7 @@ class ContaReceberThefarma(models.Model):
     percentual_administradora_cartao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     valor_administradora_cartao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     data_credito = models.DateField(null=True)
+    numero_parcela = models.IntegerField(default=1)
 
     @property
     def valor_liquido(self):
