@@ -67,12 +67,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "daphne -e ssl::privateKey=/etc/certificates/thefarmaapi.pem:certKey=/etc/certificates/thefarmaapi.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
+    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/thefarmaapi.pem:certKey=/etc/certificates/thefarmaapi.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
     volumes:
       - media-data:/thefarmaapi/media
       - ./config/ssl:/etc/certificates
     expose:
       - "8000"
+      - "443"
     environment:
      - DEBUG=False
      - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
