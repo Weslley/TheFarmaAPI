@@ -682,7 +682,15 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
             item.valor_unitario = item_proposta.valor_unitario
             item.quantidade_atendida = item_proposta.quantidade
-            item.status = StatusItem.CONFIRMADO if item_proposta.possui else StatusItem.CANCELADO
+            if item_proposta.possui:
+                item.status = StatusItem.CONFIRMADO
+                item.percentual_similar = farmacia.percentual_similar
+                item.percentual_etico = farmacia.percentual_etico
+                item.percentual_generico = farmacia.percentual_generico
+                item.percentual_nao_medicamentos = farmacia.percentual_nao_medicamentos
+            else:
+                item.status = StatusItem.CANCELADO
+
             item.save()
 
         instance = super(PedidoCheckoutSerializer, self).update(instance, validated_data)

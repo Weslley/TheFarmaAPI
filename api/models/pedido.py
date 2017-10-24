@@ -83,7 +83,6 @@ class Pedido(models.Model):
 
         return comissao_parcela, diff
 
-
     @property
     def localizacao(self):
         """
