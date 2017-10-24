@@ -13,6 +13,7 @@ class ContaReceber(models.Model):
     percentual_administradora_cartao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_administradora_thefarma = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     numero_parcela = models.IntegerField(default=1)
+    valor_comissao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     @property
     def valor_liquido_parcela(self):
@@ -40,15 +41,6 @@ class ContaReceber(models.Model):
             return self.pedido.administradora_cartao
         else:
             return self.pedido.farmacia
-
-    @property
-    def valor_comissao(self):
-        """
-        Property que retorna o valor da comissão por parcela
-        :return:
-        """
-        comissao_parcela, diff = self.pedido.comissao
-        return comissao_parcela if self.numero_parcela > 1 else comissao_parcela + diff
 
     @property
     def valor_administradora_cartao(self):

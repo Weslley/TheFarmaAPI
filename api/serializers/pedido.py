@@ -2,6 +2,7 @@ import locale
 
 from api.consumers.farmacia import FarmaciaConsumer
 from api.models.administradora import Administradora
+from api.models.conta_pagar import ContaPagar
 from api.models.conta_receber import ContaReceber
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
@@ -566,14 +567,10 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         with transaction.atomic():
             instance = self.valida_pagamento(instance, validated_data)
-            self.gerar_contas_pagar(instance)
-            self.gerar_contas_receber(instance)
+            self.gerar_contas(instance)
         return instance
 
-    def gerar_contas_pagar(self, pedido):
-        pass
-
-    def gerar_contas_receber(self, pedido):
+    def gerar_contas(self, pedido):
         percentual_administradora_cartao = 0
         percentual_administradora_thefarma = 0
         valor_parcela = 0
@@ -591,17 +588,29 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_parcelado_farmacia
             percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_parcelado_thefarma
 
-        dia_vencimento = datetime.now().date() + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+        dia_vencimento_conta_receber = datetime.now().date() + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+        dia_vencimento_conta_pagar = datetime.now().date() + timedelta(31)
+        comissao_parcela, diff = pedido.comissao
         for parcela in range(1, pedido.numero_parcelas + 1):
-            ContaReceber.objects.create(
+            conta_receber = ContaReceber.objects.create(
                 numero_parcela=parcela,
                 valor_parcela=valor_parcela,  # Valor bruto da parcela
                 pedido=pedido,
-                data_vencimento=dia_vencimento,
+                data_vencimento=dia_vencimento_conta_receber,
                 percentual_administradora_cartao=percentual_administradora_cartao,
-                percentual_administradora_thefarma=percentual_administradora_thefarma
+                percentual_administradora_thefarma=percentual_administradora_thefarma,
+                valor_comissao=comissao_parcela if parcela > 1 else comissao_parcela + diff
             )
-            dia_vencimento = dia_vencimento + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+            if pedido.forma_pagamento == FormaPagamento.CARTAO:
+                ContaPagar.objects.create(
+                    numero_parcela=parcela,
+                    valor_liquido=conta_receber.valor_parcela - conta_receber.valor_administradora_thefarma - conta_receber.valor_comissao,  # Valor liquido da parcela
+                    pedido=pedido,
+                    data_vencimento=dia_vencimento_conta_pagar,
+                )
+
+            dia_vencimento_conta_receber += timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+            dia_vencimento_conta_pagar += timedelta(31)
 
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
