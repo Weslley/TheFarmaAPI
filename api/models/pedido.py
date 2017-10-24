@@ -189,6 +189,10 @@ class ItemPedido(models.Model):
     quantidade_atendida = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2)
     status = models.IntegerField(choices=StatusItem.choices(), default=StatusItem.ABERTO)
+    percentual_similar = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    percentual_generico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    percentual_etico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    percentual_nao_medicamentos = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     class Meta:
         unique_together = ('pedido', 'apresentacao')
@@ -213,16 +217,19 @@ class ItemPedido(models.Model):
 
     @property
     def comissao(self):
+        """
+        :return:
+        """
         valor = 0
         if self.farmacia:
             if self.tipo == TipoProduto.ETICO:
-                valor = (self.farmacia.percentual_etico * self.total_liquido) / 100
+                valor = (self.percentual_etico * self.total_liquido) / 100
             elif self.tipo == TipoProduto.GENERICO:
-                valor = (self.farmacia.percentual_generico * self.total_liquido) / 100
+                valor = (self.percentual_generico * self.total_liquido) / 100
             elif self.tipo == TipoProduto.SIMILAR:
-                valor = (self.farmacia.percentual_similar * self.total_liquido) / 100
+                valor = (self.percentual_similar * self.total_liquido) / 100
             else:
-                valor = (self.farmacia.percentual_nao_medicamentos * self.total_liquido) / 100
+                valor = (self.percentual_nao_medicamentos * self.total_liquido) / 100
         return valor
 
 

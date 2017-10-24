@@ -15,12 +15,20 @@ class ContaReceber(models.Model):
     numero_parcela = models.IntegerField(default=1)
 
     @property
-    def valor_liquido(self):
+    def valor_liquido_parcela(self):
         """
         Property para imprimir o valor liquido de acodo com o valor bruto e demais variaveis
         :return: Valor liquido da parcela
         """
-        return self.comissao + (self.valor_administradora_thefarma - self.valor_administradora_cartao)
+        return self.valor_parcela - self.valor_administradora_cartao
+
+    @property
+    def valor_liquido_thefarma(self):
+        """
+        Valor
+        :return:
+        """
+        return self.valor_comissao + (self.valor_administradora_thefarma - self.valor_administradora_cartao)
 
     @property
     def devedor(self):
@@ -34,13 +42,13 @@ class ContaReceber(models.Model):
             return self.pedido.farmacia
 
     @property
-    def comissao(self):
+    def valor_comissao(self):
         """
         Property que retorna o valor da comissão por parcela
         :return:
         """
         comissao_parcela, diff = self.pedido.comissao
-        return comissao_parcela if self.numero_parcela > 1 else comissao_parcela + 0
+        return comissao_parcela if self.numero_parcela > 1 else comissao_parcela + diff
 
     @property
     def valor_administradora_cartao(self):

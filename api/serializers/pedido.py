@@ -574,9 +574,14 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         pass
 
     def gerar_contas_receber(self, pedido):
-        # Lembrar de perguntar pro gabriel se não vamos cobrar alguma taxa quando for a dinheiro
         percentual_administradora_cartao = 0
         percentual_administradora_thefarma = 0
+        valor_parcela = 0
+
+        # calculando valor da parcela quando a venda é a cartão
+        if pedido.administradora_cartao:
+            valor_parcela = (pedido.valor_total / pedido.numero_parcelas)
+
         if pedido.administradora_cartao and pedido.numero_parcelas == 1:
             # credido a vista
             percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_avista_farmacia
@@ -590,7 +595,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         for parcela in range(1, pedido.numero_parcelas + 1):
             ContaReceber.objects.create(
                 numero_parcela=parcela,
-                valor_parcela=(pedido.valor_total / pedido.numero_parcelas),
+                valor_parcela=valor_parcela,  # Valor bruto da parcela
                 pedido=pedido,
                 data_vencimento=dia_vencimento,
                 percentual_administradora_cartao=percentual_administradora_cartao,
