@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Sum
@@ -12,9 +13,12 @@ from api.models.cliente import Cliente
 from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
                               StatusPagamentoCartao, StatusPedido)
 from api.models.enums.status_pagamento import StatusPagamento
+from api.models.enums.tipo_produto import TipoProduto
 from api.models.farmacia import Farmacia
 from api.models.log import Log
 from django.contrib.postgres.fields import JSONField
+
+from api.utils.math import truncate
 
 
 class Pedido(models.Model):
@@ -50,6 +54,35 @@ class Pedido(models.Model):
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)
+
+    @property
+    def comissao_thefarma(self):
+        """
+        Property para retornar comissão de acordo com os itens e os percentuais da farmacia
+        :return:
+        """
+        comissao = 0
+
+        if self.farmacia:
+            for item in self.itens.filter(status=StatusItem.CONFIRMADO):
+                comissao += item.comissao
+
+        return round(Decimal(comissao), 2)
+
+    @property
+    def comissao(self):
+        """
+        Property para calcular o valor da comissão por parcela e a diferença da primeira
+        :return: Uma tupla (comissão, diferença)
+        """
+        comissao_base = self.comissao_thefarma
+        comissao_parcela = truncate(comissao_base / self.numero_parcelas, 2)
+        diff = 0
+        if truncate(comissao_parcela * self.numero_parcelas, 2) < comissao_base:
+            diff = truncate(comissao_base - truncate(comissao_parcela * self.numero_parcelas, 2), 2)
+
+        return comissao_parcela, diff
+
 
     @property
     def localizacao(self):
@@ -102,13 +135,6 @@ class Pedido(models.Model):
         if qs.exists():
             return qs.first()
         return None
-
-    @property
-    def farmacia_selecionada(self):
-        item = self.itens.exclude(status=StatusItem.CANCELADO).first()
-        if not item:
-            return None
-        return item.farmacia.id
 
     def farmacia_esta_nas_propostas(self, farmacia):
         """
@@ -166,6 +192,38 @@ class ItemPedido(models.Model):
 
     class Meta:
         unique_together = ('pedido', 'apresentacao')
+
+    @property
+    def total_bruto(self):
+        return self.quantidade * self.valor_unitario
+
+    @property
+    def total_liquido(self):
+        return self.quantidade_atendida * self.valor_unitario
+
+    @property
+    def farmacia(self):
+        if self.pedido.farmacia:
+            return self.pedido.farmacia
+        return None
+
+    @property
+    def tipo(self):
+        return self.apresentacao.produto.tipo
+
+    @property
+    def comissao(self):
+        valor = 0
+        if self.farmacia:
+            if self.tipo == TipoProduto.ETICO:
+                valor = (self.farmacia.percentual_etico * self.total_liquido) / 100
+            elif self.tipo == TipoProduto.GENERICO:
+                valor = (self.farmacia.percentual_generico * self.total_liquido) / 100
+            elif self.tipo == TipoProduto.SIMILAR:
+                valor = (self.farmacia.percentual_similar * self.total_liquido) / 100
+            else:
+                valor = (self.farmacia.percentual_nao_medicamentos * self.total_liquido) / 100
+        return valor
 
 
 class ItemPropostaPedido(models.Model):

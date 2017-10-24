@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from api.models.administradora import Administradora
 from api.models.apresentacao import Apresentacao, ImagemApresentacao, Unidade
 from api.models.atualizacao import Atualizacao
 from api.models.bairro import Bairro
@@ -215,3 +216,4 @@ admin.site.register(ContaPagar)
 admin.site.register(ItemPropostaPedido)
 admin.site.register(Configuracao)
 admin.site.register(Feriado)
+admin.site.register(Administradora)

@@ -7,6 +7,7 @@ from datetime import datetime
 class Administradora(models.Model):
     nome = models.CharField(max_length=60)
     log = models.OneToOneField(Log)
+    dias_recebimento = models.IntegerField(default=1)
     percentual_credito_avista_farmacia = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_credito_parcelado_farmacia = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_credito_avista_thefarma = models.DecimalField(max_digits=15, decimal_places=2, default=0)

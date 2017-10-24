@@ -1,6 +1,8 @@
 import locale
 
 from api.consumers.farmacia import FarmaciaConsumer
+from api.models.administradora import Administradora
+from api.models.conta_receber import ContaReceber
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.models.enums.status_pedido import StatusPedido
@@ -23,6 +25,7 @@ from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento.servicos.cielo import ServicoCielo, ResponseCieloException
 from api.utils import get_client_browser, get_client_ip  # , status_transacao_cartao_cielo
 from api.utils import get_user_lookup, get_tempo_proposta
+from datetime import datetime, timedelta
 from .log import LogSerializer
 
 
@@ -561,19 +564,39 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        instance = self.valida_pagamento(instance, validated_data)
-        self.gerar_fluxo_caixa(instance)
+        with transaction.atomic():
+            instance = self.valida_pagamento(instance, validated_data)
+            self.gerar_contas_pagar(instance)
+            self.gerar_contas_receber(instance)
         return instance
-
-    def gerar_fluxo_caixa(self, pedido):
-        self.gerar_contas_pagar(pedido)
-        self.gerar_contas_receber(pedido)
 
     def gerar_contas_pagar(self, pedido):
         pass
 
     def gerar_contas_receber(self, pedido):
-        pass
+        # Lembrar de perguntar pro gabriel se não vamos cobrar alguma taxa quando for a dinheiro
+        percentual_administradora_cartao = 0
+        percentual_administradora_thefarma = 0
+        if pedido.administradora_cartao and pedido.numero_parcelas == 1:
+            # credido a vista
+            percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_avista_farmacia
+            percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_avista_thefarma
+        elif pedido.administradora_cartao and pedido.numero_parcelas > 1:
+            # credito parcelado
+            percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_parcelado_farmacia
+            percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_parcelado_thefarma
+
+        dia_vencimento = datetime.now().date() + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+        for parcela in range(1, pedido.numero_parcelas + 1):
+            ContaReceber.objects.create(
+                numero_parcela=parcela,
+                valor_parcela=(pedido.valor_total / pedido.numero_parcelas),
+                pedido=pedido,
+                data_vencimento=dia_vencimento,
+                percentual_administradora_cartao=percentual_administradora_cartao,
+                percentual_administradora_thefarma=percentual_administradora_thefarma
+            )
+            dia_vencimento = dia_vencimento + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
 
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
@@ -583,52 +606,51 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
             cartao = validated_data['cartao']
             try:
-                with transaction.atomic():
-                    # venda = object
-                    # data['venda'] = venda = VendaCartao.objects.create(
-                    #     motorista=data['unidade'].motorista,
-                    #     unidade=data['unidade'],
-                    #     descricao='RADIO TAXI',
-                    #     valor=data['valor'],
-                    #     bandeira=self.translate_brand(data['bandeira'])
-                    # )
+                # venda = object
+                # data['venda'] = venda = VendaCartao.objects.create(
+                #     motorista=data['unidade'].motorista,
+                #     unidade=data['unidade'],
+                #     descricao='RADIO TAXI',
+                #     valor=data['valor'],
+                #     bandeira=self.translate_brand(data['bandeira'])
+                # )
 
-                    venda = {
-                        'pedido_id': instance.id,
-                        'valor': valor_total,
-                        'cvv': cartao.cvv,
-                        'bandeira': cartao.bandeira,
-                        'token': cartao.token
-                    }
+                venda = {
+                    'pedido_id': instance.id,
+                    'valor': valor_total,
+                    'cvv': cartao.cvv,
+                    'bandeira': cartao.bandeira,
+                    'token': cartao.token
+                }
 
-                    data = Pagamento.pagar(tipo_servicos.CIELO, venda)
+                data = Pagamento.pagar(tipo_servicos.CIELO, venda)
 
-                    json_venda, json_captura = data['venda'], data['captura']
-                    instance.json_venda = json_venda
-                    instance.json_captura = json_captura
-                    instance.pagamento_status = int(json_venda['Payment']['Status'])
-                    # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
-                    #                                                         json_venda['Payment'] else None
-                    pagamento_id = json_venda['Payment']['PaymentId']
-                    # venda.pagamento_data_recebimento = datetime.strptime(json_venda['Payment']['ReceivedDate'],
-                    #                                                      '%Y-%m-%d %H:%M:%S')
-                    # venda.pagamento_codigo_autorizacao = json_venda['Payment'][
-                    #     'AuthorizationCode'] if 'AuthorizationCode' in \
-                    #                             json_venda[
-                    #                                 'Payment'] else None
-                    # venda.pagamento_tid = str(json_venda['Payment']['Tid'])
-                    # venda.pagamento_mensagem_retorno = json_venda['Payment']['ReturnMessage']
-                    # venda.pagamento_codigo_retorno = json_venda['Payment']['ReturnCode']
+                json_venda, json_captura = data['venda'], data['captura']
+                instance.json_venda = json_venda
+                instance.json_captura = json_captura
+                instance.pagamento_status = int(json_venda['Payment']['Status'])
+                # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
+                #                                                         json_venda['Payment'] else None
+                pagamento_id = json_venda['Payment']['PaymentId']
+                # venda.pagamento_data_recebimento = datetime.strptime(json_venda['Payment']['ReceivedDate'],
+                #                                                      '%Y-%m-%d %H:%M:%S')
+                # venda.pagamento_codigo_autorizacao = json_venda['Payment'][
+                #     'AuthorizationCode'] if 'AuthorizationCode' in \
+                #                             json_venda[
+                #                                 'Payment'] else None
+                # venda.pagamento_tid = str(json_venda['Payment']['Tid'])
+                # venda.pagamento_mensagem_retorno = json_venda['Payment']['ReturnMessage']
+                # venda.pagamento_codigo_retorno = json_venda['Payment']['ReturnCode']
 
-                    if json_captura:
-                        # venda.capturado = True
-                        instance.captura_status = int(json_captura['Status'])
-                        # venda.captura_codigo_retorno = json_captura['ReturnCode']
-                        # venda.captura_mensagem_retorno = json_captura['ReturnMessage']
+                if json_captura:
+                    # venda.capturado = True
+                    instance.captura_status = int(json_captura['Status'])
+                    # venda.captura_codigo_retorno = json_captura['ReturnCode']
+                    # venda.captura_mensagem_retorno = json_captura['ReturnMessage']
 
-                        instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
+                    instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
 
-                    instance.save()
+                instance.save()
             except ResponseCieloException as err:
                 print(err)
             except Exception as e:
@@ -646,7 +668,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
             item.valor_unitario = item_proposta.valor_unitario
             item.quantidade_atendida = item_proposta.quantidade
-            item.status = StatusItem.ABERTO if item_proposta.possui else StatusItem.CANCELADO
+            item.status = StatusItem.CONFIRMADO if item_proposta.possui else StatusItem.CANCELADO
             item.save()
 
         instance = super(PedidoCheckoutSerializer, self).update(instance, validated_data)
@@ -662,6 +684,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             FarmaciaConsumer.checkout(instance, farmacia)
         elif instance.status_cartao == StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
             instance.status_pagamento = StatusPagamento.PAGO
+            instance.administradora_cartao = Administradora.objects.first()
             if instance.delivery:
                 instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
             else:
