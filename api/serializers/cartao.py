@@ -29,11 +29,11 @@ class CartaoSerializer(serializers.ModelSerializer):
             expire_month=attrs['mes_expiracao'],
             expire_year=attrs['ano_expiracao']
         )
-        if not self.card.is_valid:
-            raise ValidationError('Cartão inválido.')
-
-        if self.card.is_expired:
-            raise ValidationError('Cartão expirado.')
+        # if not self.card.is_valid:
+        #     raise ValidationError('Cartão inválido.')
+        #
+        # if self.card.is_expired:
+        #     raise ValidationError('Cartão expirado.')
 
         request = self.context['request']
         attrs['bandeira'] = self.card.brand
