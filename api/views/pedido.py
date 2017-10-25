@@ -144,12 +144,6 @@ class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Pedido já foi cancelado.'})
 
-        if instance.status == StatusPedido.TIMEOUT:
-            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
-
-        if instance.status == StatusPedido.SEM_PROPOSTA:
-            raise ValidationError({'detail': 'Não houve propostas para este pedido.'})
-
         if instance.status == StatusPedido.ENVIADO:
             raise ValidationError({'detail': 'Pedido já foi enviado.'})
 
@@ -216,9 +210,6 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
 
-        if instance.status == StatusPedido.TIMEOUT:
-            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
-
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
@@ -250,9 +241,6 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
-
-        if instance.status == StatusPedido.TIMEOUT:
-            raise ValidationError({'detail': 'Tempo excedido para realizar qualquer operação.'})
 
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})

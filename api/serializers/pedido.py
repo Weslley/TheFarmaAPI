@@ -612,6 +612,8 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             dia_vencimento_conta_receber += timedelta(pedido.administradora_cartao.dias_recebimento + 1)
             dia_vencimento_conta_pagar += timedelta(31)
 
+        self.instance = pedido
+
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
         valor_total = instance.get_total_farmacia(farmacia)
