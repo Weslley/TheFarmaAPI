@@ -7,3 +7,4 @@ from .status_pedido import StatusPedido
 from .status_produto import StatusProduto
 from .status_pagamento import StatusPagamento
 from .devedor import Devedor
+from .tipo_venda import TipoVenda

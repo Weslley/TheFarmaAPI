@@ -17,4 +17,4 @@ class PrincipioAtivoSerializer(serializers.ModelSerializer):
 class PrincipioAtivoBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrincipioAtivo
-        fields = ('id', 'nome')
+        fields = ('id', 'nome', 'tipo_venda')
