@@ -36,7 +36,8 @@ class CartaoSerializer(serializers.ModelSerializer):
         #     raise ValidationError('Cartão expirado.')
 
         request = self.context['request']
-        attrs['bandeira'] = self.card.brand
+        # attrs['bandeira'] = self.card.brand
+        attrs['bandeira'] = 'Master'
         attrs['cliente'] = request.user.cliente
         attrs['token'] = ServicoCielo.create_token(attrs)
         attrs['numero_cartao'] = attrs['numero_cartao'][-4:]
