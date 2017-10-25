@@ -86,7 +86,7 @@ class PropostaSerializer(serializers.ModelSerializer):
             "itens_proposta",
             "cliente",
             "tempo",
-            "farmacia_selecionada",
+            "farmacia",
             "status_submissao"
         )
         extra_kwargs = {
