@@ -122,6 +122,122 @@
                             </div>
                         </div>
 
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Conta Bancária</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.cep.label }}</label>
+                                    {{ form.cep|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.logradouro.label }}</label>
+                                    {{ form.logradouro|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.numero.label }}</label>
+                                    {{ form.numero|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.complemento.label }}</label>
+                                    {{ form.complemento|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.cidade.label }}</label>
+                                    {{ form.cidade|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.bairro.label }}</label>
+                                    <select id="id_bairro" name="bairro" required class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" data-background-color="purple">
+                        <h4 class="title">Pedidos</h4>
+                    </div>
+                    <div class="card-content">
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.cep.label }}</label>
+                                    {{ form.cep|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.logradouro.label }}</label>
+                                    {{ form.logradouro|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.numero.label }}</label>
+                                    {{ form.numero|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group label-floating">
+                                    <label class="control-label">{{ form.complemento.label }}</label>
+                                    {{ form.complemento|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.cidade.label }}</label>
+                                    {{ form.cidade|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group label-floating">
+                                    <label>{{ form.bairro.label }}</label>
+                                    <select id="id_bairro" name="bairro" required class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
                         <a href="{% url 'farmacia-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
                         <button onclick="limpar_campos();" type="submit" class="btn btn-primary pull-right">Salvar</button>
                         <div class="clearfix"></div>

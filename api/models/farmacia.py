@@ -36,17 +36,19 @@ class FarmaciaManager(models.Manager):
 
 
 class Farmacia(models.Model):
+    # Dados basicos
     cnpj = models.CharField(verbose_name='CNPJ', max_length=14)
     nome_fantasia = models.CharField(max_length=100, blank=True, null=True)
     razao_social = models.CharField(max_length=100)
     telefone = models.CharField(max_length=11)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
     logo = models.ImageField(upload_to='farmacias', null=True, blank=True)
+    # Endereco
     endereco = models.OneToOneField(Endereco)
     data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
+    # Conta bancaria
     conta_bancaria = models.OneToOneField(ContaBancaria)
+    # Pedidos
     servico_entregador = models.BooleanField(default=True)
     servico_estoque = models.BooleanField(default=False)
     percentual_similar = models.DecimalField(max_digits=15, decimal_places=2, default=0)
@@ -62,6 +64,8 @@ class Farmacia(models.Model):
     horario_funcionamento_domingo_final = models.TimeField(default=time(0, 0, 0))
     horario_funcionamento_feriado_inicial = models.TimeField(default=time(0, 0, 0))
     horario_funcionamento_feriado_final = models.TimeField(default=time(0, 0, 0))
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     objects = FarmaciaManager()
 
     class Meta:

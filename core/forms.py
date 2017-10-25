@@ -4,6 +4,7 @@ from django.db import transaction
 
 from api.models.atualizacao import Atualizacao
 from api.models.bairro import Bairro
+from api.models.banco import Banco
 from api.models.cidade import Cidade
 from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
@@ -31,9 +32,16 @@ class FarmaciaForm(forms.ModelForm):
     cidade = forms.ModelChoiceField(queryset=Cidade.objects.all())
     bairro = forms.IntegerField(required=True)
 
+    banco = forms.ModelChoiceField(queryset=Banco.objects.all())
+    numero_agencia = forms.IntegerField()
+    digito_agencia = forms.CharField(max_length=1)
+    numero_conta = forms.IntegerField()
+    digito_conta = forms.CharField(max_length=1)
+    operacao = forms.CharField(max_length=3)
+
     class Meta:
         model = Farmacia
-        exclude = ('endereco', 'latitude', 'longitude')
+        exclude = ('endereco', 'conta_bancaria', 'data_criacao', 'data_atualizacao')
 
     def clean_bairro(self):
         bairro_id = int(self.data['bairro'])
