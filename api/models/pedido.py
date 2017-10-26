@@ -55,6 +55,9 @@ class Pedido(models.Model):
     def __str__(self):
         return 'Pedido {}'.format(self.id)
 
+    def get_status_submissao(self, farmacia):
+        return farmacia.get_status_proposta(self).value
+
     @property
     def comissao_thefarma(self):
         """
