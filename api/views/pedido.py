@@ -38,7 +38,7 @@ class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
         Filtrando pelo cliente da requisição
         :return: Queryset
         """
-        queryset = Pedido.objects.filter(cliente=self.request.user.cliente)
+        queryset = Pedido.objects.filter(cliente=self.request.user.cliente).order_by('-log__data_criacao')
         return queryset
 
     def get_serializer_class(self):
