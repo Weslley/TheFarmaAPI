@@ -20,7 +20,7 @@ from api.models.farmacia import Farmacia
 from api.models.log import Log
 from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
 from api.serializers.apresentacao import ApresentacaoListSerializer
-from api.serializers.farmacia import FarmaciaListSerializer
+from api.serializers.farmacia import FarmaciaListSerializer, FarmaciaEnderecoSerializer
 from api.servico_pagamento import tipo_servicos
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento.servicos.cielo import ServicoCielo, ResponseCieloException
@@ -181,6 +181,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 
 class PedidoSerializer(PedidoCreateSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
+    farmacia = serializers.SerializerMethodField()
 
     class Meta:
         model = Pedido
@@ -203,6 +204,7 @@ class PedidoSerializer(PedidoCreateSerializer):
             "longitude",
             "delivery",
             "troco",
+            "farmacia",
             "itens"
         )
         extra_kwargs = {
@@ -211,6 +213,12 @@ class PedidoSerializer(PedidoCreateSerializer):
             'status': {'read_only': True},
             'valor_frete': {'read_only': True},
         }
+
+    def get_farmacia(self, obj):
+        if obj.farmacia:
+            serializer = FarmaciaEnderecoSerializer(instance=obj.farmacia, context={'pedido': obj})
+            return serializer.data
+        return None
 
 
 class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
@@ -232,12 +240,13 @@ class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
 
 class PedidoDetalhadoSerializer(PedidoSerializer):
     propostas = serializers.SerializerMethodField()
+    farmacia = serializers.SerializerMethodField()
 
     def get_propostas(self, obj):
         propostas = [_ for _ in obj.propostas if _['status'] == StatusItemProposta.ENVIADO]
         for proposta in propostas:
             proposta['itens'] = ItemPropostaSimplificadoSerializer(instance=proposta['itens'], many=True).data
-            proposta['farmacia'] = FarmaciaListSerializer(instance=proposta['farmacia'], context={'pedido': obj}).data
+            proposta['farmacia'] = FarmaciaEnderecoSerializer(instance=proposta['farmacia'], context={'pedido': obj}).data
 
         return propostas
 
@@ -262,6 +271,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             "longitude",
             "delivery",
             "troco",
+            "farmacia",
             "itens",
             "propostas"
         )
@@ -272,6 +282,11 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             'valor_frete': {'read_only': True},
         }
 
+    def get_farmacia(self, obj):
+        if obj.farmacia:
+            serializer = FarmaciaEnderecoSerializer(instance=obj.farmacia, context={'pedido': obj})
+            return serializer.data
+        return None
 
 class ItemPropostaSerializer(serializers.ModelSerializer):
     apresentacao = serializers.SerializerMethodField()

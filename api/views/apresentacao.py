@@ -109,6 +109,7 @@ class ApresentacaoMaisVendidasPorEstadoList(generics.ListAPIView):
 
         return context
 
+
 class ApresentacaoPorEstadoRetrieve(generics.RetrieveAPIView):
     queryset = Apresentacao.objects.all()
     serializer_class = ApresentacaoProdutoRetrieve

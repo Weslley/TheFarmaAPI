@@ -6,7 +6,7 @@ from api.models.feriado import Feriado
 from api.serializers.conta_bancaria import ContaBancariaSerializer
 from datetime import datetime
 
-from api.serializers.endereco import EnderecoClienteCreateSerializer
+from api.serializers.endereco import EnderecoClienteCreateSerializer, EnderecoSerializer
 from api.utils.generics import calcula_distancia
 
 
@@ -157,3 +157,7 @@ class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
                 serializer.save()
 
             return super(FarmaciaRepresentanteSerializer, self).update(instance, validated_data)
+
+
+class FarmaciaEnderecoSerializer(FarmaciaListSerializer):
+    endereco = EnderecoSerializer()
