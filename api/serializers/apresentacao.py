@@ -122,7 +122,7 @@ class ProdutoFabricante(serializers.ModelSerializer):
 
     class Meta:
         model = Produto
-        fields = ('id', 'nome', 'fabricante')
+        fields = ('id', 'nome', 'fabricante', 'tipo')
 
 
 class ProdutoSimplesSerializer(serializers.ModelSerializer):
@@ -154,7 +154,19 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'produto', 'imagem', 'pmc', 'quantidade', 'classe_terapeutica')
+        fields = (
+            'id',
+            'codigo_barras',
+            'nome',
+            'preco',
+            'imagens',
+            'unidade',
+            'produto',
+            'imagem',
+            'pmc',
+            'quantidade',
+            'classe_terapeutica'
+        )
 
     def get_preco(self, obj):
         cidade = self.context['cidade']
