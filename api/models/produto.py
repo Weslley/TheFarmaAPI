@@ -13,7 +13,7 @@ class Produto(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
     principio_ativo = models.ForeignKey(PrincipioAtivo)
     laboratorio = models.ForeignKey(Fabricante)
-    tipo = models.IntegerField(choices=tipo_produto.CHOICES)
+    tipo = models.IntegerField(choices=tipo_produto.CHOICES, default=tipo_produto.NAO_MEDICAMENTO)
     status = models.IntegerField(choices=StatusProduto.choices(), default=StatusProduto.REVISAR)
     secao = models.ForeignKey(Secao, null=True)
     subsecao = models.ForeignKey(Subsecao, null=True)

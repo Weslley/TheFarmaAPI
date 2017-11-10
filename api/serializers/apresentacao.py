@@ -48,7 +48,18 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('id', 'nome', 'preco', 'imagens', 'unidade', 'imagem', 'pmc', 'data_atualizacao', 'classe_terapeutica')
+        fields = (
+            'id',
+            'codigo_barras',
+            'nome',
+            'preco',
+            'imagens',
+            'unidade',
+            'imagem',
+            'pmc',
+            'data_atualizacao',
+            'classe_terapeutica'
+        )
 
     def get_data_atualizacao(self, obj):
         return int(obj.data_atualizacao.timestamp() * 1000)

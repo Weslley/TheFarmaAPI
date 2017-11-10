@@ -43,7 +43,7 @@ class ProdutoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Produto
-        fields = ('id', 'nome', 'fabricante', 'apresentacoes', 'principio_ativo')
+        fields = ('id', 'nome', 'tipo', 'fabricante', 'apresentacoes', 'principio_ativo')
 
     def get_apresentacoes(self, obj):
         qs = obj.apresentacoes.filter(ativo=True)
