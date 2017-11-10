@@ -143,7 +143,7 @@ class ProdutoFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
     secao = django_filters.CharFilter(name="secao", lookup_expr='nome__istartswith')
     subsecao = django_filters.CharFilter(name="subsecao", lookup_expr='nome__istartswith')
-    codigo_barras = django_filters.CharFilter(name="subsecao", lookup_expr='apresentacoes__codigo_barras')
+    codigo_barras = django_filters.CharFilter(name="apresentacoes", lookup_expr='codigo_barras')
 
     class Meta:
         model = Produto
