@@ -114,11 +114,57 @@
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">Menu Principal</li>
-        <li class="active">
-          <a href="{% url 'farmacia-admin-list' %}">
-            <i class="fa fa-medkit"></i> <span>Farmácia</span>
-          </a>
-        </li>
+            <li id="menu_dashboard">
+                <a href="{% url 'home' %}">
+                    <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li id="menu_perfil">
+                <a href="{% url 'perfil-view' user.id %}">
+                    <i class="fa fa-user"></i> <span>Perfil</span>
+                </a>
+            </li>
+            {% if user.is_superuser %}
+                <li id="menu_parceiro">
+                    <a href="{% url 'parceiro-admin-list' %}">
+                        <i class="fa fa-users"></i> <span>Parceiros</span>
+                    </a>
+                </li>
+            {% endif %}
+            <li id="menu_post">
+                <a href="{% url 'post-admin-list' %}">
+                    <i class="fa fa-newspaper-o"></i> <span>Posts</span>
+                </a>
+            </li>
+            {% if user.is_superuser %}
+                <li id="menu_produto">
+                    <a href="{% url 'produto-admin-list' %}">
+                        <i class="fa fa-cubes"></i><span>Produtos</span>
+                    </a>
+                </li>
+                <li id="menu_atualizacao">
+                    <a href="{% url 'atualizacao-admin-list' %}">
+                        <i class="fa fa-refresh"></i> <span>Atualizações</span>
+                    </a>
+                </li>
+                <li id="menu_estoque">
+                    <a href="{% url 'estoque-admin-list' %}">
+                        <i class="fa fa-database"></i> <span>Estoque</span>
+                    </a>
+                </li>
+                <li class="active">
+                  <a href="{% url 'farmacia-admin-list' %}">
+                    <i class="fa fa-medkit"></i> <span>Farmácia</span>
+                  </a>
+                </li>
+                <li id="menu_uf">
+                    <a href="{% url 'uf-admin-list' %}">
+                        <i class="fa fa-building"></i> <span>UFs</span>
+                    </a>
+                </li>
+            {% endif %}
+
+
       </ul>
     </section>
     <!-- /.sidebar -->
