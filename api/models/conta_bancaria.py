@@ -9,4 +9,4 @@ class ContaBancaria(models.Model):
     digito_agencia = models.CharField(max_length=1)
     numero_conta = models.IntegerField()
     digito_conta = models.CharField(max_length=1)
-    operacao = models.CharField(max_length=3, null=True)
+    operacao = models.CharField(max_length=3, null=True, blank=True)

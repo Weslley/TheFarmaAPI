@@ -6,6 +6,7 @@ from api.models.atualizacao import Atualizacao
 from api.models.bairro import Bairro
 from api.models.banco import Banco
 from api.models.cidade import Cidade
+from api.models.conta_bancaria import ContaBancaria
 from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
 from api.models.parceiro import UsuarioParceiro
@@ -26,18 +27,18 @@ class AtualizacaoForm(forms.ModelForm):
 
 class FarmaciaForm(forms.ModelForm):
     cep = forms.CharField(label='CEP', max_length=8, required=False)
-    logradouro = forms.CharField(max_length=80)
+    logradouro = forms.CharField(label='Logradouro*', max_length=80)
     numero = forms.IntegerField(label='Número', required=False)
     complemento = forms.CharField(max_length=100, required=False)
-    cidade = forms.ModelChoiceField(queryset=Cidade.objects.all())
-    bairro = forms.IntegerField(required=True)
+    cidade = forms.ModelChoiceField(label='Cidade*',queryset=Cidade.objects.all())
+    bairro = forms.IntegerField(label='Bairro*', required=True)
 
-    banco = forms.ModelChoiceField(queryset=Banco.objects.all())
-    numero_agencia = forms.IntegerField(label='Número Agência')
-    digito_agencia = forms.CharField(label='Dígito Agência', max_length=1)
-    numero_conta = forms.IntegerField(label='Número Conta')
-    digito_conta = forms.CharField(label='Dígito Conta', max_length=1)
-    operacao = forms.CharField(label='Operação', max_length=3)
+    banco = forms.ModelChoiceField(label='Banco*', queryset=Banco.objects.all())
+    numero_agencia = forms.IntegerField(label='Número Agência*')
+    digito_agencia = forms.CharField(label='Dígito Agência*', max_length=1)
+    numero_conta = forms.IntegerField(label='Número Conta*')
+    digito_conta = forms.CharField(label='Dígito Conta*', max_length=1)
+    operacao = forms.CharField(label='Operação', max_length=3, required=False)
 
     class Meta:
         model = Farmacia
@@ -58,11 +59,13 @@ class FarmaciaForm(forms.ModelForm):
             return None
 
     def save(self, commit=True):
-        self.instance = super(FarmaciaForm, self).save(commit=False)
-        self.instance.endereco = self.get_endereco(commit=commit)
-        if commit:
-            self.instance.save()
-        return self.instance
+        with transaction.atomic():
+            self.instance = super(FarmaciaForm, self).save(commit=False)
+            self.instance.endereco = self.get_endereco(commit=commit)
+            self.instance.conta_bancaria = self.get_conta_bancaria(commit=commit)
+            if commit:
+                self.instance.save()
+            return self.instance
 
     def get_endereco(self, commit=True):
         try:
@@ -85,13 +88,13 @@ class FarmaciaForm(forms.ModelForm):
 
     def get_conta_bancaria(self, commit=True):
         try:
-            obj = Endereco(
-                cep=self.cleaned_data['cep'],
-                logradouro=self.cleaned_data['logradouro'],
-                numero=self.cleaned_data['numero'],
-                complemento=self.cleaned_data['complemento'],
-                cidade=self.cleaned_data['cidade'],
-                bairro=self.cleaned_data['bairro']
+            obj = ContaBancaria(
+                banco=self.cleaned_data['banco'],
+                numero_agencia=self.cleaned_data['numero_agencia'],
+                digito_agencia=self.cleaned_data['digito_agencia'],
+                numero_conta=self.cleaned_data['numero_conta'],
+                digito_conta=self.cleaned_data['digito_conta'],
+                operacao=self.cleaned_data['operacao']
             )
 
             if commit:
