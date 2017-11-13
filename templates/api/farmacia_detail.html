@@ -1,153 +1,423 @@
-{% extends 'components/base.html' %}
+{% extends 'components/new_base.html' %}
 {% load staticfiles %}
 {% load helper %}
 
-{% block header %}
-  Farmácia
-{% endblock header %}
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Farmácia
+        <small>Visualização</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Farmácia</li>
+    </ol>
+</section>
+{% endblock %}
 
-{% block conteudo %}
+{% block content %}
 
     <div class="row">
 
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header" data-background-color="purple">
-                    <h4 class="title">Dados básicos</h4>
+
+        <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab">Dados da Farmácia</a></li>
+                        <li><a href="#tab_2" data-toggle="tab">Representantes</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane tab-pane-height active" id="tab_1">
+
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#tab_2_1" data-toggle="tab">Dados Básicos</a></li>
+                                    <li><a href="#tab_2_2" data-toggle="tab">Endereço</a></li>
+                                    <li><a href="#tab_2_3" data-toggle="tab">Conta Bancária</a></li>
+                                    <li><a href="#tab_2_4" data-toggle="tab">Pedidos</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tab_2_1">
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Razão Social</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.razao_social }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Nome Fantasia</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.nome_fantasia }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group ">
+                                                    <label class="control-label">CNPJ</label>
+                                                    <input id="id_cnpj" type="text" class="form-control" disabled value="{{ farmacia.cnpj }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Telefone</label>
+                                                    <input id="id_cep" type="text" class="form-control" disabled value="{{ farmacia.endereco.cep }}">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <!-- /.tab-pane -->
+                                    <div class="tab-pane" id="tab_2_2">
+
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <div class="form-group ">
+                                                    <label class="control-label">CEP</label>
+                                                    <input id="id_cep" type="text" class="form-control" disabled value="{{ farmacia.endereco.cep }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Logradouro</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.endereco.logradouro }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Número</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.endereco.numero }}">
+                                                </div>
+                                            </div>
+                                            </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Complemento</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.endereco.complemento }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group ">
+                                                    <label>Cidade</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.endereco.cidade }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group ">
+                                                    <label>Bairro</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.endereco.bairro }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- /.tab-pane -->
+                                    <div class="tab-pane" id="tab_2_3">
+
+                                        <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group ">
+                                                <label class="control-label">Banco</label>
+                                                <input type="text" class="form-control" disabled value="{{ farmacia.conta_bancaria.banco }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group ">
+                                                <label class="control-label">Número Agência</label>
+                                                <input type="text" class="form-control" disabled value="{{ farmacia.conta_bancaria.numero_agencia }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group ">
+                                                <label class="control-label">Dígito Agência</label>
+                                                <input type="text" class="form-control" disabled value="{{ farmacia.conta_bancaria.digito_agencia }}">
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Número Conta</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.conta_bancaria.numero_conta }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Dígito Conta</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.conta_bancaria.digito_conta }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Operação</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.conta_bancaria.operacao }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- /.tab-pane -->
+                                    <div class="tab-pane tab-pane-height-custom" id="tab_2_4">
+
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" disabled  {% if farmacia.servico_entregador %}checked{% endif %}> <strong>Possui Entregador</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" disabled {% if farmacia.servico_estoque %}checked{% endif %}>  <strong>Habilitar Estoque</strong>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Percentual Similares</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.percentual_similar }}">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Percentual Genéricos</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.percentual_generico }}">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Percentual Éticos</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.percentual_etico }}">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Percentual não Medicamentos</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.percentual_nao_medicamentos }}">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Dias Úteis Inicial</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_segunda_sexta_inicial }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Dias Úteis Final</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_segunda_sexta_final }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Sábados Inicial</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_sabado_inicial }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Sábados Final</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_sabado_final }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Domingos Inicial</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_domingo_inicial }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Domingos Final</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_domingo_final }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Feriados Inicial</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_feriado_inicial }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Horário Feriados Final</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.horario_funcionamento_feriado_final }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Tempo de Entrega</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                                        <input type="text" class="form-control" disabled value="{{ farmacia.tempo_entrega }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Latitude</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.latitude }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group ">
+                                                    <label class="control-label">Longitude</label>
+                                                    <input type="text" class="form-control" disabled value="{{ farmacia.longitude }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- /.tab-pane -->
+                            </div>
+                                <!-- /.tab-content -->
+                            </div>
+
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane tab-pane-height  table-responsive no-padding" id="tab_2">
+
+                            <table class="table table-hover">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>CPF</th>
+                                    <th>Telefone</th>
+                                    <th>Cargo</th>
+                                    <th>Ação</th>
+                                </tr>
+
+                                    {% for representante in farmacia.representantes.all %}
+                                        {% if representante.usuario.is_active %}
+                                            <tr>
+                                                <td>{{ representante }}</td>
+                                                <td>{{ representante.usuario.email }}</td>
+                                                <td>{{ representante.cpf }}</td>
+                                                <td>{{ representante.telefone }}</td>
+                                                <td>{{ representante.cargo }}</td>
+                                                <td><button class="btn btn-flat btn-danger" onclick="remover_usuario({{ representante.usuario.id }}, {{ farmacia.id }}, 'farmacia');"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+
+                          </table>
+
+                        </div>
+                        <!-- /.tab-pane -->
                 </div>
-                <div class="card-content">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group label-floating">
-                                <label class="control-label">Razão Social</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.razao_social }}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group label-floating">
-                                <label class="control-label">Nome Fantasia</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.nome_fantasia }}">
+                    <!-- /.tab-content -->
+                    <div class="tab-footer box-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{% url 'farmacia-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
+{#                                <button onclick="limpar_campos();" type="submit" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>#}
+                                <div class="clearfix"></div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group label-floating">
-                                <label class="control-label">CNPJ</label>
-                                <input id="id_cnpj" type="text" class="form-control" disabled value="{{ farmacia.cnpj }}">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group label-floating">
-                                <label class="control-label">Telefone</label>
-                                <input id="id_telefone" type="text" class="form-control" disabled value="{{ farmacia.telefone }}">
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </div>
-        </div>
-
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header" data-background-color="purple">
-                    <h4 class="title">Endereço</h4>
-                </div>
-                <div class="card-content">
-
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-group label-floating">
-                                <label class="control-label">CEP</label>
-                                <input id="id_cep" type="text" class="form-control" disabled value="{{ farmacia.endereco.cep }}">
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="form-group label-floating">
-                                <label class="control-label">Logradouro</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.logradouro }}">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group label-floating">
-                                <label class="control-label">Número</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.numero }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group label-floating">
-                                <label class="control-label">Complemento</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.complemento }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group label-floating">
-                                <label>Cidade</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.cidade }}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group label-floating">
-                                <label>Bairro</label>
-                                <input type="text" class="form-control" disabled value="{{ farmacia.endereco.bairro }}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <a href="{% url 'farmacia-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
-                    <div class="clearfix"></div>
-
-                </div>
-            </div>
         </div>
 
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header" data-background-color="purple">
-                    <h4 class="title" style="float: left; margin-top:15px;">Representantes</h4>
-                    <a href="{% url 'farmacia-admin-add-representante' farmacia.id %}" class="btn btn-white pull-right" style="color: #999999;"><i class="fa fa-plus"></i> Adicionar</a>
-                    <div class="clearfix"></div>
-                </div>
-
-                <div class="card-content">
-                    {% for representante in farmacia.representantes.all %}
-                        {% if representante.usuario.is_active %}
-                            <div class="row">
-                                <div class="col-md-5">
-                                    <div class="form-group label-floating">
-                                        <label class="control-label">Nome</label>
-                                        <input type="text" class="form-control" disabled value="{{ representante }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group label-floating">
-                                        <label class="control-label">Email</label>
-                                        <input type="text" class="form-control" disabled value="{{ representante.usuario.email }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <button style="margin-top: 20px;" onclick="remover_usuario({{ representante.usuario.id }}, {{ farmacia.id }}, 'farmacia');"><i class="fa fa-trash"></i></button>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-
-            </div>
-        </div>
-    </div>
+{#    <div class="row">#}
+{#        <div class="col-md-12">#}
+{#            <div class="card">#}
+{#                <div class="card-header" data-background-color="purple">#}
+{#                    <h4 class="title" style="float: left; margin-top:15px;">Representantes</h4>#}
+{#                    <a href="{% url 'farmacia-admin-add-representante' farmacia.id %}" class="btn btn-white pull-right" style="color: #999999;"><i class="fa fa-plus"></i> Adicionar</a>#}
+{#                    <div class="clearfix"></div>#}
+{#                </div>#}
+{##}
+{#                <div class="card-content">#}
+{#                    {% for representante in farmacia.representantes.all %}#}
+{#                        {% if representante.usuario.is_active %}#}
+{#                            <div class="row">#}
+{#                                <div class="col-md-5">#}
+{#                                    <div class="form-group label-floating">#}
+{#                                        <label class="control-label">Nome</label>#}
+{#                                        <input type="text" class="form-control" disabled value="{{ representante }}">#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="col-md-6">#}
+{#                                    <div class="form-group label-floating">#}
+{#                                        <label class="control-label">Email</label>#}
+{#                                        <input type="text" class="form-control" disabled value="{{ representante.usuario.email }}">#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="col-md-1">#}
+{#                                    <button style="margin-top: 20px;" onclick="remover_usuario({{ representante.usuario.id }}, {{ farmacia.id }}, 'farmacia');"><i class="fa fa-trash"></i></button>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endif %}#}
+{#                    {% endfor %}#}
+{#                </div>#}
+{##}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
 {% endblock %}
 
@@ -167,3 +437,29 @@
         });
     </script>
 {% endblock js %}
+
+{% block css %}
+<style type="text/css">
+    .tab-pane-height{
+         height: 330px;
+         max-height: 330px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    .tab-pane-height-custom{
+         height: 246px;
+         max-height: 246px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+</style>
+{% endblock %}
