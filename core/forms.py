@@ -25,23 +25,27 @@ class AtualizacaoForm(forms.ModelForm):
 
 
 class FarmaciaForm(forms.ModelForm):
-    cep = forms.CharField(max_length=8, required=False)
+    cep = forms.CharField(label='CEP', max_length=8, required=False)
     logradouro = forms.CharField(max_length=80)
-    numero = forms.IntegerField(required=False)
+    numero = forms.IntegerField(label='Número', required=False)
     complemento = forms.CharField(max_length=100, required=False)
     cidade = forms.ModelChoiceField(queryset=Cidade.objects.all())
     bairro = forms.IntegerField(required=True)
 
     banco = forms.ModelChoiceField(queryset=Banco.objects.all())
-    numero_agencia = forms.IntegerField()
-    digito_agencia = forms.CharField(max_length=1)
-    numero_conta = forms.IntegerField()
-    digito_conta = forms.CharField(max_length=1)
-    operacao = forms.CharField(max_length=3)
+    numero_agencia = forms.IntegerField(label='Número Agência')
+    digito_agencia = forms.CharField(label='Dígito Agência', max_length=1)
+    numero_conta = forms.IntegerField(label='Número Conta')
+    digito_conta = forms.CharField(label='Dígito Conta', max_length=1)
+    operacao = forms.CharField(label='Operação', max_length=3)
 
     class Meta:
         model = Farmacia
         exclude = ('endereco', 'conta_bancaria', 'data_criacao', 'data_atualizacao')
+
+    def __init__(self, *args, **kwargs):
+        super(FarmaciaForm, self).__init__(*args, **kwargs)
+        self.fields['cidade'].widget.attrs.update({'style': 'width: 100%;'})
 
     def clean_bairro(self):
         bairro_id = int(self.data['bairro'])
@@ -79,6 +83,24 @@ class FarmaciaForm(forms.ModelForm):
             print(err)
             return None
 
+    def get_conta_bancaria(self, commit=True):
+        try:
+            obj = Endereco(
+                cep=self.cleaned_data['cep'],
+                logradouro=self.cleaned_data['logradouro'],
+                numero=self.cleaned_data['numero'],
+                complemento=self.cleaned_data['complemento'],
+                cidade=self.cleaned_data['cidade'],
+                bairro=self.cleaned_data['bairro']
+            )
+
+            if commit:
+                obj.save()
+
+            return obj
+        except Exception as err:
+            print(err)
+            return None
 
 class RepresentanteFarmaciaForm(forms.ModelForm):
     nome = forms.CharField(max_length=30)

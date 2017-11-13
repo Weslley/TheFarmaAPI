@@ -1,260 +1,392 @@
-{% extends 'components/base.html' %}
+{% extends 'components/new_base.html' %}
 {% load staticfiles %}
 {% load helper %}
 
-{% block header %}
-  Farmacias
-{% endblock header %}
+{% block content-header %}
+    <section class="content-header">
+      <h1>
+        Farmácias
+        <small>Cadastro</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Farmácias</li>
+      </ol>
+    </section>
+{% endblock content-header %}
 
-{% block conteudo %}
+{% block content %}
 
 <style type="text/css">
-    .file_input {
-    background: linear-gradient(60deg, #12A298, #44BABB);
-    padding: 10px;
-    border-radius: 50%;
-    color: whitesmoke;
-    float: left;
-    margin-right: 10px;
-}
+    .tab-pane {
+         height: 330px;
+         max-height: 330px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
 </style>
 
     <div class="row">
-        <form id="farma_form" method="post" enctype="multipart/form-data">{% csrf_token %}
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" data-background-color="purple">
-                        <h4 class="title">Dados básicos</h4>
-                    </div>
-                    <div class="card-content">
+        <div class="col-md-12">
+          <!-- Custom Tabs -->
+            <form id="farma_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab">Dados Básicos</a></li>
+                        <li><a href="#tab_2" data-toggle="tab">Endereço</a></li>
+                        <li><a href="#tab_3" data-toggle="tab">Conta Bancária</a></li>
+                        <li><a href="#tab_4" data-toggle="tab">Pedidos</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1">
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.razao_social.label }}</label>
-                                    {{ form.razao_social|addclass:"form-control" }}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.razao_social.label }}</label>
+                                        {{ form.razao_social|addclass:"form-control" }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.nome_fantasia.label }}</label>
-                                    {{ form.nome_fantasia|addclass:"form-control" }}
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.nome_fantasia.label }}</label>
+                                        {{ form.nome_fantasia|addclass:"form-control" }}
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.cnpj.label }}</label>
+                                        {{ form.cnpj|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.telefone.label }}</label>
+                                        {{ form.telefone|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label style="margin-top: 12px;">{{ form.logo.label }}</label>
+                                        {{ form.logo }}
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane" id="tab_2">
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.cnpj.label }}</label>
-                                    {{ form.cnpj|addclass:"form-control" }}
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.cep.label }}</label>
+                                        {{ form.cep|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.logradouro.label }}</label>
+                                        {{ form.logradouro|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.numero.label }}</label>
+                                        {{ form.numero|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.complemento.label }}</label>
+                                        {{ form.complemento|addclass:"form-control" }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.telefone.label }}</label>
-                                    {{ form.telefone|addclass:"form-control" }}
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group ">
+                                        <label>{{ form.cidade.label }}</label>
+                                        {{ form.cidade|addclass:"form-control select2" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group ">
+                                        <label>{{ form.bairro.label }}</label>
+                                        <select id="id_bairro" name="bairro" required class="form-control select2"></select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group label-floating">
-                                    <i class="material-icons file_input">file_upload</i>
-                                    <label style="margin-top: 12px;">{{ form.logo.label }}</label>
-                                    {{ form.logo }}
-                                    <div class="clearfix"></div>
-                                </div>
-                            </div>
+
                         </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane" id="tab_3">
 
-                    </div>
+                            <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.banco.label }}</label>
+                                    {{ form.banco|addclass:"form-control select2" }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.numero_agencia.label }}</label>
+                                    {{ form.numero_agencia|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.digito_agencia.label }}</label>
+                                    {{ form.digito_agencia|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.numero_conta.label }}</label>
+                                        {{ form.numero_conta|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.digito_conta.label }}</label>
+                                        {{ form.digito_conta|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.operacao.label }}</label>
+                                        {{ form.operacao|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane" id="tab_4">
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="checkbox">
+                                        <label>
+                                            {{ form.servico_entregador }} <strong>{{ form.servico_entregador.label }}</strong>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="checkbox">
+                                        <label>
+                                            {{ form.servico_estoque }} <strong>{{ form.servico_estoque.label }}</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.percentual_similar.label }}</label>
+                                        <div class="input-group">
+                                            {{ form.percentual_similar|addclass:"form-control" }}
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.percentual_generico.label }}</label>
+                                        <div class="input-group">
+                                            {{ form.percentual_generico|addclass:"form-control" }}
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.percentual_etico.label }}</label>
+                                        <div class="input-group">
+                                            {{ form.percentual_etico|addclass:"form-control" }}
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.percentual_nao_medicamentos.label }}</label>
+                                        <div class="input-group">
+                                            {{ form.percentual_nao_medicamentos|addclass:"form-control" }}
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_segunda_sexta_inicial.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_segunda_sexta_inicial|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_segunda_sexta_final.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_segunda_sexta_final|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_sabado_inicial.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_sabado_inicial|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_sabado_final.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_sabado_final|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_domingo_inicial.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_domingo_inicial|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_domingo_final.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_domingo_final|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_feriado_inicial.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_feriado_inicial|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.horario_funcionamento_feriado_final.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.horario_funcionamento_feriado_final|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.tempo_entrega.label }}</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                            {{ form.tempo_entrega|addclass:"form-control timepicker" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.latitude.label }}</label>
+                                        {{ form.latitude|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">{{ form.longitude.label }}</label>
+                                        {{ form.longitude|addclass:"form-control" }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.tab-pane -->
                 </div>
-            </div>
-
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" data-background-color="purple">
-                        <h4 class="title">Endereço</h4>
-                    </div>
-                    <div class="card-content">
-
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.cep.label }}</label>
-                                    {{ form.cep|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.logradouro.label }}</label>
-                                    {{ form.logradouro|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.numero.label }}</label>
-                                    {{ form.numero|addclass:"form-control" }}
-                                </div>
-                            </div>
-                        </div>
-
+                    <!-- /.tab-content -->
+                    <div class="tab-footer box-footer">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.complemento.label }}</label>
-                                    {{ form.complemento|addclass:"form-control" }}
-                                </div>
+                                <a href="{% url 'farmacia-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
+                                <button onclick="limpar_campos();" type="submit" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>
+                                <div class="clearfix"></div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label>{{ form.cidade.label }}</label>
-                                    {{ form.cidade|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label>{{ form.bairro.label }}</label>
-                                    <select id="id_bairro" name="bairro" required class="form-control"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="clearfix"></div>
-
                     </div>
                 </div>
-            </div>
-
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" data-background-color="purple">
-                        <h4 class="title">Conta Bancária</h4>
-                    </div>
-                    <div class="card-content">
-
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.cep.label }}</label>
-                                    {{ form.cep|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.logradouro.label }}</label>
-                                    {{ form.logradouro|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.numero.label }}</label>
-                                    {{ form.numero|addclass:"form-control" }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.complemento.label }}</label>
-                                    {{ form.complemento|addclass:"form-control" }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label>{{ form.cidade.label }}</label>
-                                    {{ form.cidade|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label>{{ form.bairro.label }}</label>
-                                    <select id="id_bairro" name="bairro" required class="form-control"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="clearfix"></div>
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" data-background-color="purple">
-                        <h4 class="title">Pedidos</h4>
-                    </div>
-                    <div class="card-content">
-
-                        <div class="row">
-                            <div class="col-md-2">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.cep.label }}</label>
-                                    {{ form.cep|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.logradouro.label }}</label>
-                                    {{ form.logradouro|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.numero.label }}</label>
-                                    {{ form.numero|addclass:"form-control" }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group label-floating">
-                                    <label class="control-label">{{ form.complemento.label }}</label>
-                                    {{ form.complemento|addclass:"form-control" }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label>{{ form.cidade.label }}</label>
-                                    {{ form.cidade|addclass:"form-control" }}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group label-floating">
-                                    <label>{{ form.bairro.label }}</label>
-                                    <select id="id_bairro" name="bairro" required class="form-control"></select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <a href="{% url 'farmacia-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
-                        <button onclick="limpar_campos();" type="submit" class="btn btn-primary pull-right">Salvar</button>
-                        <div class="clearfix"></div>
-
-                    </div>
-                </div>
-            </div>
-        </form>
+            </form>
+          <!-- nav-tabs-custom -->
+        </div>
     </div>
 
 
 {% endblock %}
 
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/i18n/pt-BR.js"></script>
-    <script type="text/javascript">
+<!-- Select2 -->
+<script src="{% static 'admlte/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+<script src="{% static 'admlte/bower_components/select2/dist/js/i18n/pt-BR.js' %}"></script>
+<!-- InputMask -->
+<script src="{% static 'admlte/plugins/input-mask/jquery.inputmask.js' %}"></script>
+<script src="{% static 'admlte/plugins/input-mask/jquery.inputmask.date.extensions.js' %}"></script>
+<script src="{% static 'admlte/plugins/input-mask/jquery.inputmask.extensions.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'admlte/bower_components/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'admlte/bower_components/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<!-- bootstrap datepicker -->
+<script src="{% static 'admlte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<!-- bootstrap color picker -->
+<script src="{% static 'admlte/bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js' %}"></script>
+<!-- bootstrap time picker -->
+<script src="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.js' %}"></script>
+
+{#<script src="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.js' %}"></script>#}
+{#<script src="{% static 'admlte/bower_components/select2/dist/js/select2.full.min.js' %}"></script>#}
+<script type="text/javascript">
     function get_cidade_id() {
         return ($("#id_cidade").val() != '' && $("#id_cidade").val() != undefined) ? $("#id_cidade").val() : null;
     }
@@ -284,19 +416,19 @@
         $('#id_cep').attr('maxlength', 9)
         $('#id_cep').mask('00000-000', {reverse: true})
 
-
-        $('.active').removeClass('active');
-        $('#menu_farmacia').addClass('active');
-
         $('#id_cidade').select2({
-            allowClear: true,
-            language: "pt-BR"
+            language: "pt-BR",
+            width: '100%'
+        });
+        $('#id_banco').select2({
+            language: "pt-BR",
+            width: '100%'
         });
         $("#id_bairro").select2({
-            allowClear: true,
             language: "pt-BR",
+            width: '100%',
             ajax: {
-                url: "/bairros/busca/",
+                url: "/admin/bairros/busca/",
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -322,11 +454,30 @@
             escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
             minimumInputLength: 3
         });
+
     })();
-    </script>
+</script>
 {% endblock js %}
 
 {% block css %}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-daterangepicker/daterangepicker.css' %}">
+  <!-- bootstrap datepicker -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="{% static 'admlte/plugins/iCheck/all.css' %}">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css' %}">
+  <!-- Bootstrap time Picker -->
+  <link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/select2/dist/css/select2.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'admlte/dist/css/AdminLTE.min.css' %}">
+    
+{#      <!-- Bootstrap time Picker -->#}
+{#  <link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">#}
+{#      <!-- Select2 -->#}
+{#  <link rel="stylesheet" href="{% static 'admlte/bower_components/select2/dist/css/select2.min.css' %}">#}
 {% endblock css %}
 
