@@ -552,37 +552,37 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         return data
 
     def validate(self, attrs):
-        # If para verificar se os pagamentos estão inseridos corretamente
-        if 'forma_pagamento' not in attrs or (
-                'forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO) and (
-                ('cartao' not in attrs) or ('cartao' in attrs and not attrs['cartao'])):
-            raise serializers.ValidationError('Em pagamentos com cartão é necessário informar pelo menos um cartão')
-
-        # definindo a forma de pagamento
-        if ('forma_pagamento' not in attrs) or \
-           ('forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO):
-            attrs['forma_pagamento'] = FormaPagamento.CARTAO
-
-        else:
-            attrs['forma_pagamento'] = FormaPagamento.DINHEIRO
-
-        pedido = getattr(self, 'instance', None)
-
-        if pedido:
-            if pedido.status_pagamento == StatusPagamento.PAGO:
-                raise serializers.ValidationError('Pedido ja está pago.')
-            elif pedido.status_pagamento == StatusPagamento.CANCELADO:
-                raise serializers.ValidationError('Status de pagamento está cancelado.')
-
-        else:
-            raise serializers.ValidationError('Deve haver pedido no checkout.')
+        # # If para verificar se os pagamentos estão inseridos corretamente
+        # if 'forma_pagamento' not in attrs or (
+        #         'forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO) and (
+        #         ('cartao' not in attrs) or ('cartao' in attrs and not attrs['cartao'])):
+        #     raise serializers.ValidationError('Em pagamentos com cartão é necessário informar pelo menos um cartão')
+        #
+        # # definindo a forma de pagamento
+        # if ('forma_pagamento' not in attrs) or \
+        #    ('forma_pagamento' in attrs and attrs['forma_pagamento'] == FormaPagamento.CARTAO):
+        #     attrs['forma_pagamento'] = FormaPagamento.CARTAO
+        #
+        # else:
+        #     attrs['forma_pagamento'] = FormaPagamento.DINHEIRO
+        #
+        # pedido = getattr(self, 'instance', None)
+        #
+        # if pedido:
+        #     if pedido.status_pagamento == StatusPagamento.PAGO:
+        #         raise serializers.ValidationError('Pedido ja está pago.')
+        #     elif pedido.status_pagamento == StatusPagamento.CANCELADO:
+        #         raise serializers.ValidationError('Status de pagamento está cancelado.')
+        #
+        # else:
+        #     raise serializers.ValidationError('Deve haver pedido no checkout.')
 
         return attrs
 
     def update(self, instance, validated_data):
-        with transaction.atomic():
-            instance = self.valida_pagamento(instance, validated_data)
-            self.gerar_contas(instance)
+        # with transaction.atomic():
+        #     instance = self.valida_pagamento(instance, validated_data)
+        #     self.gerar_contas(instance)
         return instance
 
     def gerar_contas(self, pedido):
