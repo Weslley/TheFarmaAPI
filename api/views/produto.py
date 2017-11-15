@@ -57,7 +57,7 @@ class ProdutosBusca(generics.ListAPIView):
     """
     Listagem de todos os produtos
     """
-    queryset = Produto.objects.all()
+    queryset = Produto.objects.filter(apresentacoes__isnull=False).distinct()
     serializer_class = ProdutoSerializer
     pagination_class = SmallResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
