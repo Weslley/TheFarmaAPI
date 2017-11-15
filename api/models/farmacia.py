@@ -14,7 +14,7 @@ class FarmaciaManager(models.Manager):
 
     def proximas(self, pedido, **kwargs):
         filter_queryset = {"representantes__usuario__auth_token__isnull": False}
-        if pedido.cidade_obj:
+        if pedido.cidade_obj and pedido.cidade is not None and pedido.cidade.strip() != '':
             filter_queryset['endereco__cidade'] = pedido.cidade_obj
 
         queryset = self.filter(**filter_queryset)

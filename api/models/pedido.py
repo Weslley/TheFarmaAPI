@@ -136,6 +136,11 @@ class Pedido(models.Model):
         qs = Cidade.objects.filter(nome__exact=self.cidade, uf__sigla=self.uf)
         if qs.exists():
             return qs.first()
+
+        qs = Cidade.objects.filter(uf__sigla=self.uf)
+        if qs.exists():
+            return qs.first()
+
         return None
 
     def farmacia_esta_nas_propostas(self, farmacia):
