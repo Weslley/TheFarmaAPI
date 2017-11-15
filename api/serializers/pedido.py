@@ -104,7 +104,8 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             "longitude",
             "delivery",
             "troco",
-            "itens"
+            "itens",
+            "uf"
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -147,7 +148,8 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                     "nome_destinatario"
                 )
                 for prop in endereco_props:
-                    validated_data[prop] = getattr(endereco, prop, None)
+                    if prop == 'uf' and 'uf' not in validated_data or ('uf' in validated_data and validated_data['uf'] == '' or validated_data['uf'] is None):
+                        validated_data[prop] = getattr(endereco, prop, None)
 
             # pegando o cliente da requisição
             cliente = get_user_lookup(request, 'cliente')
