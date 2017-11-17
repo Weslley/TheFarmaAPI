@@ -17,3 +17,4 @@ class Cartao(models.Model):
     mes_expiracao = models.CharField(max_length=2, choices=[(str(value), str(value)) for value in list(range(1, 13))])
     ano_expiracao = models.CharField(max_length=4, choices=[(str(value), str(value)) for value in list(range(date.today().year, date.today().year + 101))])
     cliente = models.ForeignKey(Cliente, related_name='cartoes', on_delete=models.CASCADE)
+    deletado = models.BooleanField(default=False)
