@@ -621,12 +621,12 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                 data_vencimento=dia_vencimento_conta_receber,
                 percentual_administradora_cartao=percentual_administradora_cartao,
                 percentual_administradora_thefarma=percentual_administradora_thefarma,
-                valor_comissao=comissao_parcela if parcela > 1 else comissao_parcela + diff
+                valor_comissao=comissao_parcela if parcela > 1 else float(comissao_parcela) + float(diff)
             )
             if pedido.forma_pagamento == FormaPagamento.CARTAO:
                 ContaPagar.objects.create(
                     numero_parcela=parcela,
-                    valor_liquido=conta_receber.valor_parcela - conta_receber.valor_administradora_thefarma - conta_receber.valor_comissao,  # Valor liquido da parcela
+                    valor_liquido=float(conta_receber.valor_parcela) - float(conta_receber.valor_administradora_thefarma) - float(conta_receber.valor_comissao),  # Valor liquido da parcela
                     pedido=pedido,
                     data_vencimento=dia_vencimento_conta_pagar,
                 )
