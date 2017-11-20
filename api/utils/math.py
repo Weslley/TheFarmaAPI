@@ -8,4 +8,4 @@ def truncate(value, places=1, _type=float):
     :param places: Casa decimais
     :return:
     """
-    return ""
+    return math.floor(value * 10 ** places) / 10 ** places
