@@ -49,3 +49,18 @@ class ProdutoSerializer(serializers.ModelSerializer):
         qs = obj.apresentacoes.filter(ativo=True)
         serializer = ApresentacaoBusca(instance=qs, many=True, context=self.context)
         return serializer.data
+
+
+class ProdutoNovoSerializer(serializers.Serializer):
+    nome = serializers.CharField()
+    ids = serializers.SerializerMethodField()
+
+    def get_ids(self, obj):
+        qs = Produto.objects.filter(apresentacoes__isnull=False, nome__iexact=obj['nome']).distinct()
+        return [p['id'] for p in qs.values('id')]
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError('`update()` must be implemented.')
+
+    def create(self, validated_data):
+        raise NotImplementedError('`create()` must be implemented.')

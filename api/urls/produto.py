@@ -11,4 +11,5 @@ urlpatterns = [
 
     # Produtos
     url(r'^(?P<uf>[A-Z]{2})/$', ProdutosBusca.as_view(), name='produto-list'),
+    url(r'^v2/(?P<uf>[A-Z]{2})/$', ProdutosBuscaNova.as_view(), name='produto-list2'),
 ]

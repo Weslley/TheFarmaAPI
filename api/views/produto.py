@@ -14,6 +14,7 @@ from api.pagination import (LargeResultsSetPagination,
                             SmallResultsSetPagination,
                             StandardResultsSetPagination)
 from api.serializers.produto import *
+from django.db.models import Count
 from api.utils import tipo_produto
 
 
@@ -79,3 +80,36 @@ class ProdutosBusca(generics.ListAPIView):
                 context['cidade'] = cidades.first()
 
         return context
+
+
+class ProdutosBuscaNova(generics.ListAPIView):
+    """
+    Listagem de todos os produtos
+    """
+    queryset = Produto.objects.filter(apresentacoes__isnull=False).distinct()
+    serializer_class = ProdutoNovoSerializer
+    pagination_class = SmallResultsSetPagination
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_class = ProdutoFilter
+    ordering_fields = ('nome', '-nome')
+    ordering = ('nome',)
+
+    def get_serializer_context(self):
+        context = super(ProdutosBuscaNova, self).get_serializer_context()
+        context['cidade'] = None
+
+        unidade_federativa = self.kwargs['uf']
+        nome_cidade = self.request.GET.get('cidade')
+
+        if nome_cidade:
+            nome_cidade = nome_cidade.strip()
+            cidades = Cidade.objects.filter(uf__sigla=unidade_federativa, nome__iexact=nome_cidade)
+            if cidades.count():
+                context['cidade'] = cidades.first()
+
+        return context
+
+    def get_queryset(self):
+        qs = super(ProdutosBuscaNova, self).get_queryset()
+        qs = qs.values('nome').annotate(dcount=Count('nome'))
+        return qs
