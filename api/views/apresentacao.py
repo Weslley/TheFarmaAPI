@@ -8,7 +8,7 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.filters import ApresentacaoFilter, OrderingFilter
+from api.filters import ApresentacaoFilter, OrderingFilter, ApresentacaoBuscaFilter
 from api.mixins.base import SyncApiMixin
 from api.models.apresentacao import Apresentacao
 from api.models.cidade import Cidade
@@ -65,7 +65,7 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
     serializer_class = ApresentacaoBuscaProduto
     pagination_class = SmallResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = ApresentacaoFilter
+    filter_class = ApresentacaoBuscaFilter
     ordering_fields = ('produto__nome', '-produto__nome')
     ordering = ('produto__nome',)
 
@@ -76,11 +76,14 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
         unidade_federativa = self.kwargs['uf']
         nome_cidade = self.request.GET.get('cidade')
 
+        cidades = Cidade.objects.filter(uf__sigla=unidade_federativa)
+
         if nome_cidade:
             nome_cidade = nome_cidade.strip()
-            cidades = Cidade.objects.filter(uf__sigla=unidade_federativa, nome__iexact=nome_cidade)
-            if cidades.count():
-                context['cidade'] = cidades.first()
+            cidades = cidades.filter(nome__iexact=nome_cidade)
+
+        if cidades.count():
+            context['cidade'] = cidades.first()
 
         return context
 

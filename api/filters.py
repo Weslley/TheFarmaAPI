@@ -192,3 +192,13 @@ class ApresentacaoFilter(django_filters.FilterSet):
     class Meta:
         model = Apresentacao
         fields = ['nome', 'secao', 'subsecao']
+
+
+class ApresentacaoBuscaFilter(django_filters.FilterSet):
+    nome = django_filters.CharFilter(name="produto__nome", lookup_expr='exact')
+    secao = django_filters.CharFilter(name="produto__secao", lookup_expr='nome__exact')
+    subsecao = django_filters.CharFilter(name="produto__subsecao", lookup_expr='nome__exact')
+
+    class Meta:
+        model = Apresentacao
+        fields = ['nome', 'secao', 'subsecao']
