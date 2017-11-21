@@ -8,6 +8,7 @@ from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.models.estoque import Estoque
 from api.models.produto import Produto
 from api.models.uf import Uf
+from api.serializers.principio_ativo import PrincipioAtivoBasicSerializer
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 from django.conf import settings
 
@@ -119,10 +120,11 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
 class ProdutoFabricante(serializers.ModelSerializer):
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
+    principio_ativo = PrincipioAtivoBasicSerializer()
 
     class Meta:
         model = Produto
-        fields = ('id', 'nome', 'fabricante', 'tipo')
+        fields = ('id', 'nome', 'fabricante', 'tipo', 'principio_ativo')
 
 
 class ProdutoSimplesSerializer(serializers.ModelSerializer):
