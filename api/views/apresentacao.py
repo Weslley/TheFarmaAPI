@@ -154,10 +154,13 @@ class GenericosPorEstadoList(generics.ListAPIView):
         unidade_federativa = self.kwargs['uf']
         nome_cidade = self.request.GET.get('cidade')
 
+        cidades = Cidade.objects.filter(uf__sigla=unidade_federativa)
+
         if nome_cidade:
             nome_cidade = nome_cidade.strip()
-            cidades = Cidade.objects.filter(uf__sigla=unidade_federativa, nome__iexact=nome_cidade)
-            if cidades.count():
-                context['cidade'] = cidades.first()
+            cidades = cidades.filter(nome__iexact=nome_cidade)
+
+        if cidades.count():
+            context['cidade'] = cidades.first()
 
         return context
