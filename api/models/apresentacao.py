@@ -1,5 +1,6 @@
 from django.db import models
 
+from api.models.configuracao import Configuracao
 from api.models.produto import Produto
 from api.models.unidade import Unidade
 
@@ -14,9 +15,17 @@ class Apresentacao(models.Model):
     unidade = models.ForeignKey(Unidade, null=True, blank=True)
     quantidade = models.IntegerField(default=0)
     classe_terapeutica = models.CharField(max_length=254, null=True, blank=True)
+    ranking_visualizacao = models.BigIntegerField(default=0)
+    ranking_proposta = models.BigIntegerField(default=0)
+    ranking_compra = models.BigIntegerField(default=0)
 
     def __str__(self):
         return self.nome if self.nome else self.produto.nome
+
+    @property
+    def ranking(self):
+        conf = Configuracao.objects.first()
+        return self.ranking_visualizacao
 
 
 def generate_filename(self, filename):
