@@ -134,7 +134,7 @@ class CartaoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
     serializer_class = CartaoSerializer
 
     def get_queryset(self):
-        return Cartao.objects.filter(cliente=self.request.user.cliente)
+        return Cartao.objects.filter(cliente=self.request.user.cliente, deletado=False)
 
 
 class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, IsClienteAuthenticatedMixin):
@@ -152,3 +152,7 @@ class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, IsClienteAuthentic
 
     def get_queryset(self):
         return Cartao.objects.filter(cliente=self.request.user.cliente)
+
+    def perform_destroy(self, instance):
+        instance.deletado = True
+        instance.save()
