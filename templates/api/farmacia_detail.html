@@ -372,7 +372,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <a href="{% url 'farmacia-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
-{#                                <button onclick="limpar_campos();" type="submit" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>#}
+{#                                <a href="{% url 'farmacia-admin-list' %}" class="btn btn-lg btn-flat btn-success pull-right">Editar</a>#}
+                                <a href="{% url 'farmacia-admin-add-representante' farmacia.id %}" class="btn btn-lg btn-flat btn-primary pull-right" style="margin-right: 5px;">Adicionar Representante</a>
                                 <div class="clearfix"></div>
                             </div>
                         </div>
