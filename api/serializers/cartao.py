@@ -14,7 +14,7 @@ class CartaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cartao
-        exclude = ('cliente', 'token')
+        exclude = ('cliente', 'token', 'deletado')
         extra_kwargs = {
             'id': {'read_only': True},
             'bandeira': {'allow_blank': True, 'allow_null': True, 'required': False},

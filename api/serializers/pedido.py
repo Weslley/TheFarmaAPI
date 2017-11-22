@@ -7,6 +7,7 @@ from api.models.conta_receber import ContaReceber
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.models.enums.status_pedido import StatusPedido
+from api.serializers.cartao import CartaoSerializer
 from api.utils.generics import print_exception
 
 from django.db import transaction
@@ -189,6 +190,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 class PedidoSerializer(PedidoCreateSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
     farmacia = serializers.SerializerMethodField()
+    cartao = CartaoSerializer()
 
     class Meta:
         model = Pedido
@@ -212,6 +214,11 @@ class PedidoSerializer(PedidoCreateSerializer):
             "delivery",
             "troco",
             "farmacia",
+            "cartao",
+            "status_pagamento",
+            "status_cartao",
+            "valor_total",
+            "numero_parcelas",
             "itens"
         )
         extra_kwargs = {
@@ -248,6 +255,7 @@ class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
 class PedidoDetalhadoSerializer(PedidoSerializer):
     propostas = serializers.SerializerMethodField()
     farmacia = serializers.SerializerMethodField()
+    cartao = CartaoSerializer()
 
     def get_propostas(self, obj):
         propostas = [_ for _ in obj.propostas if _['status'] == StatusItemProposta.ENVIADO]
@@ -279,6 +287,11 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             "delivery",
             "troco",
             "farmacia",
+            "cartao",
+            "status_pagamento",
+            "status_cartao",
+            "valor_total",
+            "numero_parcelas",
             "itens",
             "propostas"
         )
