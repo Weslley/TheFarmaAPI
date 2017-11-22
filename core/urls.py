@@ -66,4 +66,6 @@ urlpatterns = [
     url(r'^cidades/$', CidadeList.as_view(), name='cidade-admin-list'),
     url(r'^cidades/adicionar/$', CidadeCreate.as_view(), name='cidade-admin-add'),
     url(r'^cidades/(?P<id>[0-9]+)/$', CidadeDetail.as_view(), name='cidade-admin-view'),
+    url(r'^cidades/(?P<id>[0-9]+)/adicionar/bairro/$', BairroCreate.as_view(), name='cidade-admin-add-bairro'),
+
 ]

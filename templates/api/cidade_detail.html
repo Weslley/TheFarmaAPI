@@ -18,44 +18,93 @@
 {% block content %}
 
     <div class="row">
-
         <div class="col-md-12">
-            <div class=" box box-success">
-                 <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group ">
-                                <label class="control-label">Código IBGE</label>
-                                <input type="text" class="form-control" disabled value="{{ cidade.ibge }}">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab_1" data-toggle="tab">Dados da Cidade</a></li>
+                    <li><a href="#tab_2" data-toggle="tab">Bairros</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">Código IBGE</label>
+                                    <input type="text" class="form-control" disabled value="{{ cidade.ibge }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group ">
-                                <label class="control-label">Nome</label>
-                                <input type="text" class="form-control" disabled value="{{ cidade.nome }}">
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label class="control-label">Nome</label>
+                                    <input type="text" class="form-control" disabled value="{{ cidade.nome }}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group ">
-                                <label class="control-label">UF</label>
-                                <input type="text" class="form-control" disabled value="{{ cidade.uf.sigla }}">
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">UF</label>
+                                    <input type="text" class="form-control" disabled value="{{ cidade.uf.sigla }}">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- /.tab-content -->
-                <div class="box-footer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
-    {#                                <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-success pull-right">Editar</a>#}
-                            <div class="clearfix"></div>
-                        </div>
+
+                    <div class="tab-pane tab-pane-height  table-responsive no-padding" id="tab_2">
+                        <table class="table table-hover">
+                            <tr>
+                                <th>Nome</th>
+{#                                <th>Ação</th>#}
+                            </tr>
+                            {% for bairro in cidade.bairros.all %}
+                                <tr>
+                                    <td>{{ bairro.nome|default_if_none:'' }}</td>
+{#                                    <td>{{ representante.usuario.email|default_if_none:'' }}</td>#}
+{#                                    <td>{{ representante.cpf|default_if_none:'' }}</td>#}
+{#                                    <td>{{ representante.telefone|default_if_none:'' }}</td>#}
+{#                                    <td>{{ representante.cargo|default_if_none:'' }}</td>#}
+{#                                    <td><button class="btn btn-flat btn-danger" onclick="remover_usuario({{ representante.usuario.id }}, {{ farmacia.id }}, 'farmacia');"><i class="fa fa-trash"></i></button></td>#}
+                                </tr>
+                            {% endfor %}
+                      </table>
                     </div>
                 </div>
+                <div class="tab-footer box-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
+        {#                                <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-success pull-right">Editar</a>#}
+                                <a href="{% url 'cidade-admin-add-bairro' cidade.ibge %}" class="btn btn-lg btn-flat btn-primary pull-right" style="margin-right: 5px;">Adicionar Bairro</a>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
-
     </div>
 
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+    .tab-pane-height{
+         height: 330px;
+         max-height: 330px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    .tab-pane-height-custom{
+         height: 246px;
+         max-height: 246px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+</style>
 {% endblock %}
