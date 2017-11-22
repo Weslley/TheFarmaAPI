@@ -1,14 +1,28 @@
-{% extends 'components/base.html' %}
+{% extends 'components/new_base.html' %}
 {% load staticfiles %}
+{% load helper %}
 
-{% block header %}
-  Farmacias
-{% endblock header %}
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Farmácias
+        <small>Listagem</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Farmácias</li>
+    </ol>
+</section>
+{% endblock %}
 
-{% block conteudo %}
+{% block content %}
 
-    <div class="card">
-        {{ view.as_table }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                {{ view.as_table }}
+            </div>
+        </div>
     </div>
 
 {% endblock %}
@@ -17,11 +31,7 @@
     {{ view.as_statics }}
     <script type="text/javascript">
         (function () {
-            $('.active').removeClass('active');
-            $('#menu_farmacia').addClass('active');
+            $('#am_add_button').addClass('btn-flat');
         })();
-        $(window).on('load', function () {
-            $('.pagination').addClass('pagination-success');
-        });
     </script>
 {% endblock %}

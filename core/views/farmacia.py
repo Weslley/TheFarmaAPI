@@ -15,13 +15,14 @@ class FarmaciaList(ListMixin, AdminBaseMixin):
     queryset = Farmacia.objects.all()
     paginate_by = 10
     search_default = ('razao_social', 'razao_social', 'Razão social')
+    pagination_labels = {'prev': 'Anterior', 'next': 'Próximo', 'first': 'Primeiro', 'last': 'Último'}
     css_table = 'table'
-    css_div_header = 'card-header'
-    css_div_body = 'card-content table-responsive'
+    css_div_header = 'box-header'
+    css_div_body = 'box-body table-responsive'
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
-    css_div_footer = ''
-    detail_url = '\'+ id + \'/'
+    css_div_footer = 'box-footer'
+    detail_url = '\'+ pk + \'/'
     columns = [
         {'lookup': 'razao_social', 'name': 'Razão social'},
         {'lookup': 'nome_fantasia', 'name': 'Nome fantasia'},
