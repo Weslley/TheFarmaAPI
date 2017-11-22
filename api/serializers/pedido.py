@@ -564,11 +564,12 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         return data
 
     def validate_cartao(self, data):
-        if 'view' not in self.context:
-            raise serializers.ValidationError('Erro de validação')
-        pedido = self.context['view'].get_object()
-        if data not in pedido.cliente.cartoes.all():
-            raise serializers.ValidationError('Cartão não encontrado.')
+        if data:
+            if 'view' not in self.context:
+                raise serializers.ValidationError('Erro de validação')
+            pedido = self.context['view'].get_object()
+            if data not in pedido.cliente.cartoes.all():
+                raise serializers.ValidationError('Cartão não encontrado.')
         return data
 
     def validate(self, attrs):
