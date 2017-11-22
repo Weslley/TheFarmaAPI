@@ -593,48 +593,49 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         return instance
 
     def gerar_contas(self, pedido):
-        percentual_administradora_cartao = 0
-        percentual_administradora_thefarma = 0
-        valor_parcela = 0
+        if pedido.forma_pagamento == FormaPagamento.CARTAO:
+            percentual_administradora_cartao = 0
+            percentual_administradora_thefarma = 0
+            valor_parcela = 0
 
-        # calculando valor da parcela quando a venda é a cartão
-        if pedido.administradora_cartao:
-            valor_parcela = (pedido.valor_total / pedido.numero_parcelas)
+            # calculando valor da parcela quando a venda é a cartão
+            if pedido.administradora_cartao:
+                valor_parcela = (pedido.valor_total / pedido.numero_parcelas)
 
-        if pedido.administradora_cartao and pedido.numero_parcelas == 1:
-            # credido a vista
-            percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_avista_farmacia
-            percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_avista_thefarma
-        elif pedido.administradora_cartao and pedido.numero_parcelas > 1:
-            # credito parcelado
-            percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_parcelado_farmacia
-            percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_parcelado_thefarma
+            if pedido.administradora_cartao and pedido.numero_parcelas == 1:
+                # credido a vista
+                percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_avista_farmacia
+                percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_avista_thefarma
+            elif pedido.administradora_cartao and pedido.numero_parcelas > 1:
+                # credito parcelado
+                percentual_administradora_cartao = pedido.administradora_cartao.percentual_credito_parcelado_farmacia
+                percentual_administradora_thefarma = pedido.administradora_cartao.percentual_credito_parcelado_thefarma
 
-        dia_vencimento_conta_receber = datetime.now().date() + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
-        dia_vencimento_conta_pagar = datetime.now().date() + timedelta(31)
-        comissao_parcela, diff = pedido.comissao
-        for parcela in range(1, pedido.numero_parcelas + 1):
-            conta_receber = ContaReceber.objects.create(
-                numero_parcela=parcela,
-                valor_parcela=valor_parcela,  # Valor bruto da parcela
-                pedido=pedido,
-                data_vencimento=dia_vencimento_conta_receber,
-                percentual_administradora_cartao=percentual_administradora_cartao,
-                percentual_administradora_thefarma=percentual_administradora_thefarma,
-                valor_comissao=comissao_parcela if parcela > 1 else float(comissao_parcela) + float(diff)
-            )
-            if pedido.forma_pagamento == FormaPagamento.CARTAO:
-                ContaPagar.objects.create(
+            dia_vencimento_conta_receber = datetime.now().date() + timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+            dia_vencimento_conta_pagar = datetime.now().date() + timedelta(31)
+            comissao_parcela, diff = pedido.comissao
+            for parcela in range(1, pedido.numero_parcelas + 1):
+                conta_receber = ContaReceber.objects.create(
                     numero_parcela=parcela,
-                    valor_liquido=float(conta_receber.valor_parcela) - float(conta_receber.valor_administradora_thefarma) - float(conta_receber.valor_comissao),  # Valor liquido da parcela
+                    valor_parcela=valor_parcela,  # Valor bruto da parcela
                     pedido=pedido,
-                    data_vencimento=dia_vencimento_conta_pagar,
+                    data_vencimento=dia_vencimento_conta_receber,
+                    percentual_administradora_cartao=percentual_administradora_cartao,
+                    percentual_administradora_thefarma=percentual_administradora_thefarma,
+                    valor_comissao=comissao_parcela if parcela > 1 else float(comissao_parcela) + float(diff)
                 )
+                if pedido.forma_pagamento == FormaPagamento.CARTAO:
+                    ContaPagar.objects.create(
+                        numero_parcela=parcela,
+                        valor_liquido=float(conta_receber.valor_parcela) - float(conta_receber.valor_administradora_thefarma) - float(conta_receber.valor_comissao),  # Valor liquido da parcela
+                        pedido=pedido,
+                        data_vencimento=dia_vencimento_conta_pagar,
+                    )
 
-            dia_vencimento_conta_receber += timedelta(pedido.administradora_cartao.dias_recebimento + 1)
-            dia_vencimento_conta_pagar += timedelta(31)
+                dia_vencimento_conta_receber += timedelta(pedido.administradora_cartao.dias_recebimento + 1)
+                dia_vencimento_conta_pagar += timedelta(31)
 
-        self.instance = pedido
+            self.instance = pedido
 
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
