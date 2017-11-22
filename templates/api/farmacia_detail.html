@@ -352,11 +352,11 @@
                                     {% for representante in farmacia.representantes.all %}
                                         {% if representante.usuario.is_active %}
                                             <tr>
-                                                <td>{{ representante }}</td>
-                                                <td>{{ representante.usuario.email }}</td>
-                                                <td>{{ representante.cpf }}</td>
-                                                <td>{{ representante.telefone }}</td>
-                                                <td>{{ representante.cargo }}</td>
+                                                <td>{{ representante|default_if_none:'' }}</td>
+                                                <td>{{ representante.usuario.email|default_if_none:'' }}</td>
+                                                <td>{{ representante.cpf|default_if_none:'' }}</td>
+                                                <td>{{ representante.telefone|default_if_none:'' }}</td>
+                                                <td>{{ representante.cargo|default_if_none:'' }}</td>
                                                 <td><button class="btn btn-flat btn-danger" onclick="remover_usuario({{ representante.usuario.id }}, {{ farmacia.id }}, 'farmacia');"><i class="fa fa-trash"></i></button></td>
                                             </tr>
                                         {% endif %}
