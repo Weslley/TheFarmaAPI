@@ -1,0 +1,61 @@
+{% extends 'components/new_base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Cidade
+        <small>Visualização</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Cidade</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class=" box box-success">
+                 <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group ">
+                                <label class="control-label">Código IBGE</label>
+                                <input type="text" class="form-control" disabled value="{{ cidade.ibge }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label class="control-label">Nome</label>
+                                <input type="text" class="form-control" disabled value="{{ cidade.nome }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group ">
+                                <label class="control-label">UF</label>
+                                <input type="text" class="form-control" disabled value="{{ cidade.uf.sigla }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.tab-content -->
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
+    {#                                <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-success pull-right">Editar</a>#}
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'components/new_base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Cidades
+        <small>Listagem</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Cidades</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                {{ view.as_table }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    {{ view.as_statics }}
+    <script type="text/javascript">
+        (function () {
+            $('#am_add_button').addClass('btn-flat');
+        })();
+    </script>
+{% endblock %}

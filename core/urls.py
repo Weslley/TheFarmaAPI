@@ -4,6 +4,7 @@ from django.conf.urls import url
 
 from core.views.atualizacao import *
 from core.views.bairro import *
+from core.views.cidade import *
 from core.views.base import *
 from core.views.estoque import *
 from core.views.farmacia import *
@@ -60,4 +61,9 @@ urlpatterns = [
     url(r'^ufs/$', UfList.as_view(), name='uf-admin-list'),
     url(r'^ufs/adicionar/$', UfCreate.as_view(), name='uf-admin-add'),
     url(r'^ufs/(?P<id>[0-9]+)/$', UfUpdate.as_view(), name='uf-admin-view'),
+
+    # Cidade
+    url(r'^cidades/$', CidadeList.as_view(), name='cidade-admin-list'),
+    url(r'^cidades/adicionar/$', CidadeCreate.as_view(), name='cidade-admin-add'),
+    url(r'^cidades/(?P<id>[0-9]+)/$', CidadeDetail.as_view(), name='cidade-admin-view'),
 ]

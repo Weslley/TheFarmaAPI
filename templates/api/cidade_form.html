@@ -1,0 +1,124 @@
+{% extends 'components/new_base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block content-header %}
+    <section class="content-header">
+      <h1>
+        Cidades
+        <small>Cadastro</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Cidades</li>
+      </ol>
+    </section>
+{% endblock content-header %}
+
+{% block content %}
+
+<style type="text/css">
+    .tab-pane {
+         height: 330px;
+         max-height: 330px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+</style>
+
+    <div class="row">
+        <div class="col-md-12">
+          <!-- Custom Tabs -->
+            <form method="post">{% csrf_token %}
+                <div class="box box-success">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.ibge.label }}</label>
+                                    {{ form.ibge|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.nome.label }}</label>
+                                    {{ form.nome|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.uf.label }}</label>
+                                    {{ form.uf|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.tab-content -->
+                    <div class=" box-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a href="{% url 'cidade-admin-list' %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
+                                <button type="submit" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+          <!-- nav-tabs-custom -->
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+<!-- Select2 -->
+<script src="{% static 'admlte/bower_components/select2/dist/js/select2.full.min.js' %}"></script>
+<script src="{% static 'admlte/bower_components/select2/dist/js/i18n/pt-BR.js' %}"></script>
+<!-- InputMask -->
+<script src="{% static 'admlte/plugins/input-mask/jquery.inputmask.js' %}"></script>
+<script src="{% static 'admlte/plugins/input-mask/jquery.inputmask.date.extensions.js' %}"></script>
+<script src="{% static 'admlte/plugins/input-mask/jquery.inputmask.extensions.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'admlte/bower_components/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'admlte/bower_components/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<!-- bootstrap datepicker -->
+<script src="{% static 'admlte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<!-- bootstrap color picker -->
+<script src="{% static 'admlte/bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js' %}"></script>
+<!-- bootstrap time picker -->
+<script src="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.js' %}"></script>
+
+{% endblock js %}
+
+{% block css %}
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-daterangepicker/daterangepicker.css' %}">
+  <!-- bootstrap datepicker -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="{% static 'admlte/plugins/iCheck/all.css' %}">
+  <!-- Bootstrap Color Picker -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css' %}">
+  <!-- Bootstrap time Picker -->
+  <link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'admlte/bower_components/select2/dist/css/select2.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'admlte/dist/css/AdminLTE.min.css' %}">
+    
+{#      <!-- Bootstrap time Picker -->#}
+{#  <link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">#}
+{#      <!-- Select2 -->#}
+{#  <link rel="stylesheet" href="{% static 'admlte/bower_components/select2/dist/css/select2.min.css' %}">#}
+{% endblock css %}
+
