@@ -24,8 +24,10 @@ class Apresentacao(models.Model):
 
     @property
     def ranking(self):
-        conf = Configuracao.objects.first()
-        return self.ranking_visualizacao
+        configuracao = Configuracao.objects.first()
+        return (self.ranking_visualizacao * configuracao.peso_ranking_visualizacao) + \
+               (self.ranking_proposta * configuracao.peso_ranking_proposta) + \
+               (self.ranking_compra * configuracao.peso_ranking_compra)
 
 
 def generate_filename(self, filename):
