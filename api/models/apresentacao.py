@@ -63,6 +63,7 @@ class Apresentacao(models.Model):
     ranking_visualizacao = models.BigIntegerField(default=0)
     ranking_proposta = models.BigIntegerField(default=0)
     ranking_compra = models.BigIntegerField(default=0)
+    patrocinio = models.BigIntegerField(default=0)
     objects = ApresentacaoManager()
 
     def __str__(self):
