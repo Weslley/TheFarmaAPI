@@ -98,7 +98,9 @@ class Farmacia(models.Model):
         :return: Retorna um boolean
         """
         itens = self.get_itens_proposta(pedido)
-        return itens.count() == itens.filter(possui=True).count()
+        itens_disponiveis = itens.filter(possui=True)
+
+        return itens.count() == itens_disponiveis.count() and not any(item.quantidade_inferior for item in itens_disponiveis)
 
     def get_status_proposta(self, pedido):
         """

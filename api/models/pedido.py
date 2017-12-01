@@ -251,3 +251,11 @@ class ItemPropostaPedido(models.Model):
 
     class Meta:
         unique_together = ('pedido', 'apresentacao', 'farmacia')
+
+    @property
+    def quantidade_inferior(self):
+        """
+        Property para informar se a quantidade deste item é inferior a solicitada
+        :return:
+        """
+        return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade

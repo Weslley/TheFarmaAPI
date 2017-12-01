@@ -242,13 +242,15 @@ class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
             "apresentacao",
             "quantidade",
             "valor_unitario",
-            "possui"
+            "possui",
+            "quantidade_inferior"
         )
         extra_kwargs = {
             "quantidade": {'read_only': True},
             'apresentacao': {'read_only': True},
             'valor_unitario': {'read_only': True},
             'possui': {'read_only': True},
+            'quantidade_inferior': {'read_only': True},
         }
 
 
@@ -308,6 +310,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             return serializer.data
         return None
 
+
 class ItemPropostaSerializer(serializers.ModelSerializer):
     apresentacao = serializers.SerializerMethodField()
 
@@ -323,7 +326,8 @@ class ItemPropostaSerializer(serializers.ModelSerializer):
             "valor_unitario",
             "farmacia",
             "status",
-            "possui"
+            "possui",
+            "quantidade_inferior",
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -331,6 +335,7 @@ class ItemPropostaSerializer(serializers.ModelSerializer):
             'apresentacao': {'read_only': True},
             'status': {'read_only': True},
             'farmacia': {'read_only': True},
+            'quantidade_inferior': {'read_only': True},
         }
 
 
@@ -564,11 +569,12 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         return data
 
     def validate_cartao(self, data):
-        if 'view' not in self.context:
-            raise serializers.ValidationError('Erro de validação')
-        pedido = self.context['view'].get_object()
-        if data not in pedido.cliente.cartoes.all():
-            raise serializers.ValidationError('Cartão não encontrado.')
+        if data:
+            if 'view' not in self.context:
+                raise serializers.ValidationError('Erro de validação')
+            pedido = self.context['view'].get_object()
+            if data not in pedido.cliente.cartoes.all():
+                raise serializers.ValidationError('Cartão não encontrado.')
         return data
 
     def validate(self, attrs):
