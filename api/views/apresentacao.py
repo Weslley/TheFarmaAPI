@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Sum, FloatField, F, Count, Value
 # from django_filters.rest_framework import DjangoFilterBackend
 from pyrebase import pyrebase
 from rest_framework import generics, status
@@ -13,6 +13,7 @@ from api.filters import ApresentacaoFilter, OrderingFilter, ApresentacaoBuscaFil
 from api.mixins.base import SyncApiMixin
 from api.models.apresentacao import Apresentacao
 from api.models.cidade import Cidade
+from api.models.configuracao import Configuracao
 from api.models.produto import Produto
 from api.pagination import LargeResultsSetPagination, SmallResultsSetPagination
 from api.serializers.apresentacao import *
@@ -59,8 +60,6 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
     pagination_class = SmallResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = ApresentacaoBuscaFilter
-    ordering_fields = ('produto__nome', '-produto__nome')
-    ordering = ('produto__nome',)
 
     def get_serializer_context(self):
         context = super(ApresentacaoPorEstadoList, self).get_serializer_context()
@@ -79,6 +78,15 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
             context['cidade'] = cidades.first()
 
         return context
+
+    def get_queryset(self):
+        qs = super(ApresentacaoPorEstadoList, self).get_queryset()
+        c = Configuracao.objects.first()
+        return qs.annotate(
+            _ranking=Sum(F('ranking_visualizacao') * Value(c.peso_ranking_visualizacao), output_field=FloatField()) +
+            Sum(F('ranking_proposta') * Value(c.peso_ranking_proposta), output_field=FloatField()) +
+            Sum(F('ranking_compra') * Value(c.peso_ranking_compra), output_field=FloatField())
+        ).order_by('-_ranking')
 
 
 class ApresentacaoMaisVendidasPorEstadoList(generics.ListAPIView):
