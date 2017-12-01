@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Count
 # from django_filters.rest_framework import DjangoFilterBackend
 from pyrebase import pyrebase
@@ -38,14 +39,6 @@ class ApresentacaoList(generics.ListAPIView):
     queryset = Apresentacao.objects.all()
     serializer_class = ApresentacaoListSerializer
     pagination_class = SmallResultsSetPagination
-
-
-class RankingApresentacao(APIView):
-    """
-    View para adicionar visualização à apresentação e ao medicamento
-    """
-    def post(self, request, id, format=None):
-        return Response({'detail': 'sucesso'}, status=status.HTTP_200_OK)
 
 
 class ApresentacaoSync(generics.ListAPIView, SyncApiMixin):
@@ -164,3 +157,12 @@ class GenericosPorEstadoList(generics.ListAPIView):
             context['cidade'] = cidades.first()
 
         return context
+
+
+class RankingVisualizacaoUpdate(APIView):
+    """
+    View para adicionar visualização à apresentação e ao medicamento
+    """
+    def post(self, request, id, format=None):
+        Apresentacao.objects.update_ranking_visualizacao(id)
+        return Response({'detail': 'Sucesso'}, status=status.HTTP_200_OK)

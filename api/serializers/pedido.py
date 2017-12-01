@@ -172,7 +172,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             for item_data in itens:
                 valor_unitario = 0
                 apresentacao = item_data["apresentacao"]
-
+                apresentacao.get_manager.update_ranking_proposta(apresentacao.id)
                 # Buscando o pmc base para calcular o valor unitário
                 try:
                     tabela = apresentacao.tabelas.get(icms=cidade.uf.icms)
@@ -732,6 +732,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                 item.percentual_etico = farmacia.percentual_etico
                 item.percentual_generico = farmacia.percentual_generico
                 item.percentual_nao_medicamentos = farmacia.percentual_nao_medicamentos
+                item.apresentacao.get_manager.update_ranking_compra(item.apresentacao.id)
             else:
                 item.status = StatusItem.CANCELADO
 
