@@ -158,8 +158,13 @@ class OrderingFilter(BaseFilterBackend):
         ordering = request.query_params.get('order', '')
         ordering = ordering.split(',')
         order_list = []
+        ordering_fields = getattr(view, 'ordering_fields', None)
+
+        if not ordering_fields:
+            return queryset
+
         for order in ordering:
-            if order in view.ordering_fields:
+            if order in ordering_fields:
                 order_list.append(order)
 
         if order_list:
