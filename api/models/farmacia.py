@@ -124,3 +124,14 @@ class Farmacia(models.Model):
             F('quantidade') * F('valor_unitario'), output_field=models.DecimalField(max_digits=15, decimal_places=2)
         ))
         return resultado['valor_proposta']
+
+    def get_quantidade_maxima_parcelas(self, pedido):
+        conf = Configuracao.objects.first()
+        try:
+            administradora = conf.administradora
+            for parcelamento in administradora.parcelamentos.all():
+                if parcelamento.valor_minimo <= self.get_valor_proposta(pedido) <= parcelamento.valor_maximo:
+                    return parcelamento.quantidade
+        except Exception as e:
+            print(e)
+            return 1

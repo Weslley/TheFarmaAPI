@@ -1,6 +1,6 @@
 from datetime import timedelta
-
 from django.db import models
+from api.models.administradora import Administradora
 
 
 class Configuracao(models.Model):
@@ -9,3 +9,4 @@ class Configuracao(models.Model):
     peso_ranking_visualizacao = models.FloatField(default=1.0)
     peso_ranking_proposta = models.FloatField(default=1.25)
     peso_ranking_compra = models.FloatField(default=1.5)
+    administradora = models.OneToOneField(Administradora, null=True, blank=True)

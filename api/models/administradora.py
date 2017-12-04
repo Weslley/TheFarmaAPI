@@ -26,3 +26,10 @@ class Administradora(models.Model):
         return super(Administradora, self).save(
             force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
         )
+
+
+class Parcelamento(models.Model):
+    administradora = models.ForeignKey(Administradora, related_name='parcelamentos')
+    valor_minimo = models.DecimalField(max_digits=15, decimal_places=2, unique=True)
+    valor_maximo = models.DecimalField(max_digits=15, decimal_places=2, unique=True)
+    quantidade = models.IntegerField()

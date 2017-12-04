@@ -2,6 +2,7 @@ import locale
 
 from api.consumers.farmacia import FarmaciaConsumer
 from api.models.administradora import Administradora
+from api.models.configuracao import Configuracao
 from api.models.conta_pagar import ContaPagar
 from api.models.conta_receber import ContaReceber
 from api.models.enums.status_pagamento import StatusPagamento
