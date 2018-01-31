@@ -14,4 +14,6 @@ ENV LANG pt_BR.UTF-8
 ENV LANGUAGE pt_BR:pt
 ENV LC_ALL pt_BR.UTF-8
 
-RUN pip install -r requirements.txt
+RUN pip install -U pip pipenv
+
+RUN pipenv install --system

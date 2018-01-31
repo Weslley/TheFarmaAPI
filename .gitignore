@@ -1,4 +1,6 @@
 .idea/*
+.vscode/*
+Pipfile.lock
 *.pyc
 *.ini
 bin/*
