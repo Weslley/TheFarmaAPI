@@ -5,11 +5,12 @@ from pyrebase import pyrebase
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.db.models import Count, Case, When
 from api.filters import MedicamentoFilter, OrderingFilter, ProdutoFilter
 from api.mixins.base import SyncApiMixin
 from api.models.cidade import Cidade
 from api.models.produto import Produto
+from api.models.enums import StatusPedido, StatusProduto
 from api.pagination import (LargeResultsSetPagination,
                             SmallResultsSetPagination,
                             StandardResultsSetPagination)
@@ -113,3 +114,26 @@ class ProdutosBuscaNova(generics.ListAPIView):
         qs = super(ProdutosBuscaNova, self).get_queryset()
         qs = qs.values('nome').annotate(dcount=Count('nome'))
         return qs
+
+
+class ProdutoIndicadorVenda(generics.ListAPIView):
+    """
+    Listar os produtos mais vendidos 
+    """
+    queryset = Produto.objects.filter(
+        status=StatusProduto.PUBLICADO.value,
+        apresentacoes__isnull=False
+    ).distinct().select_related(
+        'principio_ativo', 'laboratorio'
+    ).annotate(
+        vendas=Count(
+            Case(
+                When(apresentacoes__itens_vendidos__pedido__status=StatusPedido.ENTREGUE.value, then=1)
+            )
+        )
+    ).filter(vendas__gte=0).order_by('-vendas')
+    serializer_class = ProdutoIndicadorVendaSerializer
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_class = ProdutoIndicadorVendaFilter
+    ordering_fields = ('vendas', '-vendas')
+    ordering = ('-vendas',)

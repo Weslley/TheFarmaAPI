@@ -44,6 +44,7 @@ pyrebase = "==3.0.9"
 simplejson = "==3.11.1"
 "psycopg2" = "*"
 service-identity = "==17.0.0"
+"markdown2" = "==2.3.4"
 
 
 [dev-packages]
