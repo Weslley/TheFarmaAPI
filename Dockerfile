@@ -13,7 +13,8 @@ RUN sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && loca
 ENV LANG pt_BR.UTF-8
 ENV LANGUAGE pt_BR:pt
 ENV LC_ALL pt_BR.UTF-8
+ENV PIPENV_HIDE_EMOJIS=1
 
-RUN pip install -U pip pipenv
+RUN set -ex && pip install pipenv --upgrade
 
-RUN pipenv install --system
+RUN set -ex && pipenv install --system
