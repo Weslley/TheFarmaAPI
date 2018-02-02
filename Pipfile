@@ -20,7 +20,7 @@ django = "==1.11.4"
 dj-database-url = "*"
 dj-static = "*"
 django-extensions = "*"
-channels = "*"
+channels = "==1.1.6"
 djangoajax = "*"
 djangorestframework = "==3.6.3"
 drfdocs = "*"
@@ -43,6 +43,7 @@ pydotplus = "==2.0.2"
 pyrebase = "==3.0.9"
 simplejson = "==3.11.1"
 "psycopg2" = "*"
+service-identity = "==17.0.0"
 
 
 [dev-packages]
