@@ -153,8 +153,8 @@ class ProdutoFilter(django_filters.FilterSet):
 class ProdutoIndicadorVendaFilter(django_filters.FilterSet):
     laboratorio = django_filters.NumberFilter(name="laboratorio", lookup_expr='id')
     principio_ativo = django_filters.NumberFilter(name="principio_ativo", lookup_expr='id')
-    data_inicial = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='gte') 
-    data_final = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='lte')
+    data_inicial = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='gte', distinct=True) 
+    data_final = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='lte', distinct=True)
     vendas = django_filters.NumberFilter(name='vendas', lookup_expr='exact')
 
     class Meta:
