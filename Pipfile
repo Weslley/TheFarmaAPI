@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 
 redis = "*"
-asgi-redis = "*"
+asgi-redis = "==1.4.2"
 requests = "*"
 python-decouple = "*"
 python-cards = "*"
@@ -20,7 +20,7 @@ django = "==1.11.4"
 dj-database-url = "*"
 dj-static = "*"
 django-extensions = "*"
-channels = "*"
+channels = "==1.1.6"
 djangoajax = "*"
 djangorestframework = "==3.6.3"
 drfdocs = "*"
@@ -43,6 +43,8 @@ pydotplus = "==2.0.2"
 pyrebase = "==3.0.9"
 simplejson = "==3.11.1"
 "psycopg2" = "*"
+service-identity = "==17.0.0"
+"markdown2" = "==2.3.4"
 
 
 [dev-packages]
@@ -51,6 +53,7 @@ simplejson = "==3.11.1"
 bpython = "*"
 isort = "*"
 model-mommy = "*"
+pylint = "*"
 
 
 [requires]
