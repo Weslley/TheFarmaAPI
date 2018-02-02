@@ -150,6 +150,18 @@ class ProdutoFilter(django_filters.FilterSet):
         fields = ['nome', 'secao', 'subsecao', 'codigo_barras']
 
 
+class ProdutoIndicadorVendaFilter(django_filters.FilterSet):
+    laboratorio = django_filters.NumberFilter(name="laboratorio", lookup_expr='id')
+    principio_ativo = django_filters.NumberFilter(name="principio_ativo", lookup_expr='id')
+    data_inicial = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='gte') 
+    data_final = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='lte')
+    vendas = django_filters.NumberFilter(name='vendas', lookup_expr='exact')
+
+    class Meta:
+        model = Produto
+        fields = ['laboratorio', 'principio_ativo', 'data_inicial', 'data_final', 'vendas']
+
+
 class OrderingFilter(BaseFilterBackend):
     """
     Filter that only allows users to see their own objects.
