@@ -6,7 +6,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Count, Case, When
-from api.filters import MedicamentoFilter, OrderingFilter, ProdutoFilter
+from api.filters import MedicamentoFilter, OrderingFilter, ProdutoFilter, ProdutoIndicadorVendaFilter
 from api.mixins.base import SyncApiMixin
 from api.models.cidade import Cidade
 from api.models.produto import Produto
@@ -131,7 +131,7 @@ class ProdutoIndicadorVenda(generics.ListAPIView):
                 When(apresentacoes__itens_vendidos__pedido__status=StatusPedido.ENTREGUE.value, then=1)
             )
         )
-    ).filter(vendas__gte=0).order_by('-vendas')
+    ).filter(vendas__gte=1).order_by('-vendas')
     serializer_class = ProdutoIndicadorVendaSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = ProdutoIndicadorVendaFilter
