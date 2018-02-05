@@ -12,7 +12,7 @@ from api.mixins.edit import UpdateAPIViewNoPatch
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pedido import StatusPedido
-from api.pagination import SmallResultsSetPagination
+from api.pagination import SmallResultsSetPagination, MinResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
 from api.consumers import FarmaciaConsumer
@@ -79,7 +79,7 @@ class PropostaList(ListAPIView, IsRepresentanteAuthenticatedMixin, FarmaciaSeria
 
     """
     serializer_class = PropostaSerializer
-    pagination_class = SmallResultsSetPagination
+    pagination_class = MinResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = PropostaFilter
     ordering_fields = ('log__data_criacao', '-log__data_criacao')
