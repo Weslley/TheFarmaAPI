@@ -64,3 +64,13 @@ class ProdutoNovoSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         raise NotImplementedError('`create()` must be implemented.')
+
+
+class ProdutoIndicadorVendaSerializer(serializers.ModelSerializer):
+    principio_ativo = serializers.CharField(source='principio_ativo.nome')
+    laboratorio = serializers.CharField(source='laboratorio.nome')
+    vendas = serializers.IntegerField()
+
+    class Meta:
+        model = Produto
+        fields = ('nome', 'vendas', 'principio_ativo', 'laboratorio')
