@@ -17,6 +17,7 @@ from api.pagination import (LargeResultsSetPagination,
 from api.serializers.produto import *
 from django.db.models import Count
 from api.utils import tipo_produto
+from datetime import datetime
 
 
 class MedicamentoList(generics.ListAPIView):
@@ -120,20 +121,45 @@ class ProdutoIndicadorVenda(generics.ListAPIView):
     """
     Listar os produtos mais vendidos 
     """
-    queryset = Produto.objects.filter(
-        status=StatusProduto.PUBLICADO.value,
-        apresentacoes__isnull=False
-    ).distinct().select_related(
-        'principio_ativo', 'laboratorio'
-    ).annotate(
-        vendas=Count(
+    serializer_class = ProdutoIndicadorVendaSerializer
+
+    def get_queryset(self):
+
+        filter_kwargs = {
+            'status': StatusProduto.PUBLICADO.value,
+            'apresentacoes__isnull':False
+        }
+
+        ff = '%Y-%m-%d'
+        data_inicial = self.request.GET.get('data_inicial', None)
+        if data_inicial:
+            filter_kwargs['apresentacoes__itens_vendidos__pedido__log__data_criacao__gte'] = datetime.strptime(data_inicial, ff)
+
+        data_final = self.request.GET.get('data_final', None)
+        if data_final:
+            filter_kwargs['apresentacoes__itens_vendidos__pedido__log__data_criacao__lte'] = datetime.strptime(data_final, ff)
+
+        laboratorio = self.request.GET.get('laboratorio', None)
+        if laboratorio:
+            filter_kwargs['laboratorio_id'] = laboratorio
+
+        principio_ativo = self.request.GET.get('principio_ativo', None)
+        if principio_ativo:
+            filter_kwargs['principio_ativo_id'] = principio_ativo   
+
+        select_rel = ['principio_ativo', 'laboratorio']
+        vendas_annotate = Count(
             Case(
                 When(apresentacoes__itens_vendidos__pedido__status=StatusPedido.ENTREGUE.value, then=1)
             )
         )
-    ).filter(vendas__gte=1).order_by('-vendas')
-    serializer_class = ProdutoIndicadorVendaSerializer
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_class = ProdutoIndicadorVendaFilter
-    ordering_fields = ('vendas', '-vendas')
-    ordering = ('-vendas',)
+
+        return Produto.objects.filter(
+            **filter_kwargs
+        ).select_related(
+            *select_rel
+        ).annotate(
+            vendas=vendas_annotate
+        ).filter(
+            vendas__gte=1
+        ).distinct().order_by('-vendas')

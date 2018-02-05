@@ -155,11 +155,10 @@ class ProdutoIndicadorVendaFilter(django_filters.FilterSet):
     principio_ativo = django_filters.NumberFilter(name="principio_ativo", lookup_expr='id')
     data_inicial = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='gte', distinct=True) 
     data_final = django_filters.DateFilter(name='apresentacoes__itens_vendidos__pedido__log__data_criacao', lookup_expr='lte', distinct=True)
-    vendas = django_filters.NumberFilter(name='vendas', lookup_expr='exact')
 
     class Meta:
         model = Produto
-        fields = ['laboratorio', 'principio_ativo', 'data_inicial', 'data_final', 'vendas']
+        fields = ['laboratorio', 'principio_ativo', 'data_inicial', 'data_final']
 
 
 class OrderingFilter(BaseFilterBackend):
