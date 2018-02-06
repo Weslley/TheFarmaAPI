@@ -29,6 +29,7 @@ from api.models.sintoma import Sintoma
 from api.models.subsecao import Subsecao
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
+from api.models.regiao import Regiao
 from api.utils.reverse_admin import ReverseModelAdmin
 
 # class FarmaciaAdmin(admin.ModelAdmin):
@@ -218,3 +219,4 @@ admin.site.register(Configuracao)
 admin.site.register(Feriado)
 admin.site.register(Administradora)
 admin.site.register(Parcelamento)
+admin.site.register(Regiao)

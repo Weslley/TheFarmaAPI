@@ -191,6 +191,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 class PedidoSerializer(PedidoCreateSerializer):
     itens = ItemPedidoSerializer(many=True, read_only=True)
     farmacia = serializers.SerializerMethodField()
+    bairro = serializers.SerializerMethodField()
     cartao = CartaoSerializer()
 
     class Meta:
@@ -229,6 +230,11 @@ class PedidoSerializer(PedidoCreateSerializer):
             'valor_frete': {'read_only': True},
         }
 
+    def get_bairro(self, obj):
+        if obj.bairro:
+            return obj.bairro.nome
+        return ''
+
     def get_farmacia(self, obj):
         if obj.farmacia:
             serializer = FarmaciaEnderecoSerializer(instance=obj.farmacia, context={'pedido': obj})
@@ -258,6 +264,7 @@ class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
 class PedidoDetalhadoSerializer(PedidoSerializer):
     propostas = serializers.SerializerMethodField()
     farmacia = serializers.SerializerMethodField()
+    bairro = serializers.SerializerMethodField()
     cartao = CartaoSerializer()
 
     def get_propostas(self, obj):
@@ -305,6 +312,11 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             'valor_frete': {'read_only': True},
         }
 
+    def get_bairro(self, obj):
+        if obj.bairro:
+            return obj.bairro.nome
+        return ''
+
     def get_farmacia(self, obj):
         if obj.farmacia:
             serializer = FarmaciaEnderecoSerializer(instance=obj.farmacia, context={'pedido': obj})
@@ -344,8 +356,14 @@ class PropostaSerializer(serializers.ModelSerializer):
     tempo = serializers.SerializerMethodField(read_only=True)
     cliente = serializers.CharField(read_only=True, source='cliente.usuario.get_full_name')
     itens_proposta = serializers.SerializerMethodField(read_only=True)
+    bairro = serializers.SerializerMethodField(read_only=True)
     log = LogSerializer(read_only=True)
     status_submissao = serializers.SerializerMethodField()
+
+    def get_bairro(self, obj):
+        if obj.bairro:
+            return obj.bairro.nome
+        return ''
 
     def get_tempo(self, obj):
         return get_tempo_proposta(obj)

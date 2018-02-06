@@ -34,7 +34,7 @@ class Pedido(models.Model):
     complemento = models.CharField(max_length=100, null=True, blank=True)
     cidade = models.CharField(max_length=150, null=True, blank=True)
     uf = models.CharField(max_length=2, null=True, blank=True)
-    bairro = models.CharField(max_length=60, null=True, blank=True)
+    bairro = models.ForeignKey('Bairro', null=True, blank=True)
     nome_endereco = models.CharField(max_length=40, null=True, blank=True)
     nome_destinatario = models.CharField(max_length=80, null=True, blank=True)
     latitude = models.FloatField()
