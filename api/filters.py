@@ -11,6 +11,9 @@ from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums.status_pedido import StatusPedido
 from api.models.pedido import Pedido
 from api.models.produto import Produto
+from api.models.fabricante import Fabricante
+from api.models.principio_ativo import PrincipioAtivo
+from api.models.regiao import Regiao
 
 from django import forms
 
@@ -218,3 +221,27 @@ class ApresentacaoBuscaFilter(django_filters.FilterSet):
     class Meta:
         model = Apresentacao
         fields = ['nome', 'secao', 'subsecao']
+
+
+class LaboratorioFilter(django_filters.FilterSet):
+    nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
+    
+    class Meta:
+        model = Fabricante
+        fields = ['nome']
+
+
+class PrincipioAtivoFilter(django_filters.FilterSet):
+    nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
+    
+    class Meta:
+        model = PrincipioAtivo
+        fields = ['nome']
+
+
+class RegiaoFilter(django_filters.FilterSet):
+    nome = django_filters.CharFilter(name="nome", lookup_expr='istartswith')
+    
+    class Meta:
+        model = Regiao
+        fields = ['nome']
