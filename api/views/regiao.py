@@ -20,3 +20,8 @@ class RegiaoList(generics.ListAPIView):
     filter_class = RegiaoFilter
     ordering_fields = ('nome', '-nome')
     ordering = ('nome',)
+
+
+class RegiaoRetrieve(generics.RetrieveAPIView):
+    queryset = Regiao.objects.all()
+    serializer_class = RegiaoSerializer

@@ -23,6 +23,11 @@ class PrincipioAtivoList(generics.ListAPIView):
     ordering = ('nome',)
 
 
+class PrincipioAtivoRetrieve(generics.RetrieveAPIView):
+    queryset = PrincipioAtivo.objects.all()
+    serializer_class = PrincipioAtivoSerializer
+    
+
 class PrincipioAtivoSync(generics.ListAPIView, SyncApiMixin):
     queryset = PrincipioAtivo.objects.all()
     serializer_class = PrincipioAtivoSerializer

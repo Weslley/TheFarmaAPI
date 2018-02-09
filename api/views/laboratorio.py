@@ -33,3 +33,9 @@ class LaboratorioExport(generics.ListAPIView):
     queryset = Fabricante.objects.all()
     serializer_class = LaboratorioSerializer
     pagination_class = LargeResultsSetPagination
+
+
+
+class LaboratorioRetrieve(generics.RetrieveAPIView):
+    queryset = Fabricante.objects.all()
+    serializer_class = LaboratorioSerializer
