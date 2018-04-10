@@ -67,7 +67,8 @@ parso==0.1.0
 pep8==1.7.0
 Pillow==4.2.1
 protobuf==3.0.0
-psycopg2==2.6.2
+psycopg2==2.7.4
+psycopg2-binary==2.7.4
 pusher==1.6
 pyasn1==0.1.9
 pyasn1-modules==0.0.8

@@ -14,7 +14,7 @@ class CartaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cartao
-        exclude = ('cliente', 'token', 'deletado')
+        exclude = ('cliente', 'token', 'deletado', 'nome_proprietario')
         extra_kwargs = {
             'id': {'read_only': True},
             'bandeira': {'allow_blank': True, 'allow_null': True, 'required': False},
@@ -25,7 +25,6 @@ class CartaoSerializer(serializers.ModelSerializer):
         self.card = CreditCard(
             number=attrs['numero_cartao'],
             code=attrs['cvv'],
-            cardholder=attrs['nome_proprietario'],
             expire_month=attrs['mes_expiracao'],
             expire_year=attrs['ano_expiracao']
         )

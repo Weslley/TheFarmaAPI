@@ -125,7 +125,7 @@ class ServicoCielo(Servico):
     @classmethod
     def cancelar(cls, kwargs):
         json_cancelamento = None
-        payment_id, value  = kwargs['payment_id'], kwargs['valor']
+        payment_id, value = kwargs['payment_id'], kwargs['valor']
 
         try:
             value = centavos(value)
@@ -163,12 +163,12 @@ class ServicoCielo(Servico):
         month = int(validate_data['mes_expiracao'])
         year = int(validate_data['ano_expiracao'])
         cliente = validate_data['cliente']
-        customer_name = cliente.usuario.get_full_name() if cliente.usuario.get_full_name() else validate_data['nome_proprietario']
+        customer_name = cliente.usuario.get_full_name() if cliente.usuario.get_full_name() else ''
 
         credit_card = CreditCard(validate_data['cvv'], validate_data['bandeira'])
         credit_card.expiration_date = '{:02d}/{:d}'.format(month, year)
         credit_card.card_number = validate_data['numero_cartao']
-        credit_card.holder = validate_data['nome_proprietario']
+        credit_card.holder = customer_name
         credit_card.customer_name = customer_name
 
         # Cria instância do controlador do ecommerce

@@ -8,7 +8,7 @@ from api.utils import tipo_cartao
 
 
 class Cartao(models.Model):
-    nome_proprietario = models.CharField(max_length=60)
+    nome_proprietario = models.CharField(max_length=60, blank=True, null=True, default='')
     token = models.CharField(max_length=160, null=True, blank=True)
     numero_cartao = models.CharField(max_length=4)
     tipo = models.IntegerField(default=tipo_cartao.CREDITO, choices=tipo_cartao.CHOICES)
