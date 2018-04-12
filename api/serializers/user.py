@@ -11,6 +11,52 @@ from api.models.cliente import Cliente
 from api.tasks.cliente import update_foto_facebook
 from api.utils import sexo
 from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
+from api.models.enums.login_type import LoginType
+from api.utils import sms_code
+from api.utils.generics import create_username, create_email
+
+
+class LoginClienteSerializer(serializers.ModelSerializer):
+    login_type = serializers.ChoiceField(choices=LoginType.choices(), default=LoginType.EMAIL, write_only=True)
+    password = serializers.CharField(required=True, allow_blank=True, write_only=True)  
+    email = serializers.CharField(max_length=250, required=True, allow_blank=True, write_only=True)
+    facebook_id = serializers.IntegerField(required=False, write_only=True)
+    celular = serializers.IntegerField(required=False, write_only=True)
+    codigo_sms = serializers.IntegerField(required=False, write_only=True)
+    token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
+
+    class Meta:
+        model = User
+        fields = (
+            'login_type',
+        )
+
+
+class EnviarCodigoSmsSerializer(serializers.ModelSerializer):
+    celular = serializers.CharField(max_length=11, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('celular', )
+
+    def validate_celular(self, data):
+        if not data.isdigit():
+            raise serializers.ValidationError('Número de celular inválido.')
+
+        return data
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            try:
+                user = User.objects.get(cliente__celular=validated_data['celular'])
+            except User.DoesNotExist:
+                user = User.objects.create(username=create_username(create_email(validated_data['celular'])))
+                Cliente.objects.create(usuario=user, celular=validated_data['celular'])
+
+            # Enviando SMS
+            sms_code.send_sms_code(user)
+
+            return user
 
 
 class CreateUserClienteSerializer(serializers.ModelSerializer):
@@ -55,7 +101,7 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
 
     def validate_cpf(self, data):
         if not data.isdigit():
-            raise serializers.ValidationError('Número de celular inválido.')
+            raise serializers.ValidationError('Número do CPF inválido.')
 
         try:
             User.objects.get(cliente__cpf=data)
@@ -85,7 +131,7 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
             return value
 
     def validate(self, attrs):
-        attrs['username'] = self.create_username(attrs['email'])
+        attrs['username'] = create_username(attrs['email'])
         return attrs
 
     def create(self, validated_data):
@@ -111,23 +157,14 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
             user.last_name = user_kwargs['sobrenome'] if 'sobrenome' in user_kwargs else ''
             user.save()
             cliente = Cliente.objects.create(usuario=user, **cliente_kwargs)
+            if cliente.celular:
+                pass  # enviar sms
             Token.objects.create(user=user)
 
             if foto:
                 update_foto_facebook.apply_async([cliente.id, foto], queue='update_cliente', countdown=1)
 
             return user
-
-    def create_username(self, email):
-        try:
-            highest_user_id = User.objects.all().order_by('-id')[0].id  # or something more efficient
-        except:
-            highest_user_id = 1
-        leading_part_of_email = email.split('@', 1)[0]
-        leading_part_of_email = re.sub(r'[^a-zA-Z0-9+]', '', leading_part_of_email)  # remove non-alphanumerics
-        truncated_part_of_email = leading_part_of_email[:3] + leading_part_of_email[-3:]
-        derived_username = '%s%s' % (truncated_part_of_email, highest_user_id + 1)
-        return derived_username
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -164,6 +201,7 @@ class LoginDefautSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
     email = serializers.CharField(max_length=250, required=True, allow_blank=True)
     facebook_id = serializers.IntegerField(required=False)
+    celular = serializers.IntegerField(required=False)
 
     class Meta:
         model = User
@@ -243,6 +281,10 @@ class LoginDefautSerializer(serializers.ModelSerializer):
         return instance
 
 
+class LoginCelularSerializer(serializers.ModelSerializer):
+    pass
+
+
 class LoginFarmaciaSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
@@ -314,7 +356,6 @@ class DetailUserNoTokenSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'email': {'read_only': True},
         }
-
 
 
 class RepresentanteUserSerializer(serializers.ModelSerializer):

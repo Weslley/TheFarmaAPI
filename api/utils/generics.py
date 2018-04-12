@@ -2,9 +2,9 @@ import linecache
 import re
 from datetime import timedelta, datetime
 from types import MethodType
-
+from django.conf import settings
 import sys
-
+from api.utils import hash_methods
 from api.models.configuracao import Configuracao
 
 
@@ -99,3 +99,29 @@ def print_exception():
     linecache.checkcache(filename)
     line = linecache.getline(filename, lineno, f.f_globals)
     print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+
+
+def create_username(email):
+    try:
+        highest_user_id = User.objects.all().order_by('-id')[0].id  # or something more efficient
+    except:
+        highest_user_id = 1
+    leading_part_of_email = email.split('@', 1)[0]
+    leading_part_of_email = re.sub(r'[^a-zA-Z0-9+]', '', leading_part_of_email)  # remove non-alphanumerics
+    truncated_part_of_email = leading_part_of_email[:3] + leading_part_of_email[-3:]
+    derived_username = '%s%s' % (truncated_part_of_email, highest_user_id + 1)
+    return derived_username
+
+
+def create_email(celular):
+    try:
+        highest_user_id = User.objects.all().order_by('-id')[0].id  # or something more efficient
+    except:
+        highest_user_id = 1
+
+    value = '{}{}'.format(highest_user_id, celular)
+    
+    return '{}@{}.com'.format(
+        hash_methods.make_md5(value),
+        hash_methods.make_md5(settings.FAKER_DOMAIN_EMAIL)
+    )

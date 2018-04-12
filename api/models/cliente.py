@@ -14,14 +14,15 @@ def generate_filename(self, filename):
 
 
 class Cliente(models.Model):
-    sexo = models.CharField(max_length=1, choices=sexo.CHOICES, blank=True, null=True)
+    sexo = models.CharField(max_length=1, choices=sexo.CHOICES, blank=True, null=True, default=None)
     foto = models.ImageField(upload_to=generate_filename, blank=True, null=True)
     facebook_id = models.CharField(max_length=255, null=True, blank=True, unique=True)
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.PROTECT)
     data_nascimento = models.DateField(blank=True, null=True)
     celular = models.CharField(max_length=11, null=True, blank=True, unique=True)
     cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
     email_confirmado = models.BooleanField(default=False)
+    celular_confirmado = models.BooleanField(default=False)
 
     def __str__(self):
         return self.usuario.get_full_name()

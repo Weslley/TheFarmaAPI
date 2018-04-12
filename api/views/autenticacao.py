@@ -8,6 +8,8 @@ from api.mixins.base import (
 )
 from api.serializers.cliente import ClienteSerializer
 from api.serializers.user import (
+    EnviarCodigoSmsSerializer,
+    LoginClienteSerializer,
     LoginDefautSerializer,
     LoginFarmaciaSerializer,
     CreateUserClienteSerializer
@@ -45,14 +47,12 @@ class LoginCliente(generics.GenericAPIView):
     com facebook, basta ignorar os campos de email e password, deixando em branco ou pode preenche-los se quiser
     """
     queryset = User.objects.all()
-    serializer_class = LoginDefautSerializer
+    serializer_class = LoginClienteSerializer
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
-        serializer = ClienteSerializer(instance=instance.cliente, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class EnviarCodigoSmsView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = EnviarCodigoSmsSerializer
 
 
 class LoginFarmacia(generics.GenericAPIView):
