@@ -4,4 +4,4 @@ from api.utils.enum import IntEnum
 class LoginType(IntEnum):
     EMAIL = 0
     FACEBOOK = 1
-    TELEFONE = 2
+    CELULAR = 2

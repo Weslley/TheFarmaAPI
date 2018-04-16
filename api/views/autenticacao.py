@@ -41,7 +41,7 @@ class CreateUser(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class LoginCliente(generics.GenericAPIView):
+class LoginCliente(generics.CreateAPIView):
     """
     URL de login do cliente, para login comum é obrigatório do email e senha, caso queira fazer o login
     com facebook, basta ignorar os campos de email e password, deixando em branco ou pode preenche-los se quiser

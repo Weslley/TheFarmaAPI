@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.fields import empty
 from rest_framework.validators import UniqueValidator
-
+from datetime import datetime
 from api.models.cliente import Cliente
 from api.tasks.cliente import update_foto_facebook
 from api.utils import sexo
@@ -17,19 +17,177 @@ from api.utils.generics import create_username, create_email
 
 
 class LoginClienteSerializer(serializers.ModelSerializer):
-    login_type = serializers.ChoiceField(choices=LoginType.choices(), default=LoginType.EMAIL, write_only=True)
-    password = serializers.CharField(required=True, allow_blank=True, write_only=True)  
-    email = serializers.CharField(max_length=250, required=True, allow_blank=True, write_only=True)
+    login_type = serializers.ChoiceField(choices=LoginType.choices(), write_only=True)
+    email = serializers.EmailField(max_length=250, required=False, write_only=True)
+    password = serializers.CharField(required=False, write_only=True)
     facebook_id = serializers.IntegerField(required=False, write_only=True)
     celular = serializers.IntegerField(required=False, write_only=True)
     codigo_sms = serializers.IntegerField(required=False, write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
 
+    user_queryset = User.objects.exclude(representante_farmacia__isnull=False)
+
     class Meta:
         model = User
         fields = (
             'login_type',
+            'email',
+            'password',
+            'facebook_id',
+            'celular',
+            'codigo_sms',
+            'token'
         )
+
+    def validate_login_type(self, data):
+        if data == LoginType.EMAIL:
+            if 'email' not in self.initial_data:
+                raise serializers.ValidationError('Email é obrigatório.')
+            if 'password' not in self.initial_data:
+                raise serializers.ValidationError('Senha é obrigatória.')
+        elif data == LoginType.FACEBOOK:
+            if 'facebook_id' not in self.initial_data:
+                raise serializers.ValidationError('Facebook é obrigatório.')
+        else:
+            if 'celular' not in self.initial_data:
+                raise serializers.ValidationError('Celular é obrigatório.')
+
+        return data
+
+    def validate_email(self, data):
+        return data
+
+    def validate_password(self, data):
+        if self.initial_data['login_type'] == LoginType.EMAIL:
+            email = self.initial_data['email']
+            try:
+                user = self.user_queryset.get(email=email)
+                if not user.check_password(data):
+                    raise serializers.ValidationError('Senha incorreta.')
+            except User.DoesNotExist:
+                pass
+
+        return data
+
+    def validate_celular(self, data):
+        if not self.user_queryset.filter(cliente__celular=data).exists():
+            user = User.objects.create(username=create_username(create_email(data)))
+            Cliente.objects.create(usuario=user, celular=data)
+
+            # Enviando SMS
+            sms_code.send_sms_code(user)
+            raise serializers.ValidationError('Enviamos um código via SMS.')
+
+        return data
+
+    def validate_codigo_sms(self, data):
+        celular = self.initial_data['celular']
+        user = self.user_queryset.get(cliente__celular=celular)
+
+        if not sms_code.check_code(user, data):
+            raise serializers.ValidationError('Código SMS inválido.')
+
+        return data
+
+    def validate_facebook_id(self, data):
+        if self.initial_data['login_type'] == LoginType.FACEBOOK:
+            try:
+                self.user_queryset.get(cliente__facebook_id=data)
+            except User.DoesNotExist:
+                if 'email' not in self.initial_data:
+                    raise serializers.ValidationError('Email é obrigatório.')
+        return data
+
+    def validate(self, validated_data):
+        if validated_data['login_type'] == LoginType.CELULAR:
+            if 'codigo_sms' not in validated_data or ('codigo_sms' in validated_data and not validated_data['codigo_sms']):
+                if self.user_queryset.filter(cliente__celular=validated_data['celular']).exists():
+                    user = self.user_queryset.get(cliente__celular=validated_data['celular'])
+                    sms_code.send_sms_code(user)  # Enviando SMS
+                raise serializers.ValidationError('Código SMS é obrigatório.')
+        elif validated_data['login_type'] == LoginType.FACEBOOK:
+            if 'email' in validated_data and validated_data['email']:
+                exist_user = self.user_queryset.filter(email=validated_data['email'], cliente__facebook_id__isnull=False).exists()
+                if exist_user:
+                    user = self.user_queryset.get(email=validated_data['email'], cliente__facebook_id__isnull=False)
+                    if user.cliente.facebook_id != validated_data['facebook_id']:
+                        raise serializers.ValidationError('Facebook token enválido.')
+            else:
+                exist_user = self.user_queryset.filter(cliente__facebook_id=validated_data['facebook_id']).exists()
+                if exist_user:
+                    user = self.user_queryset.get(cliente__facebook_id=validated_data['facebook_id'])
+                    if not user.email:
+                        raise serializers.ValidationError('Email é obrigatório.')
+
+        return validated_data
+
+    def login_email(self, email, password):
+        user, created = self.user_queryset.get_or_create(email=email)
+        if created:
+            user.username = create_username(email)
+            user.set_password(password)
+            user.save()
+
+        return user
+
+    def login_facebook(self, facebook_id, email=None):
+        if email:
+            try:
+                exist_user = self.user_queryset.filter(email=email).exists()
+                if exist_user:
+                    exist_user = self.user_queryset.filter(email=email, cliente__facebook_id__isnull=True).exists()
+                    if exist_user:
+                        user = self.user_queryset.get(email=email, cliente__facebook_id__isnull=True)
+                        if not hasattr(user, 'cliente'):
+                            Cliente.objects.create(usuario=user, facebook_id=facebook_id)
+                        user.cliente.facebook_id = facebook_id
+                        user.cliente.save()
+                    else:
+                        exist_user = self.user_queryset.filter(email=email, cliente__facebook_id__isnull=False).exists()
+                        if exist_user:
+                            user = self.user_queryset.get(email=email, cliente__facebook_id__isnull=False)
+                            assert user.cliente.facebook_id != facebook_id, ('Tokens inválidos.')
+                else:
+                    user = self.user_queryset.get(cliente__facebook_id=facebook_id)
+                    user.email = email
+                    user.save()
+            except User.DoesNotExist:
+                user = User.objects.create(email=email)
+                Cliente.objects.create(usuario=user, facebook_id=facebook_id)
+
+            return user
+        else:
+            exist_user = self.user_queryset.filter(cliente__facebook_id=facebook_id).exists()
+
+            if exist_user:
+                return self.user_queryset.get(cliente__facebook_id=facebook_id)
+
+            assert email is not None, ('Email não poder ser nulo ao criar cliente novo com facebook')
+
+    def login_celular(self, celular):
+        user = self.user_queryset.get(cliente__celular=celular)
+        user.cliente.celular_confirmado = True
+        user.cliente.save()
+        return user
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            login_type = validated_data['login_type']
+            if login_type == LoginType.EMAIL:
+                user = self.login_email(validated_data['email'], validated_data['password'])
+            elif login_type == LoginType.FACEBOOK:
+                user = self.login_facebook(validated_data['facebook_id'], validated_data.get('email', None))
+            else:
+                user = self.login_celular(validated_data['celular'])
+
+            user.last_login = datetime.now()
+            user.save()
+            token, created = Token.objects.get_or_create(user=user)
+            if not created:
+                token.delete()
+                Token.objects.create(user=user)
+
+            return user
 
 
 class EnviarCodigoSmsSerializer(serializers.ModelSerializer):
