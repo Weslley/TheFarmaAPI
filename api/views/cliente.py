@@ -1,6 +1,6 @@
 from django.db import transaction
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, \
-    RetrieveAPIView
+    RetrieveAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from api.mixins.base import IsRepresentanteAuthenticatedMixin, IsClienteAuthenticatedMixin
@@ -29,7 +29,7 @@ class ClienteList(ListAPIView, IsRepresentanteAuthenticatedMixin):
     pagination_class = SmallResultsSetPagination
 
 
-class ClienteRetrieve(RetrieveAPIView, IsClienteAuthenticatedMixin):
+class ClienteRetrieve(RetrieveUpdateAPIView, IsClienteAuthenticatedMixin):
     """
     Dados do cliente
 
