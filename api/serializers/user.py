@@ -491,7 +491,7 @@ class LoginFarmaciaSerializer(serializers.ModelSerializer):
 
 
 class DetailUserSerializer(serializers.ModelSerializer):
-    nome = serializers.CharField(source='first_name')
+    nome = serializers.SerializerMethodField()
     sobrenome = serializers.CharField(source='last_name')
     token = serializers.CharField(read_only=True, source='auth_token.key')
 
@@ -501,7 +501,7 @@ class DetailUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'email': {'read_only': True},
             'id': {'read_only': True},
-        }
+        } 
 
 
 class DetailUserNoTokenSerializer(serializers.ModelSerializer):
