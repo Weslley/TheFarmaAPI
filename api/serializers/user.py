@@ -17,7 +17,7 @@ from api.utils.generics import create_username, create_email
 
 
 class LoginClienteSerializer(serializers.ModelSerializer):
-    login_type = serializers.ChoiceField(choices=LoginType.choices(), write_only=True)
+    login_type = serializers.ChoiceField(choices=LoginType.choices(), write_only=True, required=True)
     email = serializers.EmailField(max_length=250, required=False, write_only=True)
     password = serializers.CharField(required=False, write_only=True)
     facebook_id = serializers.IntegerField(required=False, write_only=True)
@@ -25,7 +25,7 @@ class LoginClienteSerializer(serializers.ModelSerializer):
     codigo_sms = serializers.IntegerField(required=False, write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
 
-    user_queryset = User.objects.exclude(representante_farmacia__isnull=False)
+    user_queryset = User.objects.exclude(representante_farmacia__isnull=False, cliente__isnull=False)
 
     class Meta:
         model = User
@@ -55,9 +55,20 @@ class LoginClienteSerializer(serializers.ModelSerializer):
         return data
 
     def validate_email(self, data):
+        if data:
+            try:
+                user = self.user_queryset.get(email=data)
+                import pdb; pdb.set_trace()
+                if not hasattr(user, 'cliente'):
+                    raise serializers.ValidationError('Email já utilizado')
+            except:
+                pass
+            
         return data
 
-    def validate_password(self, data):
+    def validate_password(self, data):    
+        if 'login_type' not in self.initial_data:
+            return None
         if self.initial_data['login_type'] == LoginType.EMAIL:
             email = self.initial_data['email']
             try:
@@ -124,6 +135,7 @@ class LoginClienteSerializer(serializers.ModelSerializer):
     def login_email(self, email, password):
         user, created = self.user_queryset.get_or_create(email=email)
         if created:
+            Cliente.objects.create(usuario=user)
             user.username = create_username(email)
             user.set_password(password)
             user.save()
