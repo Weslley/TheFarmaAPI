@@ -58,7 +58,6 @@ class LoginClienteSerializer(serializers.ModelSerializer):
         if data:
             try:
                 user = self.user_queryset.get(email=data)
-                import pdb; pdb.set_trace()
                 if not hasattr(user, 'cliente'):
                     raise serializers.ValidationError('Email já utilizado')
             except:
