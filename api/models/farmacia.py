@@ -30,6 +30,8 @@ class FarmaciaManager(models.Manager):
             print(err)
             raio_proposta = 1.0
 
+        queryset = queryset.distinct('id')
+
         result_list = [f for f in queryset if calcula_distancia(pedido.localizacao, f.localizacao) <= raio_proposta]
 
         return result_list
