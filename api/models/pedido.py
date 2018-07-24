@@ -166,13 +166,16 @@ class Pedido(models.Model):
         elif type(farmacias) == list:
             for farmacia in farmacias:
                 for item in self.itens.all():
-                    ItemPropostaPedido.objects.create(
-                        pedido=self,
-                        valor_unitario=item.valor_unitario,
-                        quantidade=item.quantidade,
-                        apresentacao=item.apresentacao,
-                        farmacia=farmacia
-                    )
+                    if not ItemPropostaPedido.objects.filter(
+                            pedido=self, farmacia=farmacia, apresentacao=item.apresentacao
+                        ).exists():
+                        ItemPropostaPedido.objects.create(
+                            pedido=self,
+                            valor_unitario=item.valor_unitario,
+                            quantidade=item.quantidade,
+                            apresentacao=item.apresentacao,
+                            farmacia=farmacia
+                        )
 
     def get_total_farmacia(self, farmacia_id):
         valor = 0
