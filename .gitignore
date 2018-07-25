@@ -26,3 +26,4 @@ core/views/__pycache__/
 misc/__pycache__/
 static/sass/
 thefarmaapi/__pycache__/
+**.DS_Store
