@@ -45,6 +45,7 @@ class ClienteSerializer(serializers.ModelSerializer):
             'facebook_id',
             'nome',
             'email',
+            'fcm_token',
             'token'
         )
         extra_kwargs = {

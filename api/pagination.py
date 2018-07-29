@@ -39,6 +39,12 @@ class StandardResultsSetPagination(CustomPageNumberPagination):
     max_page_size = 1000000
 
 
+class DefaultResultsSetPagination(CustomPageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 1000000
+
+
 class SmallResultsSetPagination(CustomPageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'

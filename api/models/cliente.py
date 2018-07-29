@@ -23,6 +23,7 @@ class Cliente(models.Model):
     cpf = models.CharField(max_length=11, null=True, blank=False, unique=True)
     email_confirmado = models.BooleanField(default=False)
     celular_confirmado = models.BooleanField(default=False)
+    fcm_token = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.usuario.get_full_name()
