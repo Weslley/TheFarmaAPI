@@ -236,7 +236,7 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc', 'classe_terapeutica')
+        fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc', 'classe_terapeutica', 'codigo_barras')
 
     def get_imagem(self, obj):
         qs = obj.imagens.order_by('-capa').first()
