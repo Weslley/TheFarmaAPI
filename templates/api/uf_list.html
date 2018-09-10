@@ -1,11 +1,24 @@
-{% extends 'components/base.html' %}
+{% extends 'components/new_base.html' %}
 {% load staticfiles %}
 
 {% block header %}
   UFs
 {% endblock header %}
 
-{% block conteudo %}
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        UF
+        <small>Listagem</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">UF</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
 
     <div class="card">
         {{ view.as_table }}
