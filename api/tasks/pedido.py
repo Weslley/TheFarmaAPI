@@ -1,14 +1,15 @@
-from decimal import Decimal
-
 from api.models.configuracao import Configuracao
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums.status_pedido import StatusPedido
 from thefarmaapi._celery import app
+
 from api.models.pedido import Pedido
 from api.models.farmacia import Farmacia
 from api.consumers import FarmaciaConsumer
-from time import sleep
+
 from datetime import datetime, timedelta
+from time import sleep
+from decimal import Decimal
 
 
 @app.task(queue='propostas')
@@ -72,8 +73,15 @@ def init_proposta(id_pedido):
             # enviando para as farmaias selecionadas
             FarmaciaConsumer.send_propostas(pedido, farmacias)
 
+        else:
+            # Status Sem Proposta caso nao existam farmacias proximas
+            pedido.status = StatusPedido.SEM_PROPOSTA
+            pedido.save()
+            return
+
         # verificando se ainda da tempo de buscar mais farmacias
         duracao = datetime.now() - pedido.log.data_criacao
+
         if duracao >= duracao_proposta or pedido.status != StatusPedido.ABERTO:
             busca = False
         else:

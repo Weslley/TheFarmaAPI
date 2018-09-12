@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
-import casting
+# import casting
 from decouple import config
 from dj_database_url import parse as parse_db_url
 
@@ -208,7 +208,7 @@ CHANNEL_LAYERS = {
     }
 }
 
-HTTPS = config('HTTPS', default='https://')
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# HTTPS = config('HTTPS', default='https://')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 FAKER_DOMAIN_EMAIL = config('FAKER_DOMAIN_EMAIL', default='thefarma_domain')

@@ -1,0 +1,34 @@
+version: '2'
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: thefarma_api_nginx
+    ports:
+      - "8000:8000"
+      # - "80:80"
+      # - "443:443"
+    volumes:
+      - ./config/dev/nginx:/etc/nginx/conf.d
+      - ./config/dev/ssl:/etc/certificates
+      - ./config/dev/nginx/gsdv.txt:/cert/gsdv.txt
+      - static-data:/staticfiles
+      - media-data:/mediafiles
+    depends_on:
+      - web
+
+  web:
+    build: .
+    container_name: thefarma_api
+    # command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000  --workers 3 --log-level=debug"
+    command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000 --workers 3 --log-level=debug"
+
+    volumes:
+      - .:/thefarmaapi
+    expose:
+      - "8000"
+    env_file:
+      - dev.env
+
+volumes:
+  static-data:
+  media-data:
