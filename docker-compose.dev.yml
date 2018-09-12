@@ -19,13 +19,39 @@ services:
   web:
     build: .
     container_name: thefarma_api
-    # command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000  --workers 3 --log-level=debug"
     command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000 --workers 3 --log-level=debug"
-
+    # command: bash -c "gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000 --workers 3 --log-level=debug"
+    # command: bash -c "python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/thefarmaapi
     expose:
       - "8000"
+    env_file:
+      - dev.env
+    stdin_open: true
+    tty: true
+  
+  worker_default:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "celery -A thefarmaapi worker -l debug --autoscale=10,3 --queues=default,update_cliente,propostas --hostname=worker_default"
+    volumes:
+      - media-data:/thefarmaapi/media
+    env_file:
+      - dev.env
+
+  channels:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/thefarmaapi.pem:certKey=/etc/certificates/thefarmaapi.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
+    volumes:
+      - media-data:/thefarmaapi/media
+      - ./config/dev/ssl:/etc/certificates
+    expose:
+      - "8000"
+      - "443"
     env_file:
       - dev.env
 
