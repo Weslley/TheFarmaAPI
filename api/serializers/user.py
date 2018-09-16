@@ -1,6 +1,7 @@
 import re
 
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -14,6 +15,11 @@ from thefarmaapi.backends import EmailModelBackend, FarmaciaBackend
 from api.models.enums.login_type import LoginType
 from api.utils import sms_code
 from api.utils.generics import create_username, create_email
+
+import base64
+import six
+import uuid
+import imghdr
 
 
 class LoginClienteSerializer(serializers.ModelSerializer):
@@ -228,13 +234,44 @@ class EnviarCodigoSmsSerializer(serializers.ModelSerializer):
             return user
 
 
+class ImageB64Field(serializers.ImageField):
+    # Converte b64 em imagem
+
+    def to_internal_value(self, data):
+
+        if isinstance(data, six.string_types):
+            if 'data:' in data and ';base64,' in data:
+                header, data = data.split(';base64,')
+
+            try:
+                decoded_file = base64.b64decode(data)
+            except TypeError:
+                self.fail('invalid_image')
+
+            file_name = str(uuid.uuid4())[:12]
+            file_extension = self.get_file_extension(file_name, decoded_file)
+
+            complete_file_name = "{0}.{1}".format(file_name, file_extension)
+
+            data = ContentFile(decoded_file, name=complete_file_name)
+
+        return super(ImageB64Field, self).to_internal_value(data)
+
+    def get_file_extension(self, file_name, decoded_file):
+
+        # extension = imghdr.what(file_name, decoded_file)
+        extension = "jpg"
+
+        return extension
+
+
 class CreateUserClienteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     celular = serializers.CharField(max_length=11, required=False, write_only=True, allow_null=True, allow_blank=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
     cpf = serializers.CharField(max_length=11, write_only=True, required=False)
     sexo = serializers.ChoiceField(choices=sexo.CHOICES, required=False, allow_blank=True, allow_null=True)
-    foto = serializers.URLField(required=False, allow_blank=True, allow_null=True)
+    foto = ImageB64Field(max_length=None, use_url=True, required=False, allow_empty_file=True)
     facebook_id = serializers.IntegerField(required=False, allow_null=True)
     nome = serializers.CharField(max_length=30, required=False, allow_blank=True)
     sobrenome = serializers.CharField(max_length=30, required=False, allow_blank=True)
@@ -267,6 +304,7 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
                 )]
             }
         }
+
 
     def validate_cpf(self, data):
         if not data.isdigit():
@@ -309,14 +347,20 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
             user_kwargs = {}
             foto = None
 
-            if 'foto' in validated_data:
-                foto = validated_data.pop('foto')
+            user_fields = ['nome', 'sobrenome']
+            cliente_fields = [
+                'celular', 'cpf', 'sexo', 
+                'facebook_id', 'data_nascimento', 'foto'
+            ]
 
-            for key in ['nome', 'sobrenome']:
+            # if 'foto' in validated_data:
+            #     foto = validated_data.pop('foto')
+
+            for key in user_fields:
                 if key in validated_data:
                     user_kwargs[key] = validated_data.pop(key)
 
-            for key in ['celular', 'cpf', 'sexo', 'facebook_id', 'data_nascimento']:
+            for key in cliente_fields:
                 if key in validated_data:
                     cliente_kwargs[key] = validated_data.pop(key)
 
@@ -330,8 +374,8 @@ class CreateUserClienteSerializer(serializers.ModelSerializer):
                 pass  # enviar sms
             Token.objects.create(user=user)
 
-            if foto:
-                update_foto_facebook.apply_async([cliente.id, foto], queue='update_cliente', countdown=1)
+            # if foto:
+            #     update_foto_facebook.apply_async([cliente.id, foto], queue='update_cliente', countdown=1)
 
             return user
 
