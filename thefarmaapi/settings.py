@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
-# import casting
 from decouple import config
 from dj_database_url import parse as parse_db_url
 
@@ -33,8 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
-
-INSTALLED_APPS = [
+DEFAULT_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,8 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django_extensions',
+]
+
+LOCAL_APPS = [
     'api',
+    'core',
+]
+
+THIRD_PARTY_APPS = [
+    'django_extensions',
     'rest_framework',
     'django_ajax',
     'rest_framework.authtoken',
@@ -52,9 +57,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'awesome_mixins',
     'django_filters',
-    'core',
     'channels'
 ]
+
+INSTALLED_APPS = (DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS)
 
 SITE_ID = 1
 
