@@ -109,6 +109,7 @@ Pipfile.lock
 bin/*
 logs/*
 staticfiles/*
+mediafiles/*
 media/*
 thefarmateste-firebase-adminsdk-d4m34-a4496add17.json
 **.DS_Store
