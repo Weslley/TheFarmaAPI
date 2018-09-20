@@ -13,11 +13,12 @@ class MedicamentoList(ListMixin, AdminBaseMixin):
     paginate_by = 10
     search_default = ('nome', '-data_atualizacao', 'Nome')
     css_table = 'table'
-    css_div_header = 'card-header'
-    css_div_body = 'card-content table-responsive'
+    css_div_header = 'box-header'
+    css_div_body = 'box-content table-responsive'
     css_div_footer = ''
-    detail_url = '\'+ id + \'/'
+    detail_url = '\'+ pk + \'/'
     # css_pagination = 'pagination pagination-success'
+    pagination_labels = {'prev': 'Anterior', 'next': 'Próximo', 'first': 'Primeiro', 'last': 'Último'}
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
     columns = [
