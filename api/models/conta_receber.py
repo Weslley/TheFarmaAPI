@@ -16,6 +16,14 @@ class ContaReceber(models.Model):
     valor_comissao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     @property
+    def valor_bruto(self):
+        """
+        Property para imprimir o valor bruto
+        :return: Valor da parcela
+        """
+        return self.valor_parcela
+
+    @property
     def valor_liquido_parcela(self):
         """
         Property para imprimir o valor liquido de acodo com o valor bruto e demais variaveis

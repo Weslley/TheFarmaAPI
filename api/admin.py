@@ -11,6 +11,7 @@ from api.models.cliente import Cliente, ClienteEndereco
 from api.models.configuracao import Configuracao
 from api.models.conta_bancaria import ContaBancaria
 from api.models.conta_pagar import ContaPagar
+from api.models.conta_receber import ContaReceber
 from api.models.curtida import Curtida
 from api.models.endereco import Endereco
 from api.models.estoque import Estoque
@@ -183,6 +184,14 @@ class PostAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class ContaPagarAdmin(admin.ModelAdmin):
+    list_display = ('pedido', 'status', 'data_vencimento', 'valor_liquido')
+
+
+class ContaReceberAdmin(admin.ModelAdmin):
+    list_display = ('pedido', 'status', 'data_vencimento', 'valor_parcela')
+
+
 admin.site.register(Farmacia)
 admin.site.register(Produto)
 admin.site.register(PrincipioAtivo)
@@ -213,7 +222,8 @@ admin.site.register(Cartao)
 admin.site.register(Banco)
 admin.site.register(ContaBancaria)
 admin.site.register(Log)
-admin.site.register(ContaPagar)
+admin.site.register(ContaPagar, ContaPagarAdmin)
+admin.site.register(ContaReceber, ContaReceberAdmin)
 admin.site.register(ItemPropostaPedido)
 admin.site.register(Configuracao)
 admin.site.register(Feriado)
