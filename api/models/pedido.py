@@ -96,13 +96,26 @@ class Pedido(models.Model):
 
     @property
     def valor_bruto(self):
-        resultado = self.contas_receber_farmacia.aggregate(valor_bruto=Sum('valor_bruto'))
-        return resultado['valor_bruto']
+        from decimal import Decimal
+        valor = Decimal()
+        for contas in self.contas_receber.all():
+            valor += contas.valor_parcela
+        return valor
+
+    @property
+    def valor_administradora_cartao(self):
+        from decimal import Decimal
+        valor = Decimal()
+        for contas in self.contas_receber.all():
+            valor += contas.valor_administradora_cartao
+
+        return valor
+    
 
     @property
     def valor_liquido(self):
-        resultado = self.contas_receber_farmacia.aggregate(valor_liquido=Sum(
-            F('valor_bruto') - F('valor_administradora_cartao') - F('valor_thefarma') - F('valor_adiantamento')
+        resultado = self.contas_receber.aggregate(valor_liquido=Sum(
+            self.valor_bruto - self.valor_administradora_cartao - F('valor_thefarma') - F('valor_adiantamento')
         ))
         return resultado['valor_liquido']
 
