@@ -57,6 +57,7 @@
                     </div>
 
                     <a href="{% url 'produto-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                    <a href="{% url 'produto-admin-delete' produto.id %}" class="btn btn-danger pull-right">Excluir</a>
                     <a href="{% url 'produto-admin-update' produto.id %}" class="btn btn-primary pull-right">Editar</a>
                     <div class="clearfix"></div>
                     </div>
