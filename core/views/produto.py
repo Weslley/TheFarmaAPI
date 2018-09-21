@@ -33,11 +33,11 @@ class MedicamentoList(ListMixin, AdminBaseMixin):
 class MedicamentoCreate(CreateView, AdminBaseMixin):
     model = Produto
     fields = ('nome', 'principio_ativo', 'laboratorio', 'tipo')
-    success_url = reverse_lazy('medicamento-admin-list')
+    success_url = reverse_lazy('produto-admin-list')
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        atualizacao = Atualizacao.objects.create()
+        atualizacao = Atualizacao.objects.create(usuario=self.request.user)
         instance.data_atualizacao = atualizacao.data
         instance.save()
         return super(MedicamentoCreate, self).form_valid(form)
@@ -64,4 +64,4 @@ class MedicamentoDetail(DetailView, AdminBaseMixin):
 
 class MedicamentoDelete(DeleteView, AdminBaseMixin):
     model = Produto
-    success_url = reverse_lazy('medicamento-admin-list')
+    success_url = reverse_lazy('produto-admin-list')
