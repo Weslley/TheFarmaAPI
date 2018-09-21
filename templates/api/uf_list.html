@@ -1,9 +1,6 @@
 {% extends 'components/new_base.html' %}
 {% load staticfiles %}
 
-{% block header %}
-  UFs
-{% endblock header %}
 
 {% block content-header %}
 <section class="content-header">
@@ -20,8 +17,12 @@
 
 {% block content %}
 
-    <div class="card">
-        {{ view.as_table }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                {{ view.as_table }}
+            </div>
+        </div>
     </div>
 
 {% endblock %}
@@ -30,13 +31,13 @@
 {{ view.as_statics }}
 <script type="text/javascript">
     (function () {
-        $('#am_add_button').removeClass('btn-primary');
-        $('#am_add_button').addClass('btn-white');
-        $('.active').removeClass('active');
+        // $('#am_add_button').removeClass('btn-primary');
+        $('#am_add_button').addClass('btn-flat');
+        $('.menu-item').removeClass('active');
         $('#menu_uf').addClass('active');
     })();
-    $(window).on('load', function () {
-        $('.pagination').addClass('pagination-success');
-    });
+    // $(window).on('load', function () {
+    //     $('.pagination').addClass('pagination-success');
+    // });
 </script>
 {% endblock %}

@@ -9,11 +9,16 @@ class EstoqueList(ListMixin, AdminBaseMixin):
     queryset = Estoque.objects.all()
     paginate_by = 10
     search_default = ('apresentacao__nome', '-apresentacao__nome', 'Apresentação')
+    pagination_labels = {'prev': 'Anterior', 'next': 'Próximo', 'first': 'Primeiro', 'last': 'Último'}
     css_table = 'table'
-    css_div_header = 'card-header'
-    css_div_body = 'card-content table-responsive'
+    css_div_header = 'box-header'
+    css_div_body = 'box-body table-responsive'
+    # add_button_url = 'adicionar'
+    # add_button_name = 'Adicionar'
+    # O botao estava setado como false
     add_btn = False
     css_div_footer = ''
+    detail_url = '\'+ pk + \'/'
     columns = [
         {'lookup': 'apresentacao__nome', 'name': 'Apresentação'},
         {'lookup': 'quantidade', 'name': 'Quantidade'},

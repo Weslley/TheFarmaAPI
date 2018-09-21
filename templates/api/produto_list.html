@@ -1,17 +1,31 @@
 {% extends 'components/new_base.html' %}
 {% load staticfiles %}
+{% load helper %}
 
-{% block header %}
-  Produtos
-{% endblock header %}
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Produtos
+        <small>Listagem</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Produtos</li>
+    </ol>
+</section>
+{% endblock content-header %}
 
-{% block conteudo %}
+{% block content %}
 
-    <div class="card">
-        {{ view.as_table }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                {{ view.as_table }}
+            </div>
+        </div>
     </div>
 
-{% endblock %}
+{% endblock content %}
 
 {% block js %}
     <script type="text/javascript">
@@ -31,13 +45,13 @@
     {{ view.as_statics }}
     <script type="text/javascript">
         (function () {
-            $('#am_add_button').removeClass('btn-primary');
-            $('#am_add_button').addClass('btn-white');
-            $('.active').removeClass('active');
+            // $('#am_add_button').removeClass('btn-primary');
+            $('#am_add_button').addClass('btn-flat');
+            $('.menu-item').removeClass('active');
             $('#menu_produto').addClass('active');
         })();
-        $(window).on('load', function () {
-            $('.pagination').addClass('pagination-success');
-        });
+        // $(window).on('load', function () {
+            // $('.pagination').addClass('pagination-success');
+        // });
     </script>
 {% endblock %}

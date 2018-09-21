@@ -12,11 +12,12 @@ class PostList(ListMixin, AdminBaseMixin):
     queryset = Post.objects.all()
     paginate_by = 10
     search_default = ('titulo', '-data_atualizacao', 'Titulo')
+    pagination_labels = {'prev': 'Anterior', 'next': 'Próximo', 'first': 'Primeiro', 'last': 'Último'}
     css_table = 'table'
-    css_div_header = 'card-header'
-    css_div_body = 'card-content table-responsive'
-    css_div_footer = ''
-    detail_url = '\'+ id + \'/'
+    css_div_header = 'box-header'
+    css_div_body = 'box-body table-responsive'
+    css_div_footer = 'box-footer'
+    detail_url = '\'+ pk + \'/'
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
     columns = [
