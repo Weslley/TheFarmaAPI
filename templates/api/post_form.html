@@ -2,11 +2,20 @@
 {% load staticfiles %}
 {% load helper %}
 
-{% block header %}
-  Posts
-{% endblock header %}
+{% block content-header %}
+    <section class="content-header">
+      <h1>
+        Posts
+        <small>Cadastro</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Posts</li>
+      </ol>
+    </section>
+{% endblock content-header %}
 
-{% block conteudo %}
+{% block content %}
 
 <style type="text/css">
     .file_input {
@@ -151,8 +160,8 @@
     }
 
     (function () {
-        $("#id_tipo option[value=1]").remove()
-        $('.active').removeClass('active');
+        $("#id_tipo option[value=1]").remove();
+        $('.menu-item').removeClass('active');
         $('#menu_post').addClass('active');
         $('#id_video').on('blur', load_youtube_thumbnail);
 

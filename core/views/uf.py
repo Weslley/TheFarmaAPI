@@ -13,10 +13,10 @@ class UfList(ListMixin, AdminBaseMixin):
     paginate_by = 27
     search_default = ('nome', 'nome', 'Nome')
     css_table = 'table'
-    css_div_header = 'card-header'
-    css_div_body = 'card-content table-responsive'
-    css_div_footer = ''
-    detail_url = '\'+ id + \'/'
+    css_div_header = 'box-header'
+    css_div_body = 'box-content table-responsive'
+    css_div_footer = 'box-footer'
+    detail_url = '\'+ pk + \'/'
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
     columns = [
@@ -24,6 +24,7 @@ class UfList(ListMixin, AdminBaseMixin):
         {'lookup': 'nome', 'name': 'Nome'},
         {'lookup': 'icms', 'name': 'ICMS'},
     ]
+    pagination_labels = {'prev': 'Anterior', 'next': 'Próximo', 'first': 'Primeiro', 'last': 'Último'}
 
 
 class UfCreate(CreateView, AdminBaseMixin):

@@ -14,11 +14,12 @@ class AtualizacaoList(ListMixin, AdminBaseMixin):
     paginate_by = 10
     search_default = ('data', '-data', 'Data da atualização')
     css_table = 'table'
-    css_div_header = 'card-header'
-    css_div_body = 'card-content table-responsive'
-    css_div_footer = ''
+    css_div_header = 'box-header'
+    css_div_body = 'box-body table-responsive'
+    css_div_footer = 'box-footer'
     add_button_url = 'adicionar'
     add_button_name = 'Adicionar'
+    detail_url = '\'+ pk + \'/'
     columns = [
         {'lookup': 'data', 'name': 'Data da atualização', 'js_function': 'translate_datetime', 'width': 200},
         {'lookup': 'usuario__first_name', 'name': 'Usuário'},

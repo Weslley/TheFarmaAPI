@@ -1,14 +1,27 @@
 {% extends 'components/new_base.html' %}
 {% load staticfiles %}
 
-{% block header %}
-  Posts
-{% endblock header %}
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Posts
+        <small>Listagem</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Posts</li>
+    </ol>
+</section>
+{% endblock %}
 
-{% block conteudo %}
+{% block content %}
 
-    <div class="card">
-        {{ view.as_table }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                {{ view.as_table }}
+            </div>
+        </div>
     </div>
 
 {% endblock %}
@@ -44,9 +57,8 @@
 {{ view.as_statics }}
 <script type="text/javascript">
     (function () {
-        $('#am_add_button').removeClass('btn-primary');
-        $('#am_add_button').addClass('btn-white');
-        $('.active').removeClass('active');
+        $('#am_add_button').addClass('btn-flat');
+        $('.menu-item').removeClass('active');
         $('#menu_post').addClass('active');
     })();
     $(window).on('load', function () {

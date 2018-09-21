@@ -2,11 +2,21 @@
 {% load staticfiles %}
 {% load helper %}
 
-{% block header %}
-  Parceiros
-{% endblock header %}
 
-{% block conteudo %}
+{% block content-header %}
+    <section class="content-header">
+      <h1>
+        Parceiros
+        <small>Cadastro</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Parceiros</li>
+      </ol>
+    </section>
+{% endblock content-header %}
+
+{% block content %}
 
 <style type="text/css">
     .file_input {

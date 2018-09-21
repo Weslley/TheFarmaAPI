@@ -2,11 +2,79 @@
 {% load staticfiles %}
 {% load helper %}
 
-{% block header %}
-  UFs
-{% endblock header %}
+{% block content-header %}
+    <section class="content-header">
+      <h1>
+        UFs
+        <small>Cadastro</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">UFs</li>
+      </ol>
+    </section>
+{% endblock content-header %}
 
-{% block conteudo %}
+{% block content %}
+<style type="text/css">
+    .tab-pane {
+         height: 330px;
+         max-height: 330px;
+         overflow-y: auto;
+         overflow-x: hidden;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+</style>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab">UF</a></li>
+                    </ul>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>{{ form.nome.label }}</label>
+                                    {{ form.nome|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>{{ form.sigla.label }}</label>
+                                    {{ form.sigla|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>{{ form.icms.label }}</label>
+                                    {{ form.icms|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{% url 'uf-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                        <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block contents %}
 
     <div class="row">
         <form method="post" enctype="multipart/form-data">{% csrf_token %}
@@ -54,7 +122,7 @@
 {% block js %}
     <script type="text/javascript">
         $(window).on('load', function () {
-            $('.active').removeClass('active');
+            $('.menu-item').removeClass('active');
             $('#menu_uf').addClass('active');
         });
     </script>
