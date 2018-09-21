@@ -64,4 +64,5 @@ class MedicamentoDetail(DetailView, AdminBaseMixin):
 
 class MedicamentoDelete(DeleteView, AdminBaseMixin):
     model = Produto
+    pk_url_kwarg = 'id'
     success_url = reverse_lazy('produto-admin-list')
