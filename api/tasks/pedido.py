@@ -65,13 +65,15 @@ def init_proposta(id_pedido):
         # Atualizando pedido
         pedido = Pedido.objects.get(id=id_pedido)
         # selecionando as farmacias proximas
-        farmacias = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias_enviadas)
-        if farmacias:
-            farmacias_enviadas.extend(farmacias)
-            # gerando  propostas das farmacias
-            pedido.gerar_proposta(farmacias)
-            # enviando para as farmaias selecionadas
-            FarmaciaConsumer.send_propostas(pedido, farmacias)
+        farmacias_proximas = Farmacia.objects.proximas(pedido)
+        farmacias_sem_proposta = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias_enviadas)
+        if farmacias_proximas:
+            if farmacias_sem_proposta:
+                farmacias_enviadas.extend(farmacias_sem_proposta)
+                # gerando  propostas das farmacias
+                pedido.gerar_proposta(farmacias_sem_proposta)
+                # enviando para as farmaias selecionadas
+                FarmaciaConsumer.send_propostas(pedido, farmacias_sem_proposta)
 
         else:
             # Status Sem Proposta caso nao existam farmacias proximas
