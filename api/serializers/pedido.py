@@ -668,17 +668,14 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
         elif pedido.forma_pagamento == FormaPagamento.DINHEIRO:
             # Adicionar dia fixo para prestacao dinamicamente
-            from pprint import pprint 
-            print('>>>>>> PEDIDO')
-            pprint(pedido)
             hoje = datetime.now().date()
             vencimento_conta_receber = hoje.replace(month=hoje.month + 1, day=10)
             comissao_parcela, diff = pedido.comissao
 
-            conta_receber = ContaReceber.objects.create(
+            ContaReceber.objects.create(
                 pedido=pedido,
                 data_vencimento=vencimento_conta_receber,
-                valor_parcela=valor_parcela,
+                valor_parcela=pedido.valor_total,
                 valor_comissao=(float(comissao_parcela) + float(diff))
             )
 
