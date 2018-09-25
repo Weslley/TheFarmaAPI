@@ -82,7 +82,7 @@ class Pedido(models.Model):
         comissao_parcela = truncate(comissao_base / self.numero_parcelas, 2)
         diff = 0
         if truncate(comissao_parcela * self.numero_parcelas, 2) < comissao_base:
-            diff = truncate(comissao_base - truncate(comissao_parcela * self.numero_parcelas, 2), 2)
+            diff = truncate(float(comissao_base) - truncate(comissao_parcela * self.numero_parcelas, 2), 2)
 
         return comissao_parcela, diff
 
