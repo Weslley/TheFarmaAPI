@@ -42,8 +42,8 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
                 Q(status=StatusPedido.CANCELADO_PELO_CLIENTE)
             )\
             .filter(farmacia__representantes=representante)\
-            .order_by('contas_receber__data_vencimento')\
-            .annotate(data_criacao=F('contas_receber__data_vencimento'))\
+            .order_by('contas_receber__data_criacao')\
+            .annotate(data_criacao=F('contas_receber__data_criacao'))\
             .values('data_criacao')\
             .annotate(
                 valor_bruto=Sum('contas_receber__valor_parcela'),
