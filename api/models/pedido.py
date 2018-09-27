@@ -22,12 +22,55 @@ from api.utils.math import truncate
 
 
 class Pedido(models.Model):
-    valor_frete = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     cliente = models.ForeignKey(Cliente)
-    status = models.IntegerField(default=StatusPedido.ABERTO, choices=StatusPedido.choices())
-    status_pagamento = models.IntegerField(choices=StatusPagamento.choices(), default=StatusPagamento.ABERTO)
+    farmacia = models.ForeignKey(Farmacia, null=True, related_name='pedidos')
     log = models.OneToOneField(Log)
-    forma_pagamento = models.IntegerField(choices=FormaPagamento.choices(), default=FormaPagamento.CARTAO)
+
+    delivery = models.BooleanField(default=True)
+    valor_frete = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0
+    )
+    valor_bruto = models.DecimalField(
+        max_digits=15, decimal_places=2, default=1,
+        validators=[MinValueValidator(1), ]
+    )
+    valor_total = models.DecimalField(
+        max_digits=15, decimal_places=2, default=1,
+        validators=[MinValueValidator(1), ]
+    )
+    valor_liquido = models.DecimalField(
+        max_digits=15, decimal_places=2, default=1, 
+        validators=[MinValueValidator(1), ]
+    )
+    valor_comissao_administradora = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0, 
+        validators=[MinValueValidator(0), ]
+    )
+    valor_comissao_thefarma = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0, 
+        validators=[MinValueValidator(0), ]
+    )
+    troco = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0, 
+        validators=[MinValueValidator(0), ]
+    )
+    numero_parcelas = models.PositiveIntegerField(
+        default=1, validators=[MinValueValidator(1), ]
+    )
+    status = models.IntegerField(
+        default=StatusPedido.ABERTO, choices=StatusPedido.choices()
+    )
+    status_pagamento = models.IntegerField(
+        choices=StatusPagamento.choices(), default=StatusPagamento.ABERTO
+    )
+    forma_pagamento = models.IntegerField(
+        choices=FormaPagamento.choices(), default=FormaPagamento.CARTAO
+    )
+    status_cartao = models.IntegerField(
+        choices=StatusPagamentoCartao.choices(), 
+        default=StatusPagamentoCartao.NAO_FINALIZADO
+    )
+
     cep = models.CharField(max_length=8, null=True, blank=True)
     logradouro = models.CharField(max_length=80, null=True, blank=True)
     numero = models.IntegerField(null=True, blank=True)
@@ -39,14 +82,13 @@ class Pedido(models.Model):
     nome_destinatario = models.CharField(max_length=80, null=True, blank=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
-    delivery = models.BooleanField(default=True)
-    troco = models.DecimalField(max_digits=15, decimal_places=2, default=0, validators=[MinValueValidator(0), ])
-    administradora_cartao = models.ForeignKey(Administradora, null=True, related_name='pedidos_pagos')
-    farmacia = models.ForeignKey(Farmacia, null=True, related_name='pedidos')
+
     cartao = models.ForeignKey(Cartao, related_name='pedidos', null=True)
-    valor_total = models.DecimalField(max_digits=15, decimal_places=2, default=1, validators=[MinValueValidator(1), ])
-    status_cartao = models.IntegerField(choices=StatusPagamentoCartao.choices(), default=StatusPagamentoCartao.NAO_FINALIZADO)
-    numero_parcelas = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), ])
+    administradora_cartao = models.ForeignKey(
+        Administradora, null=True, 
+        related_name='pedidos_pagos'
+    )
+    
     json_venda = JSONField(null=True)
     json_captura = JSONField(null=True)
     pagamento_status = models.IntegerField(null=True, blank=True)
@@ -94,30 +136,29 @@ class Pedido(models.Model):
         """
         return self.latitude, self.longitude
 
-    @property
-    def valor_bruto(self):
-        from decimal import Decimal
-        valor = Decimal()
-        for contas in self.contas_receber.all():
-            valor += contas.valor_parcela
-        return valor
+    # @property
+    # def valor_bruto(self):
+    #     from decimal import Decimal
+    #     valor = Decimal()
+    #     for contas in self.contas_receber.all():
+    #         valor += contas.valor_parcela
+    #     return valor
 
-    @property
-    def valor_administradora_cartao(self):
-        from decimal import Decimal
-        valor = Decimal()
-        for contas in self.contas_receber.all():
-            valor += contas.valor_administradora_cartao
-
-        return valor
+    # @property
+    # def valor_administradora_cartao(self):
+    #     from decimal import Decimal
+    #     valor = Decimal()
+    #     for contas in self.contas_receber.all():
+    #         valor += contas.valor_administradora_cartao
+    #     return valor
     
 
-    @property
-    def valor_liquido(self):
-        resultado = self.contas_receber.aggregate(valor_liquido=Sum(
-            self.valor_bruto - self.valor_administradora_cartao - F('valor_thefarma') - F('valor_adiantamento')
-        ))
-        return resultado['valor_liquido']
+    # @property
+    # def valor_liquido(self):
+    #     resultado = self.contas_receber.aggregate(valor_liquido=Sum(
+    #         self.valor_bruto - self.valor_administradora_cartao - F('valor_thefarma') - F('valor_adiantamento')
+    #     ))
+    #     return resultado['valor_liquido']
 
     @property
     def propostas(self):
