@@ -34,10 +34,6 @@ class Pedido(models.Model):
         max_digits=15, decimal_places=2, default=1,
         validators=[MinValueValidator(1), ]
     )
-    valor_total = models.DecimalField(
-        max_digits=15, decimal_places=2, default=1,
-        validators=[MinValueValidator(1), ]
-    )
     valor_liquido = models.DecimalField(
         max_digits=15, decimal_places=2, default=1, 
         validators=[MinValueValidator(1), ]
