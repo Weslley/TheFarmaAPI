@@ -9,6 +9,7 @@ class ContaReceber(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='contas_receber')
     status = models.IntegerField(choices=StatusContaReceber.choices(), default=StatusContaReceber.ABERTA)
     data_vencimento = models.DateField()
+    data_criacao = models.DateField(auto_now_add=True)
     valor_parcela = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_administradora_cartao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_administradora_thefarma = models.DecimalField(max_digits=15, decimal_places=2, default=0)
