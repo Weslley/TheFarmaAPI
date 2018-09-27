@@ -38,34 +38,91 @@ class FarmaciaManager(models.Manager):
 
 
 class Farmacia(models.Model):
+    FATURAMENTO_CHOICES = (
+        (5, 5),
+        (10, 10),
+        (15, 15),
+        (20, 20)
+    )
+
     # Dados basicos
     cnpj = models.CharField(verbose_name='CNPJ*', max_length=14)
-    nome_fantasia = models.CharField(verbose_name='Nome Fantasia', max_length=100, blank=True, null=True)
-    razao_social = models.CharField(verbose_name='Razão Social*', max_length=100)
+    nome_fantasia = models.CharField(
+        verbose_name='Nome Fantasia', 
+        max_length=100, blank=True, null=True
+    )
+    razao_social = models.CharField(
+        verbose_name='Razão Social*', max_length=100
+    )
     telefone = models.CharField(verbose_name='Telefone*', max_length=11)
     logo = models.ImageField(upload_to='farmacias', null=True, blank=True)
+
     # Endereco
     endereco = models.OneToOneField(Endereco)
-    data_criacao = models.DateTimeField(verbose_name='Data de criação', auto_now_add=True)
-    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
+    data_criacao = models.DateTimeField(
+        verbose_name='Data de criação', auto_now_add=True
+    )
+    data_atualizacao = models.DateTimeField(
+        verbose_name='Data de atualização', auto_now=True
+    )
+
     # Conta bancaria
     conta_bancaria = models.OneToOneField(ContaBancaria)
+
     # Pedidos
-    servico_entregador = models.BooleanField(verbose_name='Possui Entregador', default=True)
-    servico_estoque = models.BooleanField(verbose_name='Habilitar Estoque', default=False)
-    percentual_similar = models.DecimalField(verbose_name='Percentual Similares', max_digits=15, decimal_places=2, default=0)
-    percentual_generico = models.DecimalField(verbose_name='Percentual Genéricos', max_digits=15, decimal_places=2, default=0)
-    percentual_etico = models.DecimalField(verbose_name='Percentual Éticos', max_digits=15, decimal_places=2, default=0)
-    percentual_nao_medicamentos = models.DecimalField(verbose_name='Percentual não Medicamentos', max_digits=15, decimal_places=2, default=0)
-    tempo_entrega = models.DurationField(verbose_name='Tempo de Entrega', default=timedelta())
-    horario_funcionamento_segunda_sexta_inicial = models.TimeField(verbose_name='Horário Dias Úteis Inicial', default=time(0, 0, 0))
-    horario_funcionamento_segunda_sexta_final = models.TimeField(verbose_name='Horário Dias Úteis Final', default=time(0, 0, 0))
-    horario_funcionamento_sabado_inicial = models.TimeField(verbose_name='Horário Sábados Inicial', default=time(0, 0, 0))
-    horario_funcionamento_sabado_final = models.TimeField(verbose_name='Horário Sábados Final', default=time(0, 0, 0))
-    horario_funcionamento_domingo_inicial = models.TimeField(verbose_name='Horário Domingos Inicial', default=time(0, 0, 0))
-    horario_funcionamento_domingo_final = models.TimeField(verbose_name='Horário Domingos Final', default=time(0, 0, 0))
-    horario_funcionamento_feriado_inicial = models.TimeField(verbose_name='Horário Feriados Inicial', default=time(0, 0, 0))
-    horario_funcionamento_feriado_final = models.TimeField(verbose_name='Horário Feriados Final', default=time(0, 0, 0))
+    servico_entregador = models.BooleanField(
+        verbose_name='Possui Entregador', default=True
+    )
+    servico_estoque = models.BooleanField(
+        verbose_name='Habilitar Estoque', default=False
+    )
+    dia_faturamento = models.IntegerField(
+        verbose_name='Dia de Faturamento', 
+        choices=FATURAMENTO_CHOICES, default=20
+    )
+    percentual_similar = models.DecimalField(
+        verbose_name='Percentual Similares', 
+        max_digits=15, decimal_places=2, default=0
+    )
+    percentual_generico = models.DecimalField(
+        verbose_name='Percentual Genéricos', 
+        max_digits=15, decimal_places=2, default=0
+    )
+    percentual_etico = models.DecimalField(
+        verbose_name='Percentual Éticos', 
+        max_digits=15, decimal_places=2, default=0
+    )
+    percentual_nao_medicamentos = models.DecimalField(
+        verbose_name='Percentual não Medicamentos', 
+        max_digits=15, decimal_places=2, default=0
+    )
+    tempo_entrega = models.DurationField(
+        verbose_name='Tempo de Entrega', default=timedelta()
+    )
+    horario_funcionamento_segunda_sexta_inicial = models.TimeField(
+        verbose_name='Horário Dias Úteis Inicial', default=time(0, 0, 0)
+    )
+    horario_funcionamento_segunda_sexta_final = models.TimeField(
+        verbose_name='Horário Dias Úteis Final', default=time(0, 0, 0)
+    )
+    horario_funcionamento_sabado_inicial = models.TimeField(
+        verbose_name='Horário Sábados Inicial', default=time(0, 0, 0)
+    )
+    horario_funcionamento_sabado_final = models.TimeField(
+        verbose_name='Horário Sábados Final', default=time(0, 0, 0)
+    )
+    horario_funcionamento_domingo_inicial = models.TimeField(
+        verbose_name='Horário Domingos Inicial', default=time(0, 0, 0)
+    )
+    horario_funcionamento_domingo_final = models.TimeField(
+        verbose_name='Horário Domingos Final', default=time(0, 0, 0)
+    )
+    horario_funcionamento_feriado_inicial = models.TimeField(
+        verbose_name='Horário Feriados Inicial', default=time(0, 0, 0)
+    )
+    horario_funcionamento_feriado_final = models.TimeField(
+        verbose_name='Horário Feriados Final', default=time(0, 0, 0)
+    )
     latitude = models.FloatField(verbose_name='Latitude*')
     longitude = models.FloatField(verbose_name='Longitude*')
     objects = FarmaciaManager()
