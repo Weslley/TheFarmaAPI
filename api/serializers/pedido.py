@@ -210,7 +210,8 @@ class PedidoSerializer(PedidoCreateSerializer):
             "cartao",
             "status_pagamento",
             "status_cartao",
-            "valor_total",
+            "valor_bruto",
+            "valor_liquido",
             "numero_parcelas",
             "itens"
         )
@@ -291,7 +292,8 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             "cartao",
             "status_pagamento",
             "status_cartao",
-            "valor_total",
+            "valor_bruto",
+            "valor_liquido",
             "numero_parcelas",
             "itens",
             "propostas"
