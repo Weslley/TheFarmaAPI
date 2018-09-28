@@ -1,9 +1,13 @@
 from cieloApi3 import *
-from decouple import config
 from api.servico_pagamento.servicos.servico_abc import Servico
 from api.servico_pagamento import tipo_servicos
 from api.utils import erros_cielo, status_transacao_cartao_cielo
 from api.utils.generics import print_exception
+
+from decouple import config
+
+import unicodedata
+
 
 SANDBOX = config('CIELO_SANDBOX', default=False, cast=bool)
 MERCHANT_ID = config('CIELO_MERCHANT_ID', default='')
@@ -164,6 +168,10 @@ class ServicoCielo(Servico):
         year = int(validate_data['ano_expiracao'])
         cliente = validate_data['cliente']
         customer_name = cliente.usuario.get_full_name() if cliente.usuario.get_full_name() else ''
+        # Substituir letras com acento por seu equivalente
+        if customer_name:
+            nfkd = unicodedata.normalize('NFKD', customer_name)
+            customer_name = u"".join([c for c in nfkd if not unicodedata.combining(c)])
 
         credit_card = CreditCard(validate_data['cvv'], validate_data['bandeira'])
         credit_card.expiration_date = '{:02d}/{:d}'.format(month, year)
