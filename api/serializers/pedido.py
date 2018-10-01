@@ -669,24 +669,17 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             self.instance = pedido
 
         elif pedido.forma_pagamento == FormaPagamento.DINHEIRO:
-            # Adicionar dia fixo para prestacao dinamicamente
-            hoje = datetime.now().date()
-            vencimento_conta_receber = hoje.replace(month=hoje.month + 1, day=10)
             comissao_parcela, diff = pedido.comissao
 
-            ContaReceber.objects.create(
-                pedido=pedido,
-                data_vencimento=vencimento_conta_receber,
-                valor_parcela=pedido.valor_total,
-                valor_comissao=(float(comissao_parcela) + float(diff))
-            )
+            pedido.valor_comissao_thefarma = (float(comissao_parcela) + float(diff))
+            pedido.valor_liquido = (float(pedido.valor_bruto) - float(pedido.valor_comissao_thefarma))
+            pedido.save()
 
-            self.instance = pedido
 
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
         valor_total = instance.get_total_farmacia(farmacia)
-        validated_data['valor_total'] = valor_total
+        validated_data['valor_bruto'] = valor_total
 
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
             cartao = validated_data['cartao']
