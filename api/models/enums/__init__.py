@@ -8,3 +8,4 @@ from .status_produto import StatusProduto
 from .status_pagamento import StatusPagamento
 from .devedor import Devedor
 from .tipo_venda import TipoVenda
+from .pagador_contas import PagadorContas
