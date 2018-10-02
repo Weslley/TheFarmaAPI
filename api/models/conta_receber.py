@@ -1,20 +1,36 @@
 from django.db import models
 
 from api.models.enums import StatusContaReceber
+from api.models.enums import PagadorContas
 from api.models.enums.forma_pagamento import FormaPagamento
 from api.models.pedido import Pedido
 
 
 class ContaReceber(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='contas_receber')
-    status = models.IntegerField(choices=StatusContaReceber.choices(), default=StatusContaReceber.ABERTA)
+    pagador = models.IntegerField(
+        choices=PagadorContas.choices(), 
+        default=PagadorContas.FARMACIA
+    )
+    status = models.IntegerField(
+        choices=StatusContaReceber.choices(), 
+        default=StatusContaReceber.ABERTA
+    )
     data_vencimento = models.DateField()
     data_criacao = models.DateField(auto_now_add=True)
-    valor_parcela = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    percentual_administradora_cartao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    percentual_administradora_thefarma = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    valor_parcela = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0
+    )
+    percentual_administradora_cartao = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0
+    )
+    percentual_administradora_thefarma = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0
+    )
     numero_parcela = models.IntegerField(default=1)
-    valor_comissao = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    valor_comissao = models.DecimalField(
+        max_digits=15, decimal_places=2, default=0
+    )
 
     @property
     def valor_bruto(self):
