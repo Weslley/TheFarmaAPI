@@ -686,15 +686,6 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
             cartao = validated_data['cartao']
             try:
-                # venda = object
-                # data['venda'] = venda = VendaCartao.objects.create(
-                #     motorista=data['unidade'].motorista,
-                #     unidade=data['unidade'],
-                #     descricao='RADIO TAXI',
-                #     valor=data['valor'],
-                #     bandeira=self.translate_brand(data['bandeira'])
-                # )
-
                 venda = {
                     'pedido_id': instance.id,
                     'valor': valor_total,
@@ -709,25 +700,10 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                 instance.json_venda = json_venda
                 instance.json_captura = json_captura
                 instance.pagamento_status = int(json_venda['Payment']['Status'])
-                # venda.pagamento_numero_autorizacao = int(json_venda['Payment']['ProofOfSale']) if 'ProofOfSale' in \
-                #                                                         json_venda['Payment'] else None
                 pagamento_id = json_venda['Payment']['PaymentId']
-                # venda.pagamento_data_recebimento = datetime.strptime(json_venda['Payment']['ReceivedDate'],
-                #                                                      '%Y-%m-%d %H:%M:%S')
-                # venda.pagamento_codigo_autorizacao = json_venda['Payment'][
-                #     'AuthorizationCode'] if 'AuthorizationCode' in \
-                #                             json_venda[
-                #                                 'Payment'] else None
-                # venda.pagamento_tid = str(json_venda['Payment']['Tid'])
-                # venda.pagamento_mensagem_retorno = json_venda['Payment']['ReturnMessage']
-                # venda.pagamento_codigo_retorno = json_venda['Payment']['ReturnCode']
 
                 if json_captura:
-                    # venda.capturado = True
                     instance.captura_status = int(json_captura['Status'])
-                    # venda.captura_codigo_retorno = json_captura['ReturnCode']
-                    # venda.captura_mensagem_retorno = json_captura['ReturnMessage']
-
                     instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
 
                 instance.save()
