@@ -689,6 +689,8 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         valor_total = instance.get_total_farmacia(farmacia)
         valor_frete = farmacia.valor_frete
 
+        validated_data['valor_bruto_sem_frete'] = valor_total
+
         if instance.delivery:
             validated_data['valor_frete'] = valor_frete
             valor_total = valor_total + valor_frete

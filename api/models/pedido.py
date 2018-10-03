@@ -33,6 +33,11 @@ class Pedido(models.Model):
     valor_frete = models.DecimalField(
         max_digits=15, decimal_places=2, default=0
     )
+    valor_bruto_sem_frete = models.DecimalField(
+        max_digits=15, decimal_places=2, default=1,
+        null=True, blank=True,
+        validators=[MinValueValidator(1), ]
+    )
     valor_bruto = models.DecimalField(
         max_digits=15, decimal_places=2, default=1,
         validators=[MinValueValidator(1), ]
