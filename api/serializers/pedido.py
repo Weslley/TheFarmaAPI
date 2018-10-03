@@ -297,7 +297,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             "valor_liquido",
             "numero_parcelas",
             "itens",
-            "propostas"
+            "propostas",
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -406,6 +406,7 @@ class PropostaSerializer(serializers.ModelSerializer):
             "farmacia",
             "status_submissao"
         )
+
         extra_kwargs = {
             'id': {'read_only': True},
             'log': {'read_only': True},
@@ -665,7 +666,8 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                     pedido.valor_liquido = (
                         float(pedido.valor_bruto) -
                         float(pedido.valor_comissao_thefarma) -
-                        float(pedido.valor_comissao_administradora)
+                        float(pedido.valor_comissao_administradora) -
+                        float(pedido.valor_frete)
                     )
 
                     pedido.save()
@@ -674,13 +676,23 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
         elif pedido.forma_pagamento == FormaPagamento.DINHEIRO:
             pedido.valor_comissao_thefarma = (float(comissao_parcela) + float(diff))
-            pedido.valor_liquido = (float(pedido.valor_bruto) - float(pedido.valor_comissao_thefarma))
+            pedido.valor_liquido = (
+                float(pedido.valor_bruto) - 
+                float(pedido.valor_comissao_thefarma) -
+                float(pedido.valor_frete)
+            )
             pedido.save()
 
 
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
         valor_total = instance.get_total_farmacia(farmacia)
+        valor_frete = farmacia.valor_frete
+
+        if instance.delivery:
+            validated_data['valor_frete'] = valor_frete
+            valor_total = valor_total + valor_frete
+
         validated_data['valor_bruto'] = valor_total
 
         if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:

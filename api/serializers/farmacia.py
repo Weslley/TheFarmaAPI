@@ -22,6 +22,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'cnpj',
+            'valor_frete',
             'nome_fantasia',
             'razao_social',
             'tempo_entrega',
@@ -32,7 +33,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
             'latitude',
             'longitude',
             'horarios',
-            'telefone'
+            'telefone',
         )
 
     def get_horarios(self, obj):
