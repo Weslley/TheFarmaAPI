@@ -258,6 +258,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
     propostas = serializers.SerializerMethodField()
     farmacia = serializers.SerializerMethodField()
     bairro = serializers.SerializerMethodField()
+    views = serializers.SerializerMethodField()
     cartao = CartaoSerializer()
 
     def get_propostas(self, obj):
@@ -274,6 +275,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             "id",
             "valor_frete",
             "status",
+            "views",
             "log",
             "forma_pagamento",
             "cep",
@@ -305,6 +307,11 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             'status': {'read_only': True},
             'valor_frete': {'read_only': True},
         }
+
+    def get_views(self, obj):
+        if obj.views:
+            return obj.views
+        return 0
 
     def get_bairro(self, obj):
         if obj.bairro:

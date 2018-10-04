@@ -29,6 +29,8 @@ class Pedido(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_faturamento = models.DateTimeField(null=True, blank=True)
 
+    views = models.IntegerField(default=0, null=True, blank=True)
+
     delivery = models.BooleanField(default=True)
     valor_frete = models.DecimalField(
         max_digits=15, decimal_places=2, default=0
