@@ -9,6 +9,5 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'thefarmaapi.settings')
 
 app = Celery('thefarmaapi')
-
-app.config_from_object('thefarmaapi.settings')
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()

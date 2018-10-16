@@ -9,11 +9,11 @@ from api.models.pedido import Pedido
 class ContaReceber(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='contas_receber')
     pagador = models.IntegerField(
-        choices=PagadorContas.choices(), 
+        choices=PagadorContas.choices(),
         default=PagadorContas.FARMACIA
     )
     status = models.IntegerField(
-        choices=StatusContaReceber.choices(), 
+        choices=StatusContaReceber.choices(),
         default=StatusContaReceber.ABERTA
     )
     data_vencimento = models.DateField()
