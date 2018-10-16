@@ -14,6 +14,7 @@ from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
                               StatusPagamentoCartao, StatusPedido)
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.tipo_produto import TipoProduto
+from api.models.enums.status_pedido_faturamento import StatusPedidoFaturamento
 from api.models.farmacia import Farmacia
 from api.models.log import Log
 from django.contrib.postgres.fields import JSONField
@@ -28,6 +29,10 @@ class Pedido(models.Model):
 
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_faturamento = models.DateTimeField(null=True, blank=True)
+    status_faturamento = models.IntegerField(
+        choices=StatusPedidoFaturamento.choices(),
+        default=StatusPedidoFaturamento.NAO_FATURADO
+    )
 
     views = models.IntegerField(default=0, null=True, blank=True)
 
