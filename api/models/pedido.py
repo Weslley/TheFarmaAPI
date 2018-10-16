@@ -31,7 +31,8 @@ class Pedido(models.Model):
     data_faturamento = models.DateTimeField(null=True, blank=True)
     status_faturamento = models.IntegerField(
         choices=StatusPedidoFaturamento.choices(),
-        default=StatusPedidoFaturamento.NAO_FATURADO
+        default=StatusPedidoFaturamento.NAO_FATURADO,
+        null=True
     )
 
     views = models.IntegerField(default=0, null=True, blank=True)
