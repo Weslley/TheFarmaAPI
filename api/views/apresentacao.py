@@ -1,7 +1,7 @@
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Sum, FloatField, F, Count, Value
+from django.db.models import Sum, FloatField, F, Count, Value, Q
 # from django_filters.rest_framework import DjangoFilterBackend
 from pyrebase import pyrebase
 from rest_framework import generics, status
@@ -86,7 +86,7 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
             _ranking=Sum(F('ranking_visualizacao') * Value(c.peso_ranking_visualizacao), output_field=FloatField()) +
             Sum(F('ranking_proposta') * Value(c.peso_ranking_proposta), output_field=FloatField()) +
             Sum(F('ranking_compra') * Value(c.peso_ranking_compra), output_field=FloatField())
-        ).order_by('patrocinio', '-_ranking')
+        ).filter(~Q(tabelas__pmc=0)).order_by('tabelas__pmc', 'patrocinio', '-_ranking')
 
 
 class ApresentacaoMaisVendidasPorEstadoList(generics.ListAPIView):
