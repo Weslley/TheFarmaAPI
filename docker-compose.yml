@@ -27,21 +27,20 @@ services:
       - "8000"
     restart: always
     environment:
-     - DEBUG=False
-     - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
-     - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
-     - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
-     - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
-     - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
-     - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
-     - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
-     - CORS_ORIGIN_WHITELIST=localhost:8000
-     - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
-     - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
-     - CIELO_SANDBOX=True
-     - REDIS_CHANNELS_HOST=api.thefarma.com.br
-     - REDIS_CHANNELS_PORT=32769
-     
+      - DEBUG=False
+      - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
+      - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
+      - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
+      - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
+      - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
+      - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
+      - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
+      - CORS_ORIGIN_WHITELIST=localhost:8000
+      - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
+      - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
+      - CIELO_SANDBOX=True
+      - REDIS_CHANNELS_HOST=api.thefarma.com.br
+      - REDIS_CHANNELS_PORT=32769
 
   worker_default:
     build:
@@ -52,20 +51,20 @@ services:
       - media-data:/thefarmaapi/media
     restart: always
     environment:
-     - DEBUG=False
-     - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
-     - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
-     - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
-     - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
-     - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
-     - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
-     - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
-     - CORS_ORIGIN_WHITELIST=localhost:8000
-     - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
-     - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
-     - CIELO_SANDBOX=True
-     - REDIS_CHANNELS_HOST=api.thefarma.com.br
-     - REDIS_CHANNELS_PORT=32769
+      - DEBUG=False
+      - BROKER_URL_INI=redis://redis:6379
+      - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
+      - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
+      - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
+      - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
+      - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
+      - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
+      - CORS_ORIGIN_WHITELIST=localhost:8000
+      - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
+      - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
+      - CIELO_SANDBOX=True
+      - REDIS_CHANNELS_HOST=api.thefarma.com.br
+      - REDIS_CHANNELS_PORT=32769
 
   channels:
     build:
@@ -80,20 +79,30 @@ services:
       - "443"
     restart: always
     environment:
-     - DEBUG=False
-     - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
-     - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
-     - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
-     - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
-     - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
-     - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
-     - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
-     - CORS_ORIGIN_WHITELIST=localhost:8000
-     - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
-     - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
-     - CIELO_SANDBOX=True
-     - REDIS_CHANNELS_HOST=api.thefarma.com.br
-     - REDIS_CHANNELS_PORT=32769
+      - DEBUG=False
+      - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
+      - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
+      - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
+      - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
+      - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
+      - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
+      - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
+      - CORS_ORIGIN_WHITELIST=localhost:8000
+      - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
+      - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
+      - CIELO_SANDBOX=True
+      - REDIS_CHANNELS_HOST=api.thefarma.com.br
+      - REDIS_CHANNELS_PORT=32769
+    depends_on:
+      - redis
+
+  # redis_channels:
+  #   image: redis:alpine
+  #   container_name: redis_channels
+  
+  redis_celery:
+    image: redis:alpine
+    container_name: redis_celery
 
 volumes:
   static-data:
