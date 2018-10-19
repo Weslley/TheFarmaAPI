@@ -94,13 +94,14 @@ services:
       - REDIS_CHANNELS_HOST=api.thefarma.com.br
       - REDIS_CHANNELS_PORT=32769
     depends_on:
-      - redis
+      - redis_channels
+      - redis_celery
 
-  # redis_channels:
-  #   image: redis:alpine
-  #   container_name: redis_channels
+  redis_channels:
+    image: redis:alpine
+    container_name: redis_channels
   
-  redis:
+  redis_celery:
     image: redis:alpine
     container_name: redis_celery
 
