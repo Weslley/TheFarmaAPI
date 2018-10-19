@@ -90,7 +90,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/thefarmaapi.pem:certKey=/etc/certificates/thefarmaapi.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
+    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/api.thefarma.com.br.pem:certKey=/etc/certificates/api.thefarma.com.br.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
     volumes:
       - media-data:/thefarmaapi/media
       - ./config/prod/ssl:/etc/certificates
