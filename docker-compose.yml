@@ -83,7 +83,8 @@ services:
     env_file:
       - dev.env
     depends_on:
-      - redis
+      - redis_channels
+      - redis_celery
 
   channels:
     build:
