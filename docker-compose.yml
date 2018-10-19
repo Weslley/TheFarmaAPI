@@ -41,12 +41,15 @@ services:
       - CIELO_SANDBOX=True
       - REDIS_CHANNELS_HOST=api.thefarma.com.br
       - REDIS_CHANNELS_PORT=32769
+    depends_on:
+      - redis_channels
+      - redis_celery
 
   worker_default:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas --hostname=worker_default"
+    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,contas --hostname=worker_default"
     volumes:
       - media-data:/thefarmaapi/media
     restart: always
@@ -65,6 +68,22 @@ services:
       - CIELO_SANDBOX=True
       - REDIS_CHANNELS_HOST=api.thefarma.com.br
       - REDIS_CHANNELS_PORT=32769
+    depends_on:
+      - redis_channels
+      - redis_celery
+    
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "celery -A thefarmaapi beat -l debug"
+    volumes:
+      - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
+    env_file:
+      - dev.env
+    depends_on:
+      - redis
 
   channels:
     build:
