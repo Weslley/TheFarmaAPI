@@ -86,7 +86,7 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
             _ranking=Sum(F('ranking_visualizacao') * Value(c.peso_ranking_visualizacao), output_field=FloatField()) +
             Sum(F('ranking_proposta') * Value(c.peso_ranking_proposta), output_field=FloatField()) +
             Sum(F('ranking_compra') * Value(c.peso_ranking_compra), output_field=FloatField())
-        ).filter(~Q(tabelas__pmc=0)).order_by('tabelas__pmc', 'patrocinio', '-_ranking')
+        ).order_by('tabelas__pmc', 'patrocinio', '-_ranking')
 
 
 class ApresentacaoMaisVendidasPorEstadoList(generics.ListAPIView):
