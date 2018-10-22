@@ -148,7 +148,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -201,13 +201,14 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_BEAT_SCHEDULE = {
-    'task-check-billing': {
-        'task': 'faturamento',
-        'schedule': 60.0,
-    },
-}
+# Comentario temporario / Workers com tasks normais nao executam com beat
+# CELERY_TIMEZONE = TIME_ZONE
+# CELERY_BEAT_SCHEDULE = {
+#     'task-check-billing': {
+#         'task': 'faturamento',
+#         'schedule': 60.0,
+#     },
+# }
 
 # CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=casting.to_tuple(','))
 CORS_ORIGIN_ALLOW_ALL = True
@@ -216,7 +217,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
-            'hosts': ['redis://redis_channels:6379'],
+            'hosts': [('redis://redis_channels:6379/1')],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }
