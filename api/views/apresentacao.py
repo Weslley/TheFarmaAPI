@@ -1,7 +1,7 @@
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Sum, FloatField, F, Count, Value, Q
+from django.db.models import Sum, FloatField, F, Count, Value
 # from django_filters.rest_framework import DjangoFilterBackend
 from pyrebase import pyrebase
 from rest_framework import generics, status

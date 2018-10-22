@@ -5,7 +5,7 @@ from pyrebase import pyrebase
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Count, Case, When, Q
+from django.db.models import Count, Case, When
 from api.filters import MedicamentoFilter, OrderingFilter, ProdutoFilter, ProdutoIndicadorVendaFilter
 from api.mixins.base import SyncApiMixin
 from api.models.cidade import Cidade
@@ -88,8 +88,7 @@ class ProdutosBuscaNova(generics.ListAPIView):
     """
     Listagem de todos os produtos
     """
-    queryset = Produto.objects.filter(
-        ~Q(apresentacoes__tabelas__pmc=0), apresentacoes__isnull=False).distinct()
+    queryset = Produto.objects.filter(apresentacoes__isnull=False).distinct()
     serializer_class = ProdutoNovoSerializer
     pagination_class = SmallResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
