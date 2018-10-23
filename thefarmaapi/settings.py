@@ -224,6 +224,6 @@ CHANNEL_LAYERS = {
 }
 
 # HTTPS = config('HTTPS', default='https://')
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 FAKER_DOMAIN_EMAIL = config('FAKER_DOMAIN_EMAIL', default='thefarma_domain')
