@@ -169,8 +169,24 @@ class LoginClienteSerializer(serializers.ModelSerializer):
                     user.email = email
                     user.save()
             except User.DoesNotExist:
+                data = self._kwargs.get('data')
+                fb_data = data.get('facebook_data')
+                foto_url = fb_data.get('picture').get('data').get('url')
+
                 user = User.objects.create(email=email)
-                Cliente.objects.create(usuario=user, facebook_id=facebook_id)
+                user.username = create_username(email)
+                user.first_name = fb_data.get('first_name')
+                user.last_name = fb_data.get('last_name')
+                user.save()
+
+                cliente = Cliente.objects.create(
+                    usuario=user,
+                    facebook_id=data.get('facebook_id')
+                )
+                update_foto_facebook.apply_async(
+                    [cliente.id, foto_url], 
+                    queue='update_cliente', countdown=1
+                )
 
             return user
         else:
