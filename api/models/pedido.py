@@ -185,7 +185,7 @@ class Pedido(models.Model):
                 'itens': farmacia.get_itens_proposta(self),
                 'status': farmacia.get_status_proposta(self),
                 'valor_total': farmacia.get_valor_proposta(self),
-                'valor_frete': farmacia.valor_frete,
+                'valor_frete': farmacia.get_valor_frete(self),
                 'valor_total_com_frete': farmacia.get_valor_proposta_com_frete(self),
                 'quantidade_maxima_parcelas': farmacia.get_quantidade_maxima_parcelas(self)
             }
