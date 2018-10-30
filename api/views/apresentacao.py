@@ -61,31 +61,51 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = ApresentacaoBuscaFilter
 
-    def get_serializer_context(self):
-        context = super(ApresentacaoPorEstadoList, self).get_serializer_context()
-        context['cidade'] = None
-
+    def get_cidade(self):
         unidade_federativa = self.kwargs['uf']
         nome_cidade = self.request.GET.get('cidade')
 
         cidades = Cidade.objects.filter(uf__sigla=unidade_federativa)
+        print(unidade_federativa, '~', cidades)
 
         if nome_cidade:
             nome_cidade = nome_cidade.strip()
             cidades = cidades.filter(nome__iexact=nome_cidade)
 
         if cidades.count():
-            context['cidade'] = cidades.first()
+            return cidades.first()
+
+
+    def get_serializer_context(self):
+        context = super(ApresentacaoPorEstadoList, self).get_serializer_context()
+        context['cidade'] = self.get_cidade()
 
         return context
 
     def get_queryset(self):
         qs = super(ApresentacaoPorEstadoList, self).get_queryset()
+
+        cidade = self.get_cidade()
+        icms = cidade.uf.icms
+
+        qs = qs.filter(tabelas__icms=icms)
+
         c = Configuracao.objects.first()
         return qs.annotate(
-            _ranking=Sum(F('ranking_visualizacao') * Value(c.peso_ranking_visualizacao), output_field=FloatField()) +
-            Sum(F('ranking_proposta') * Value(c.peso_ranking_proposta), output_field=FloatField()) +
-            Sum(F('ranking_compra') * Value(c.peso_ranking_compra), output_field=FloatField())
+            _ranking=(
+                Sum(
+                    F('ranking_visualizacao') * Value(c.peso_ranking_visualizacao), 
+                    output_field=FloatField()
+                ) +
+                Sum(
+                    F('ranking_proposta') * Value(c.peso_ranking_proposta), 
+                    output_field=FloatField()
+                ) +
+                Sum(
+                    F('ranking_compra') * Value(c.peso_ranking_compra),
+                    output_field=FloatField()
+                )
+            )
         ).order_by('tabelas__pmc', 'patrocinio', '-_ranking')
 
 
