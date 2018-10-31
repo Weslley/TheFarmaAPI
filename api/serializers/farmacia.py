@@ -140,7 +140,10 @@ class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Farmacia
-        fields = ('cnpj', 'nome_fantasia', 'razao_social', 'conta_bancaria')
+        fields = (
+            'cnpj', 'nome_fantasia', 'razao_social',
+            'conta_bancaria', 'valor_frete'
+        )
 
     def update(self, instance, validated_data):
         with transaction.atomic():
