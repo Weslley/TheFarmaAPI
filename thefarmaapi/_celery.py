@@ -19,4 +19,4 @@ def setup_periodic_tasks(sender, **kwargs):
 @app.task
 def call_period_tasks():
     from api.tasks.contas import faturamento
-    faturamento.apply_async()
+    faturamento()
