@@ -16,7 +16,7 @@ app.autodiscover_tasks()
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(30.0, call_period_tasks.s())
 
-@app.task
+@app.task(queue='periodicos')
 def call_period_tasks():
     from api.tasks.contas import faturamento
     faturamento()

@@ -78,7 +78,7 @@ def faturar_pedido(pedido):
 	pedido.save()
 
 
-@shared_task(queue='contas', name="faturamento")
+@shared_task
 def faturamento():
 	# print("fazer fatuarmento mensal")
 	pedidos_nao_faturados = Pedido.objects.filter(
