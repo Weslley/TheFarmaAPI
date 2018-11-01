@@ -26,16 +26,11 @@ class EnderecoClienteCreateSerializer(serializers.ModelSerializer):
 
 class EnderecoSerializer(serializers.ModelSerializer):
     cidade = CidadeCreateUpdateSerializer()
-    bairro = BairroCreateUpdateSerializer()
     data_atualizacao = serializers.SerializerMethodField()
 
     def validate_cidade(self, value):
         cidade = Cidade.objects.get(ibge=value['ibge'])
         return cidade
-
-    def validate_bairro(self, value):
-        bairro = Bairro.objects.get(id=value['id'])
-        return bairro
 
     class Meta:
         model = Endereco

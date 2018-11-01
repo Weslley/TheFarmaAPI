@@ -66,7 +66,6 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
         nome_cidade = self.request.GET.get('cidade')
 
         cidades = Cidade.objects.filter(uf__sigla=unidade_federativa)
-        print(unidade_federativa, '~', cidades)
 
         if nome_cidade:
             nome_cidade = nome_cidade.strip()
