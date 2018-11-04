@@ -320,7 +320,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
 
     def get_bairro(self, obj):
         if obj.bairro:
-            return obj.bairro.nome
+            return obj.bairro
         return ''
 
     def get_farmacia(self, obj):
