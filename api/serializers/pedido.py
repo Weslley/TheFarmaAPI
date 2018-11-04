@@ -45,6 +45,11 @@ class AnnotationPedidoSerializer(serializers.Serializer):
     valor_liquido = serializers.CharField()
 
 
+class PedidoMinimalSerializer(serializers.Serializer):
+    liquido = serializers.CharField()
+    bruto = serializers.CharField()
+
+
 class ItemPedidoCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
