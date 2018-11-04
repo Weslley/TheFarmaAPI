@@ -66,7 +66,7 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
         data = {
             'conta_atual': ContaSerializer(contas.first(), many=False).data,
             'contas': ContaSerializer(contas[:6], many=True).data,
-            'vendas_hoje': PedidoMinimalSerializer(pedidos_de_hoje, many=True).data,
+            'vendas_hoje': PedidoMinimalSerializer(pedidos_de_hoje, many=False).data,
             'rendimentos': {
                 'labels': [n.upper() for n in calendar.month_name if n],
                 'values': values
