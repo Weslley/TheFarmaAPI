@@ -40,7 +40,7 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
                 data_criacao__month=hoje.month,
                 data_criacao__day=hoje.day
             )\
-            .annotate(
+            .aggregate(
                 bruto=Sum('valor_bruto'),
                 liquido=Sum('valor_liquido')
             )
