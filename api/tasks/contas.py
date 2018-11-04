@@ -65,7 +65,7 @@ def faturar_pedido(pedido):
 	if pedido.forma_pagamento == FormaPagamento.CARTAO:
 		faturamento.valor_total -= pedido.valor_bruto
 	else:
-		faturamento.valor_total += pedido.valor_bruto
+		faturamento.valor_total += pedido.valor_comissao_thefarma
 
 	if faturamento.valor_total < 0:
 		faturamento.tipo = StatusConta.PAGAR
