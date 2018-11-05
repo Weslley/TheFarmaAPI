@@ -53,17 +53,26 @@
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.razao_social.label }}</label>
                                         {{ form.razao_social|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.razao_social.errors }}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.nome_fantasia.label }}</label>
                                         {{ form.nome_fantasia|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.nome_fantasia.errors }}</span>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                        <div class="form-group ">
+                                            <label class="control-label">{{ form.dia_faturamento.label }}</label>
+                                            {{ form.dia_faturamento|addclass:"form-control" }}
+                                            <span id="helpBlock" class="help-block">{{ form.dia_faturamento.errors }}</span>
+                                        </div>
+                                    </div>
                             </div>
 
                             <div class="row">
@@ -71,18 +80,21 @@
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.cnpj.label }}</label>
                                         {{ form.cnpj|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.cnpj.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.telefone.label }}</label>
                                         {{ form.telefone|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.telefone.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group ">
                                         <label style="margin-top: 12px;">{{ form.logo.label }}</label>
                                         {{ form.logo }}
+                                        <span id="helpBlock" class="help-block">{{ form.logo.errors }}</span>
                                         <div class="clearfix"></div>
                                     </div>
                                 </div>
@@ -97,18 +109,21 @@
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.cep.label }}</label>
                                         {{ form.cep|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.cep.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.logradouro.label }}</label>
                                         {{ form.logradouro|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.logradouro.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.numero.label }}</label>
                                         {{ form.numero|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.numero.errors }}</span>
                                     </div>
                                 </div>
                                 </div>
@@ -118,6 +133,7 @@
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.complemento.label }}</label>
                                         {{ form.complemento|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.complemento.errors }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -127,12 +143,14 @@
                                     <div class="form-group ">
                                         <label>{{ form.cidade.label }}</label>
                                         {{ form.cidade|addclass:"form-control select2" }}
+                                        <span id="helpBlock" class="help-block">{{ form.cidade.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group ">
                                         <label>{{ form.bairro.label }}</label>
                                         <select id="id_bairro" name="bairro" required class="form-control select2"></select>
+                                        <span id="helpBlock" class="help-block">{{ form.bairro.errors }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -146,18 +164,21 @@
                                 <div class="form-group ">
                                     <label class="control-label">{{ form.banco.label }}</label>
                                     {{ form.banco|addclass:"form-control select2" }}
+                                    <span id="helpBlock" class="help-block">{{ form.banco.errors }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group ">
                                     <label class="control-label">{{ form.numero_agencia.label }}</label>
                                     {{ form.numero_agencia|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.numero_agencia.errors }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group ">
                                     <label class="control-label">{{ form.digito_agencia.label }}</label>
                                     {{ form.digito_agencia|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.digito_agencia.errors }}</span>
                                 </div>
                             </div>
                             </div>
@@ -167,18 +188,21 @@
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.numero_conta.label }}</label>
                                         {{ form.numero_conta|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.numero_conta.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.digito_conta.label }}</label>
                                         {{ form.digito_conta|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.digito_conta.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.operacao.label }}</label>
                                         {{ form.operacao|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.operacao.errors }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -334,14 +358,23 @@
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.latitude.label }}</label>
                                         {{ form.latitude|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.latitude.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group ">
                                         <label class="control-label">{{ form.longitude.label }}</label>
                                         {{ form.longitude|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.longitude.errors }}</span>
                                     </div>
                                 </div>
+                                <div class="col-md-3">
+                                        <div class="form-group ">
+                                            <label class="control-label">{{ form.valor_frete.label }}*</label>
+                                            {{ form.valor_frete|addclass:"form-control" }}
+                                            <span id="helpBlock" class="help-block">{{ form.valor_frete.errors }}</span>
+                                        </div>
+                                    </div>
                             </div>
 
                         </div>
