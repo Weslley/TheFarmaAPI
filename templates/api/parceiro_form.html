@@ -43,12 +43,14 @@
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.razao_social.label }}</label>
                                     {{ form.razao_social|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.razao_social.errors }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.nome_fantasia.label }}</label>
                                     {{ form.nome_fantasia|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.nome_fantasia.errors }}</span>
                                 </div>
                             </div>
                         </div>
@@ -58,12 +60,14 @@
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.cpf_cnpj.label }}</label>
                                     {{ form.cpf_cnpj|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.cpf_cnpj.errors }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.telefone.label }}</label>
                                     {{ form.telefone|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.telefone.errors }}</span>
                                 </div>
                             </div>
                         </div>
@@ -73,6 +77,7 @@
                                 <div class="form-group label-floating">
                                     <label class="control-label">{{ form.site.label }}</label>
                                     {{ form.site|addclass:"form-control" }}
+                                    <span id="helpBlock" class="help-block">{{ form.site.errors }}</span>
                                 </div>
                             </div>
                         </div>
@@ -98,6 +103,7 @@
                                     <i class="material-icons file_input">file_upload</i>
                                     <label style="margin-top: 12px;">{{ form.logo.label }}</label>
                                     {{ form.logo }}
+                                    <span id="helpBlock" class="help-block">{{ form.logo.errors }}</span>
                                     <div class="clearfix"></div>
                                     <img id="id_thumbnail_imagem" style="margin-top: 10px;" src="">
                                 </div>
