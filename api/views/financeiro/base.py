@@ -11,7 +11,7 @@ from api.models.conta import Conta
 from api.models.pedido import Pedido
 from api.models.enums.status_pedido import StatusPedido
 from api.serializers.conta import ContaSerializer
-from api.serializers.pedido import PedidoMinimalSerializer
+from api.serializers.pedido import PedidoTotaisSerializer, PedidoMinimalSerializer
 
 from datetime import datetime
 
@@ -54,7 +54,7 @@ class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentante
                 'valor_liquido': valores_pedidos.get('liquido'),
                 'quantidade': pedidos_de_hoje.count()
             },
-            'data': PedidoMinimalSerializer(pedidos_de_hoje, many=False).data,
+            'data': PedidoMinimalSerializer(pedidos_de_hoje, many=True).data,
         }
         return Response(data)
 
@@ -111,7 +111,7 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
         data = {
             'conta_atual': ContaSerializer(contas.first(), many=False).data,
             'contas': ContaSerializer(contas[:6], many=True).data,
-            'vendas_hoje': PedidoMinimalSerializer(pedidos_de_hoje, many=False).data,
+            'vendas_hoje': PedidoTotaisSerializer(pedidos_de_hoje, many=False).data,
             'rendimentos': {
                 'labels': [n.upper() for n in calendar.month_name if n],
                 'values': values
