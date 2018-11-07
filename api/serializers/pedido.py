@@ -48,6 +48,7 @@ class AnnotationPedidoSerializer(serializers.Serializer):
 class PedidoMinimalSerializer(serializers.ModelSerializer):
     data_atualizacao = serializers.SerializerMethodField()
     data_criacao = serializers.SerializerMethodField()
+    cliente = serializers.SerializerMethodField()
 
     class Meta:
         model = Pedido
@@ -58,7 +59,8 @@ class PedidoMinimalSerializer(serializers.ModelSerializer):
             "delivery",
             "valor_liquido",
             "data_atualizacao",
-            "data_criacao"
+            "data_criacao",
+            "cliente"
         )
 
     def get_data_atualizacao(self, obj):
@@ -66,6 +68,9 @@ class PedidoMinimalSerializer(serializers.ModelSerializer):
 
     def get_data_criacao(self, obj):
         return obj.log.data_criacao
+    
+    def get_cliente(self, obj):
+        return str(obj.cliente)
 
 
 class PedidoTotaisSerializer(serializers.Serializer):
