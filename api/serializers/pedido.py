@@ -45,7 +45,30 @@ class AnnotationPedidoSerializer(serializers.Serializer):
     valor_liquido = serializers.CharField()
 
 
-class PedidoMinimalSerializer(serializers.Serializer):
+class PedidoMinimalSerializer(serializers.ModelSerializer):
+    data_atualizacao = serializers.SerializerMethodField()
+    data_criacao = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "status",
+            "forma_pagamento",
+            "delivery",
+            "valor_liquido",
+            "data_atualizacao",
+            "data_criacao"
+        )
+
+    def get_data_atualizacao(self, obj):
+        return obj.log.data_atualizacao
+
+    def get_data_criacao(self, obj):
+        return obj.log.data_criacao
+
+
+class PedidoTotaisSerializer(serializers.Serializer):
     liquido = serializers.CharField()
     bruto = serializers.CharField()
 

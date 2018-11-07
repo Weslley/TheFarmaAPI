@@ -54,7 +54,7 @@ class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentante
                 'valor_liquido': valores_pedidos.get('liquido'),
                 'quantidade': pedidos_de_hoje.count()
             },
-            'data': pedidos_de_hoje
+            'data': PedidoMinimalSerializer(pedidos_de_hoje, many=False).data,
         }
         return Response(data)
 
