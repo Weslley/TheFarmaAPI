@@ -63,7 +63,8 @@ class PedidoMinimalSerializer(serializers.ModelSerializer):
             "cliente",
             "valor_frete",
             "valor_comissao_administradora",
-            "valor_comissao_thefarma"
+            "valor_comissao_thefarma",
+            "valor_bruto"
         )
 
     def get_data_atualizacao(self, obj):
