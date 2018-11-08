@@ -331,3 +331,14 @@ class ItemPropostaPedido(models.Model):
         :return:
         """
         return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade
+
+
+class LogData(models.Model):
+    mes = models.CharField(max_length=75)
+    ano = models.IntegerField()
+    farmacia = models.ForeignKey(
+        Farmacia, null=True, related_name='logs_pedidos'
+    )
+
+    def __str__(self):
+        return '{} {}'.format(self.mes, self.ano)

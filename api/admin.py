@@ -20,7 +20,7 @@ from api.models.farmacia import Farmacia
 from api.models.feriado import Feriado
 from api.models.log import Log
 from api.models.parceiro import Parceiro, UsuarioParceiro
-from api.models.pedido import ItemPedido, ItemPropostaPedido, Pedido
+from api.models.pedido import ItemPedido, ItemPropostaPedido, Pedido, LogData
 from api.models.post import Post
 from api.models.principio_ativo import PrincipioAtivo
 from api.models.produto import Produto
@@ -198,6 +198,7 @@ admin.site.register(Conta)
 admin.site.register(Farmacia)
 admin.site.register(Produto)
 admin.site.register(PrincipioAtivo)
+admin.site.register(LogData)
 admin.site.register(Fabricante)
 admin.site.register(Endereco)
 admin.site.register(Cidade)

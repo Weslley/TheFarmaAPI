@@ -21,7 +21,7 @@ from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums import PagadorContas
 from api.models.farmacia import Farmacia
 from api.models.log import Log
-from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
+from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, LogData
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.serializers.farmacia import FarmaciaListSerializer, FarmaciaEnderecoSerializer
 from api.servico_pagamento import tipo_servicos
@@ -37,6 +37,15 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 class PagamentoCartao(object):
     pass
+
+
+class LogDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogData
+        fields = (
+            'mes',
+            'ano'
+        )
 
 
 class AnnotationPedidoSerializer(serializers.Serializer):
