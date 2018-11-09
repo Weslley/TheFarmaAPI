@@ -10,6 +10,8 @@ from api.models.curtida import Curtida
 from api.models.post import Post
 from api.serializers.post import PostExportSerializer
 
+import locale
+
 
 def update_model(model_name, data, remove=False):
     try:
@@ -29,6 +31,7 @@ def update_model(model_name, data, remove=False):
 
 @receiver(post_save, sender=Pedido)
 def create_log_de_datas(sender, instance, **kwargs):
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
     data = instance.data_criacao
     mes_pedido = data.strftime('%B')
     ano_pedido = data.year
