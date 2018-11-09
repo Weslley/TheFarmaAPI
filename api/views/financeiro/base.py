@@ -52,11 +52,8 @@ class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentante
             }
 
         pedidos_do_periodo = Pedido.objects\
-            .exclude(
-                Q(status=StatusPedido.CANCELADO_PELA_FARMACIA) | 
-                Q(status=StatusPedido.CANCELADO_PELO_CLIENTE)
-            )\
             .filter(
+                status=StatusPedido.ENTREGUE,
                 farmacia__representantes=representante,
                 **filtro
             )
@@ -100,11 +97,8 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
 
         hoje = datetime.now()
         pedidos_de_hoje = Pedido.objects\
-            .exclude(
-                Q(status=StatusPedido.CANCELADO_PELA_FARMACIA) | 
-                Q(status=StatusPedido.CANCELADO_PELO_CLIENTE)
-            )\
             .filter(
+                status=StatusPedido.ENTREGUE,
                 farmacia__representantes=representante,
                 data_criacao__year=hoje.year,
                 data_criacao__month=hoje.month,
@@ -119,11 +113,8 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
         values = []
         for mes in range(1, 13):
             query = Pedido.objects\
-                .exclude(
-                    Q(status=StatusPedido.CANCELADO_PELA_FARMACIA) | 
-                    Q(status=StatusPedido.CANCELADO_PELO_CLIENTE)
-                )\
                 .filter(
+                    status=StatusPedido.ENTREGUE,
                     log__data_criacao__month=mes,
                     log__data_criacao__year=date.today().year,
                     farmacia__representantes=representante,
