@@ -35,11 +35,13 @@ class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentante
             filtro.update(
                 {'data_criacao__month': data_ref.month}
             )
+            flag = False
 
         if params.get('ano'):
             filtro.update(
                 {'data_criacao__year': params.get('ano')}
             )
+            flag = False
 
         if flag:
             hoje = datetime.now()
