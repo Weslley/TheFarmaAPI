@@ -7,6 +7,7 @@ from api.models.conta_pagar import ContaPagar
 
 
 class ContaMinimalSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     data_vencimento = serializers.DateTimeField()
     valor_total = serializers.CharField()
     status = serializers.IntegerField()
