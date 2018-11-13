@@ -6,7 +6,7 @@ from api.mixins.base import IsAuthenticatedRepresentanteMixin
 from api.models.conta import Conta
 from api.models.pedido import Pedido, LogData
 from api.models.enums.status_pedido import StatusPedido
-from api.serializers.conta import ContaSerializer
+from api.serializers.conta import ContaMinimalSerializer
 from api.serializers.pedido import PedidoTotaisSerializer, \
     PedidoMinimalSerializer, LogDataSerializer
 
@@ -21,7 +21,6 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
     """
     Resumo da listagem de vendas
-    * Implementacoes de filtros
     """
     def get(self, request, *args, **kwargs):
         representante = self.get_object()
@@ -125,8 +124,8 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
             values.append(valor)
 
         data = {
-            'conta_atual': ContaSerializer(contas.first(), many=False).data,
-            'contas': ContaSerializer(contas[:6], many=True).data,
+            'conta_atual': ContaMinimalSerializer(contas.first(), many=False).data,
+            'contas': ContaMinimalSerializer(contas[:6], many=True).data,
             'vendas_hoje': PedidoTotaisSerializer(pedidos_de_hoje, many=False).data,
             'rendimentos': {
                 'labels': [n.upper() for n in calendar.month_name if n],
