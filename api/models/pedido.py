@@ -10,6 +10,7 @@ from api.models.apresentacao import Apresentacao
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
 from api.models.cliente import Cliente
+from api.models.conta import Conta
 from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
                               StatusPagamentoCartao, StatusPedido)
 from api.models.enums.status_pagamento import StatusPagamento
@@ -33,6 +34,10 @@ class Pedido(models.Model):
         choices=StatusPedidoFaturamento.choices(),
         default=StatusPedidoFaturamento.NAO_FATURADO,
         null=True
+    )
+    faturamento = models.ForeignKey(
+        Conta, on_delete=models.SET_NULL, related_name='pedidos',
+        null=True, blank=True
     )
 
     views = models.IntegerField(default=0, null=True, blank=True)
