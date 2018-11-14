@@ -75,6 +75,7 @@ def faturar_pedido(pedido):
 	faturamento.save()
 
 	pedido.status_faturamento = StatusPedidoFaturamento.FATURADO
+	pedido.faturamento = faturamento
 	pedido.save()
 
 
