@@ -63,7 +63,7 @@ def faturar_pedido(pedido):
 
 	# Se o pedido for no credito
 	if pedido.forma_pagamento == FormaPagamento.CARTAO:
-		faturamento.valor_total += pedido.valor_bruto
+		faturamento.valor_total += pedido.liquido
 	else:
 		faturamento.valor_total -= pedido.valor_comissao_thefarma
 
