@@ -9,6 +9,7 @@ from api.models.conta import Conta
 from api.models.pedido import Pedido
 from api.models.enums import FormaPagamento, StatusPedidoFaturamento
 from api.serializers.conta import ContaSerializer
+from api.serializers.farmacia import FarmaciaRepresentanteSerializer
 from api.pagination import SmallResultsSetPagination
 
 
@@ -43,6 +44,7 @@ class ContaRetrieve(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
 
     def get(self, request, *args, **kwargs):
         representante = self.get_object()
+        farmacia = representante.farmacia
         requested_pk = self.kwargs.get('pk')
 
         conta = Conta.objects.filter(
@@ -55,12 +57,17 @@ class ContaRetrieve(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
             status_faturamento=StatusPedidoFaturamento.FATURADO
         )
 
-        detalhes_credito = pedidos_faturados.filter(
-            forma_pagamento=FormaPagamento.CARTAO
-        ).aggregate(
+        detalhes_credito = pedidos_faturados.all().aggregate(
             taxa_adm=Coalesce(Sum('valor_comissao_administradora'), V(0)),
             comissoes=Coalesce(Sum('valor_comissao_thefarma'), V(0)),
-            credito=Coalesce(Sum('valor_comissao_thefarma'), V(0))
+        )
+
+        detalhes_credito.update(
+            pedidos_faturados.filter(
+                forma_pagamento=FormaPagamento.CARTAO
+            ).aggregate(
+                credito=Coalesce(Sum('valor_bruto'), V(0))
+            )
         )
 
         detalhes_faturamento = pedidos_faturados.filter(
@@ -78,6 +85,7 @@ class ContaRetrieve(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
         )
 
         data = {
+            'farmacia': FarmaciaRepresentanteSerializer(farmacia, many=False).data,
             'conta': ContaSerializer(conta, many=False).data,
             'detalhes_credito': detalhes_credito,
             'detalhes_faturamento': detalhes_faturamento
