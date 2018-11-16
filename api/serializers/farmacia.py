@@ -135,6 +135,18 @@ class FarmaciaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class FarmaciaSimplificadoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Farmacia
+        fields = (
+            'cnpj', 'nome_fantasia', 'razao_social',
+            'conta_bancaria', 'valor_frete', 'dia_faturamento',
+            'percentual_similar', 'percentual_generico', 
+            'percentual_etico', 'percentual_nao_medicamentos'
+        )
+
+
 class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
     conta_bancaria = ContaBancariaSerializer()
 

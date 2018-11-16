@@ -9,7 +9,7 @@ from api.models.conta import Conta
 from api.models.pedido import Pedido
 from api.models.enums import FormaPagamento, StatusPedidoFaturamento
 from api.serializers.conta import ContaSerializer
-from api.serializers.farmacia import FarmaciaRepresentanteSerializer
+from api.serializers.farmacia import FarmaciaSimplificadoSerializer
 from api.pagination import SmallResultsSetPagination
 
 
@@ -85,7 +85,7 @@ class ContaRetrieve(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
         )
 
         data = {
-            'farmacia': FarmaciaRepresentanteSerializer(farmacia, many=False).data,
+            'farmacia': FarmaciaSimplificadoSerializer(farmacia, many=False).data,
             'conta': ContaSerializer(conta, many=False).data,
             'detalhes_credito': detalhes_credito,
             'detalhes_faturamento': detalhes_faturamento
