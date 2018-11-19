@@ -12,6 +12,7 @@ class StatusPagamentoConta(IntEnum):
     Status de contas a receber
     """
     ABERTA = 0
-    PAGA = 1
-    ATRASADA = 2
-    CANCELADA = 3
+    FECHADA = 1
+    PAGA = 2
+    ATRASADA = 3
+    CANCELADA = 4

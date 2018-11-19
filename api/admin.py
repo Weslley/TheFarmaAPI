@@ -32,6 +32,7 @@ from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
 from api.models.regiao import Regiao
 from api.models.conta import Conta
+from api.models.boleto import Boleto
 
 from api.utils.reverse_admin import ReverseModelAdmin
 
@@ -194,6 +195,7 @@ class ContaReceberAdmin(admin.ModelAdmin):
     list_display = ('pedido', 'status', 'data_vencimento', 'valor_parcela')
 
 
+admin.site.register(Boleto)
 admin.site.register(Conta)
 admin.site.register(Farmacia)
 admin.site.register(Produto)
