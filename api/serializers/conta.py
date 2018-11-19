@@ -2,8 +2,15 @@ import locale
 
 from rest_framework import serializers
 
+from api.models.boleto import Boleto
 from api.models.conta import Conta
 from api.models.conta_pagar import ContaPagar
+
+
+class BoletoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Boleto
+        fields = ('pdf', 'codigo_de_barras')
 
 
 class ContaMinimalSerializer(serializers.Serializer):
@@ -13,10 +20,10 @@ class ContaMinimalSerializer(serializers.Serializer):
     status = serializers.IntegerField()
     tipo = serializers.IntegerField()
 
-
 class ContaSerializer(serializers.ModelSerializer):
+    boleto = BoletoSerializer()
     class Meta:
         model = Conta
         fields = (
-            'data_vencimento', 'valor_total', 'status', 'tipo', 'id'
+            'boleto', 'data_vencimento', 'valor_total', 'status', 'tipo', 'id'
         )
