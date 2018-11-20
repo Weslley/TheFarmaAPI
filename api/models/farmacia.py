@@ -80,8 +80,8 @@ class Farmacia(models.Model):
     servico_estoque = models.BooleanField(
         verbose_name='Habilitar Estoque', default=False
     )
-    dia_faturamento = models.IntegerField(
-        verbose_name='Dia de Faturamento', 
+    dia_pagamento = models.IntegerField(
+        verbose_name='Dia de Pagamento',
         choices=FATURAMENTO_CHOICES, default=20
     )
     percentual_similar = models.DecimalField(
