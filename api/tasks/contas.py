@@ -19,35 +19,37 @@ from datetime import date, timedelta
 
 def get_faturamento(data_pedido, farmacia):
 	delay_faturamento = timedelta(days=10)
-	dia_faturamento = farmacia.dia_faturamento
+	dia_pagamento = farmacia.dia_pagamento
 
-	data_ref_faturamento = data_pedido.replace(day=dia_faturamento)
-	dt_limite_faturamento = data_ref_faturamento - delay_faturamento
+	data_ref_pagamento = data_pedido.replace(day=dia_pagamento)
 
-	if dia_faturamento in range(11, 32):
+	dt_limite_faturamento = data_ref_pagamento - delay_faturamento
+
+	if dia_pagamento in range(11, 32):
 		# Se o dia de faturamento esta entre 11 e 31
 
 		if (data_pedido.day <= dt_limite_faturamento.day):
 			# Se o dia do pedido for anterior ou igual ao dia de faturamento
 			# o pedido sera referente ao faturamento do seu mes atual
-			dt_faturamento = data_pedido.replace(day=dia_faturamento)
+			dt_vencimento = data_pedido.replace(day=dia_pagamento)
 
 		else:
 			# Se o dia do pedido for maior que dia de faturamento
 			# o pedido sera referente ao faturamento do mes posterior
-			dt_faturamento = data_pedido.replace(
-				day=dia_faturamento, month=(data_pedido.month + 1)
+			dt_vencimento = data_pedido.replace(
+				day=dia_pagamento, month=(data_pedido.month + 1)
 			)
 
 	else:
 		# Se o dia de faturamento esta entre 1 e 10
-		dt_faturamento = data_pedido.replace(
-			day=dia_faturamento, month=(data_pedido.month + 1)
+		dt_vencimento = data_pedido.replace(
+			day=dia_pagamento, month=(data_pedido.month + 1)
 		)
 
+	dt_faturamento = dt_vencimento - delay_faturamento
 	conta, created = Conta.objects.get_or_create(
-		status=StatusPagamentoConta.ABERTA,
-		farmacia=farmacia, data_vencimento=dt_faturamento
+		status=StatusPagamentoConta.ABERTA, farmacia=farmacia, 
+		data_vencimento=dt_vencimento, data_faturamento=dt_faturamento
 	)
 
 	return conta
@@ -81,9 +83,7 @@ def faturar_pedido(pedido):
 
 @shared_task
 def faturamento():
-	# print("fazer fatuarmento mensal")
 	pedidos_nao_faturados = Pedido.objects.filter(
-		# Q(data_criacao__gt=inicio_mes) | Q(data_criacao__lte=hoje),
 		status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
 		status_pagamento=StatusPagamento.PAGO,
 		status=StatusPedido.ENTREGUE
@@ -93,3 +93,29 @@ def faturamento():
 	if pedidos_nao_faturados.exists():
 		for pedido_nf in pedidos_nao_faturados:
 			faturar_pedido(pedido_nf)
+
+# @shared_task
+# def alterar_status_contas():
+# 	today = date.today()
+# 	contas_abertas = Conta.objects.filter(
+# 		status=StatusPagamentoConta.ABERTA
+# 	)
+
+# 	# Fechar contas abertas que passaram do limite
+# 	delay_faturamento = timedelta(days=10)
+# 	for conta_aberta in contas_abertas:
+# 		dt_limite_fechamento = conta_aberta.farmacia.dia
+# 		if conta_aberta.farmacia.dia_pagamento <= today:
+# 			conta_aberta.status = StatusPagamentoConta.FECHADA
+# 			conta_aberta.save()
+
+	# pedidos_nao_faturados = Pedido.objects.filter(
+	# 	status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
+	# 	status_pagamento=StatusPagamento.PAGO,
+	# 	status=StatusPedido.ENTREGUE
+	# )
+
+	# # nf == pedido nao faturado
+	# if pedidos_nao_faturados.exists():
+	# 	for pedido_nf in pedidos_nao_faturados:
+	# 		faturar_pedido(pedido_nf)
