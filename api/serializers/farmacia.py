@@ -141,8 +141,8 @@ class FarmaciaSimplificadoSerializer(serializers.ModelSerializer):
         model = Farmacia
         fields = (
             'cnpj', 'nome_fantasia', 'razao_social',
-            'conta_bancaria', 'valor_frete', 'dia_faturamento',
-            'percentual_similar', 'percentual_generico', 
+            'conta_bancaria', 'valor_frete', 'dia_pagamento',
+            'percentual_similar', 'percentual_generico',
             'percentual_etico', 'percentual_nao_medicamentos'
         )
 
