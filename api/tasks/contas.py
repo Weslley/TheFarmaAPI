@@ -4,7 +4,8 @@
 # @Last Modified by:   caiovictormc
 # @Last Modified time: 2018-10-11 11:42:00
 
-# from thefarmaapi._celery import app
+from django.db.models import Q
+
 from thefarmaapi._celery import app
 from celery import shared_task
 
@@ -94,28 +95,24 @@ def faturamento():
 		for pedido_nf in pedidos_nao_faturados:
 			faturar_pedido(pedido_nf)
 
-# @shared_task
-# def alterar_status_contas():
-# 	today = date.today()
-# 	contas_abertas = Conta.objects.filter(
-# 		status=StatusPagamentoConta.ABERTA
-# 	)
+@shared_task
+def alterar_status_contas():
+	today = date.today()
+	
+	# Fechar contas que passaram do faturamento
+	contas_a_fechar = Conta.objects.filter(status=StatusPagamentoConta.ABERTA)
+	for conta_a_fechar in contas_a_fechar:
+		if conta_a_fechar.data_faturamento:
+			if conta_a_fechar.data_faturamento <= today:
+				conta_aberta.status = StatusPagamentoConta.FECHADA
+				conta_aberta.save()
 
-# 	# Fechar contas abertas que passaram do limite
-# 	delay_faturamento = timedelta(days=10)
-# 	for conta_aberta in contas_abertas:
-# 		dt_limite_fechamento = conta_aberta.farmacia.dia
-# 		if conta_aberta.farmacia.dia_pagamento <= today:
-# 			conta_aberta.status = StatusPagamentoConta.FECHADA
-# 			conta_aberta.save()
 
-	# pedidos_nao_faturados = Pedido.objects.filter(
-	# 	status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
-	# 	status_pagamento=StatusPagamento.PAGO,
-	# 	status=StatusPedido.ENTREGUE
-	# )
-
-	# # nf == pedido nao faturado
-	# if pedidos_nao_faturados.exists():
-	# 	for pedido_nf in pedidos_nao_faturados:
-	# 		faturar_pedido(pedido_nf)
+	# Vencer contas abertas que passaram do vencimento
+	contas_abertas = Conta.objects.filter(
+		Q(status=StatusPagamentoConta.ABERTA) | Q(status=StatusPagamentoConta.FECHADA)
+	)
+	for conta_aberta in contas_abertas:
+		if conta_aberta.data_vencimento <= today:
+			conta_aberta.status = StatusPagamentoConta.ATRASADA
+			conta_aberta.save()
