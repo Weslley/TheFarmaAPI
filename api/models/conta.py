@@ -39,6 +39,7 @@ class Conta(models.Model):
         default=StatusConta.PAGAR
     )
 
+    data_faturamento = models.DateField(null=True, blank=True)
     data_vencimento = models.DateField(null=True, blank=True)
     valor_total = models.DecimalField(
         max_digits=15, decimal_places=2, default=0
