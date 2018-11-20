@@ -12,11 +12,6 @@ class BoletoSerializer(serializers.ModelSerializer):
         model = Boleto
         fields = ('pdf', 'codigo_de_barras')
 
-    def get_pdf(self, obj):
-        request = self.context.get('request')
-        photo_url = obj.pdf.url
-        return request.build_absolute_uri(photo_url)
-
 
 class ContaMinimalSerializer(serializers.Serializer):
     id = serializers.IntegerField()
