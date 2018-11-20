@@ -1,5 +1,7 @@
 from django.db import models
 
+from datetime import datetime
+
 
 def generate_filename(instance, filename):
     return 'boletos/{}'.format(filename)
@@ -13,7 +15,6 @@ class Boleto(models.Model):
 
     def __str__(self):
         str_template = 'Boleto {}'
-
         try:
             if self.conta:
                 return str_template.format(self.conta.id)
@@ -21,3 +22,12 @@ class Boleto(models.Model):
             if self.data_atualizacao:
                 return str_template.format(self.data_atualizacao.strftime('%d/%m/%Y'))
             return str_template.format(self.id)
+
+    def save(self, *args, **kwargs):
+        try:
+            self.conta.data_emissao = datetime.now()
+            self.conta.save()
+        except AttributeError as e:
+            pass
+        finally:
+            super().save(*args, **kwargs)

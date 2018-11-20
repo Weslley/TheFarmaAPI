@@ -10,6 +10,8 @@ from api.models.boleto import Boleto
 from api.models.farmacia import Farmacia
 from api.models.enums import StatusConta, StatusPagamentoConta
 
+from datetime import datetime
+
 
 class Conta(models.Model):
     """
@@ -44,3 +46,8 @@ class Conta(models.Model):
 
     def __str__(self):
         return "{}".format(self.farmacia.razao_social)
+
+    def save(self, *args, **kwargs):
+        if self.boleto:
+            self.data_emissao = datetime.now()
+        super().save(*args, **kwargs)
