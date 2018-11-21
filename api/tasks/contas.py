@@ -52,9 +52,7 @@ def get_faturamento(data_pedido, farmacia):
 		status=StatusPagamentoConta.ABERTA, farmacia=farmacia, 
 		data_vencimento=dt_vencimento, data_faturamento=dt_faturamento
 	)
-
 	return conta
-
 
 def faturar_pedido(pedido):
 	farmacia = pedido.farmacia
@@ -76,11 +74,9 @@ def faturar_pedido(pedido):
 		faturamento.tipo = StatusConta.RECEBER
 
 	faturamento.save()
-
 	pedido.status_faturamento = StatusPedidoFaturamento.FATURADO
 	pedido.faturamento = faturamento
 	pedido.save()
-
 
 @shared_task
 def faturamento():
@@ -89,7 +85,6 @@ def faturamento():
 		status_pagamento=StatusPagamento.PAGO,
 		status=StatusPedido.ENTREGUE
 	)
-
 	# nf == pedido nao faturado
 	if pedidos_nao_faturados.exists():
 		for pedido_nf in pedidos_nao_faturados:
@@ -98,7 +93,7 @@ def faturamento():
 @shared_task
 def alterar_status_contas():
 	today = date.today()
-	
+
 	# Fechar contas que passaram do faturamento
 	contas_a_fechar = Conta.objects.filter(status=StatusPagamentoConta.ABERTA)
 	for conta_a_fechar in contas_a_fechar:
@@ -107,12 +102,11 @@ def alterar_status_contas():
 				conta_aberta.status = StatusPagamentoConta.FECHADA
 				conta_aberta.save()
 
-
 	# Vencer contas abertas que passaram do vencimento
 	contas_abertas = Conta.objects.filter(
 		Q(status=StatusPagamentoConta.ABERTA) | Q(status=StatusPagamentoConta.FECHADA)
 	)
 	for conta_aberta in contas_abertas:
-		if conta_aberta.data_vencimento <= today:
+		if conta_aberta.data_vencimento < today:
 			conta_aberta.status = StatusPagamentoConta.ATRASADA
 			conta_aberta.save()

@@ -26,5 +26,6 @@ class ContaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conta
         fields = (
-            'boleto', 'data_vencimento', 'valor_total', 'status', 'tipo', 'id'
+            'boleto', 'data_emissao', 'data_vencimento',
+            'valor_total', 'status', 'tipo', 'id'
         )
