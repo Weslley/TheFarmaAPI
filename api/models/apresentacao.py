@@ -50,6 +50,27 @@ class ApresentacaoManager(models.Manager):
             print(e)
 
 
+class FormaFarmaceutica(models.Model):
+    nome = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.nome
+
+
+class Embalagem(models.Model):
+    tipo = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.tipo
+
+
+class Sufixo(models.Model):
+    nome = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.nome
+
+
 class Apresentacao(models.Model):
     codigo_barras = models.BigIntegerField(null=True, blank=True, unique=True)
     nome = models.CharField(max_length=200, null=True, blank=True)
@@ -58,16 +79,56 @@ class Apresentacao(models.Model):
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     ativo = models.BooleanField(default=True)
     unidade = models.ForeignKey(Unidade, null=True, blank=True)
-    quantidade = models.IntegerField(default=0)
     classe_terapeutica = models.CharField(max_length=254, null=True, blank=True)
     ranking_visualizacao = models.BigIntegerField(default=0)
     ranking_proposta = models.BigIntegerField(default=0)
     ranking_compra = models.BigIntegerField(default=0)
     patrocinio = models.BigIntegerField(default=0)
+
+    forma_farmaceutica = models.ForeignKey(
+        FormaFarmaceutica, related_name='apresentacoes',
+        null=True
+    )
+    embalagem = models.ForeignKey(
+        Embalagem, related_name='apresentacoes', null=True
+    )
+    dosagem = models.DecimalField(
+        null=True, max_digits=15, decimal_places=2
+    )
+    sufixo_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_dosagem',
+        null=True, verbose_name='Sufixo da Dosagem'
+    )
+    quantidade = models.DecimalField(
+        null=True, max_digits=15, decimal_places=2
+    )
+    sufixo_quantidade = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_quantidade',
+        blank=True, null=True, verbose_name='Sufixo da Quantidade',
+        help_text="Não obrigatório"
+    )
+
+    comercializado = models.BooleanField(default=True)
+    pbm = models.NullBooleanField()
+    identificado = models.BooleanField(default=False)
+
     objects = ApresentacaoManager()
 
     def __str__(self):
         return self.nome if self.nome else self.produto.nome
+    
+    @property
+    def nome_apresentacao(self):
+        if self.sufixo_quantidade:
+            return "{0}{1}, {2} com {3}{4}".format(
+                self.dosagem, self.sufixo_dosagem,
+                self.forma_farmaceutica.nome, self.quantidade,
+                self.sufixo_quantidade
+            )
+        return "{0}{1}, {2} com {3}".format(
+            self.dosagem, self.sufixo_dosagem,
+            self.forma_farmaceutica.nome, self.quantidade
+        )
 
     @property
     def ranking(self):

@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from api.models.administradora import Administradora, Parcelamento
-from api.models.apresentacao import Apresentacao, ImagemApresentacao, Unidade
+from api.models.apresentacao import Apresentacao, \
+    ImagemApresentacao, Unidade, FormaFarmaceutica, Sufixo, Embalagem
 from api.models.atualizacao import Atualizacao
 from api.models.bairro import Bairro
 from api.models.banco import Banco
@@ -195,6 +196,54 @@ class ContaReceberAdmin(admin.ModelAdmin):
     list_display = ('pedido', 'status', 'data_vencimento', 'valor_parcela')
 
 
+class ImagemInline(admin.StackedInline):
+    model = ImagemApresentacao
+    extra = 1
+
+class ApresentacaoAdmin(admin.ModelAdmin):
+    inlines = [ImagemInline]
+    readonly_fields = ('codigo_barras', 'registro_ms', 'produto', 'nome')
+    fields = (
+        'produto', 'codigo_barras', 'registro_ms', 'nome',
+        'identificado', 'comercializado', 'pbm',
+        'forma_farmaceutica', 'embalagem',
+        'dosagem', 'sufixo_dosagem',
+        'quantidade', 'sufixo_quantidade',
+    )
+    list_filter = ('forma_farmaceutica', 'comercializado', 'identificado', 'pbm')
+    list_display = (
+        'nome', 'get_nome_da_apresentacao', 'produto', 'codigo_barras', 'get_possui_imagem', 'identificado'
+    )
+    search_fields = ('registro_ms', 'produto__nome')
+
+    def get_nome_da_apresentacao(self, obj):
+        if obj.forma_farmaceutica:
+            if obj.sufixo_quantidade:
+                return "{0}{1}, {2} com {3}{4}".format(
+                    obj.dosagem, obj.sufixo_dosagem,
+                    obj.forma_farmaceutica.nome, obj.quantidade,
+                    obj.sufixo_quantidade
+                )
+
+            return "{0}{1}, {2} com {3}".format(
+                obj.dosagem, obj.sufixo_dosagem,
+                obj.forma_farmaceutica.nome, obj.quantidade
+            )
+        return "{}".format(obj)
+
+    get_nome_da_apresentacao.short_description = 'Nome da Apresentação'
+
+    def get_possui_imagem(self, obj):
+        if obj.imagens:
+            if obj.imagens.exists():
+                return "Sim"
+        return "Não"
+
+    get_possui_imagem.short_description = 'Possui Imagem'
+
+admin.site.register(Embalagem)
+admin.site.register(Sufixo)
+admin.site.register(FormaFarmaceutica)
 admin.site.register(Boleto)
 admin.site.register(Conta)
 admin.site.register(Farmacia)
@@ -207,7 +256,7 @@ admin.site.register(Cidade)
 admin.site.register(Bairro)
 admin.site.register(Uf)
 admin.site.register(RepresentanteLegal)
-admin.site.register(Apresentacao)
+admin.site.register(Apresentacao, ApresentacaoAdmin)
 admin.site.register(TabelaPreco)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Cliente)
