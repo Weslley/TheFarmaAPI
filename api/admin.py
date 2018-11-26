@@ -212,9 +212,10 @@ class ApresentacaoAdmin(admin.ModelAdmin):
     )
     list_filter = ('forma_farmaceutica', 'comercializado', 'identificado', 'pbm')
     list_display = (
-        'nome', 'get_nome_da_apresentacao', 'produto', 'codigo_barras', 'get_possui_imagem', 'identificado'
+        'nome', 'get_nome_da_apresentacao', 'produto',
+        'codigo_barras', 'get_possui_imagem', 'identificado'
     )
-    search_fields = ('registro_ms', 'produto__nome')
+    search_fields = ('codigo_barras', 'registro_ms', 'produto__nome')
 
     def get_nome_da_apresentacao(self, obj):
         if obj.forma_farmaceutica:
@@ -224,14 +225,13 @@ class ApresentacaoAdmin(admin.ModelAdmin):
                     obj.forma_farmaceutica.nome, obj.quantidade,
                     obj.sufixo_quantidade
                 )
-
-            return "{0}{1}, {2} com {3}".format(
+            return "{0}{1}, {2} {3}".format(
                 obj.dosagem, obj.sufixo_dosagem,
-                obj.forma_farmaceutica.nome, obj.quantidade
+                obj.quantidade, obj.forma_farmaceutica.nome.lower()
             )
         return "{}".format(obj)
 
-    get_nome_da_apresentacao.short_description = 'Nome da Apresentação'
+    get_nome_da_apresentacao.short_description = 'Nome Formatado'
 
     def get_possui_imagem(self, obj):
         if obj.imagens:

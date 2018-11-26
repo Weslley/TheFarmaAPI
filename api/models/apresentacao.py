@@ -125,9 +125,9 @@ class Apresentacao(models.Model):
                 self.forma_farmaceutica.nome, self.quantidade,
                 self.sufixo_quantidade
             )
-        return "{0}{1}, {2} com {3}".format(
+        return "{0}{1}, {2} {3}".format(
             self.dosagem, self.sufixo_dosagem,
-            self.forma_farmaceutica.nome, self.quantidade
+            self.quantidade, self.forma_farmaceutica.nome.lower()
         )
 
     @property
