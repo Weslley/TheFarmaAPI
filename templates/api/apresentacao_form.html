@@ -67,6 +67,7 @@
                                     <div class="form-group label-floating">
                                         <label class="control-label">{{ form.embalagem.label }}</label>
                                         {{ form.embalagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
                                         <span id="helpBlock" class="help-block">{{ form.embalagem.errors }}</span>
                                     </div>
                                 </div>
@@ -93,14 +94,15 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.sufixo_quantidade.label }}*</label>
+                                        <label class="control-label">{{ form.sufixo_quantidade.label }}</label>
                                         {{ form.sufixo_quantidade|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
                                         <span id="helpBlock" class="help-block">{{ form.sufixo_quantidade.errors }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.identificado.label }}*</label>
+                                        <label class="control-label">{{ form.identificado.label }}</label>
                                         {{ form.identificado }}
                                         <span id="helpBlock" class="help-block">{{ form.identificado.errors }}</span>
                                     </div>
