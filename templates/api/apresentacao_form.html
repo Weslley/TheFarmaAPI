@@ -44,25 +44,31 @@
 
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Codigos de codigo_barras</label>
                                         <input type="text" class="form-control" disabled value="{{ apresentacao.codigo_barras }}">
                                         <span id="helpBlock" class="help-block">{{ form.codigo_barras.errors }}</span>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Produto</label>
                                         <input type="text" class="form-control" disabled value="{{ apresentacao.produto.nome }}">
                                         <span id="helpBlock" class="help-block">{{ form.produto.errors }}</span>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group label-floating">
                                         <label class="control-label">Nome sem Formatação</label>
                                         <input type="text" class="form-control" disabled value="{{ apresentacao.nome }}">
                                         <span id="helpBlock" class="help-block">{{ form.apresentacao.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Laboratorio</label>
+                                        <input type="text" class="form-control" disabled value="{{ apresentacao.produto.laboratorio }}">
                                     </div>
                                 </div>
                             </div>
