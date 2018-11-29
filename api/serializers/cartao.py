@@ -28,18 +28,19 @@ class CartaoSerializer(serializers.ModelSerializer):
             expire_month=attrs['mes_expiracao'],
             expire_year=attrs['ano_expiracao']
         )
-        # if not self.card.is_valid:
-        #     raise ValidationError('Cartão inválido.')
-        #
-        # if self.card.is_expired:
-        #     raise ValidationError('Cartão expirado.')
 
         request = self.context['request']
-        # attrs['bandeira'] = self.card.brand
-        attrs['bandeira'] = 'Master'
+        attrs['bandeira'] = self.card.brand
         attrs['cliente'] = request.user.cliente
-        attrs['token'] = ServicoCielo.create_token(attrs)
         attrs['numero_cartao'] = attrs['numero_cartao'][-4:]
+
+        if Cartao.objects.filter(
+            numero_cartao=attrs['numero_cartao'], bandeira=attrs['bandeira'],
+            cliente=attrs['cliente'], cvv=attrs['cvv']
+        ).exists():
+            raise ValidationError('Este cartão já foi cadastrado.')
+
+        attrs['token'] = ServicoCielo.create_token(attrs)
         return attrs
 
     def create(self, validated_data):
