@@ -1,0 +1,241 @@
+{% extends 'components/new_base.html' %}
+{% load staticfiles %}
+{% load helper %}
+
+{% block content-header %}
+    <section class="content-header">
+      <h1>
+        Apresentações
+        <small>Cadastro</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Apresentações</li>
+      </ol>
+    </section>
+{% endblock content-header %}
+
+{% block content %}
+
+    <style type="text/css">
+        .file_input {
+            background: linear-gradient(60deg, #12A298, #44BABB);
+            padding: 10px;
+            border-radius: 50%;
+            color: whitesmoke;
+            float: left;
+            margin-right: 10px;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form id="apresentacao_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab">Apresentação</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1">
+
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Codigos de codigo_barras</label>
+                                        <input type="text" class="form-control" disabled value="{{ apresentacao.codigo_barras }}">
+                                        <span id="helpBlock" class="help-block">{{ form.codigo_barras.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Produto</label>
+                                        <input type="text" class="form-control" disabled value="{{ apresentacao.produto.nome }}">
+                                        <span id="helpBlock" class="help-block">{{ form.produto.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Nome sem Formatação</label>
+                                        <input type="text" class="form-control" disabled value="{{ apresentacao.nome }}">
+                                        <span id="helpBlock" class="help-block">{{ form.apresentacao.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Nome Formatado</label>
+                                        <input id="exibicao" type="text" class="form-control" disabled value="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.embalagem.label }}</label>
+                                        {{ form.embalagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.embalagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.dosagem.label }}</label>
+                                        {{ form.dosagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.dosagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.sufixo_dosagem.label }}</label>
+                                        {{ form.sufixo_dosagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.sufixo_dosagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.quantidade.label }}</label>
+                                        {{ form.quantidade|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.quantidade.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.sufixo_quantidade.label }}*</label>
+                                        {{ form.sufixo_quantidade|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.sufixo_quantidade.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.identificado.label }}*</label>
+                                        {{ form.identificado }}
+                                        <span id="helpBlock" class="help-block">{{ form.identificado.errors }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.forma_farmaceutica.label }}</label>
+                                        {{ form.forma_farmaceutica|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.forma_farmaceutica.errors }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.imagem.label }}</label>
+                                        {{ form.imagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.imagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <img id="id_thumbnail_imagem" style="width: 180px; margin-left: 50px;" src="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span id="exibicao"></span>
+                                    <a href="{% url 'apresentacao-admin-list' %}" class="btn btn-default pull-left">Voltar</a>
+                                    <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+
+    (function () {
+        $('.menu-item').removeClass('active');
+        $('#menu_apresentacao').addClass('active');
+        $('#id_identificado').prop('checked', true);
+        update_exibicao();
+
+        document.getElementById('id_sufixo_dosagem').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_dosagem').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_sufixo_quantidade').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_quantidade').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_forma_farmaceutica').onchange = function(evt) {
+            update_exibicao();
+        }
+
+        function update_exibicao() {
+            var val_dosagem = $('#id_dosagem').val();
+            var qtd = $('#id_quantidade').val();
+
+            if ($('#id_forma_farmaceutica').children("option:selected").val() != "") {
+                var forma = $('#id_forma_farmaceutica').children("option:selected").text();
+            } else {
+                var forma = $('#id_forma_farmaceutica').children("option:selected").val();
+            }
+            
+            if ($('#id_sufixo_dosagem').children("option:selected").val() != "") {
+                var suf_dosagem = $('#id_sufixo_dosagem').children("option:selected").text();
+            } else {
+                var suf_dosagem = $('#id_sufixo_dosagem').children("option:selected").val();
+            }
+
+            if ($('#id_sufixo_quantidade').children("option:selected").val() != "") {
+                var suf_qtd = $('#id_sufixo_quantidade').children("option:selected").text();
+            } else {
+                var suf_qtd = $('#id_sufixo_quantidade').children("option:selected").val();
+            }
+
+            if (suf_qtd != "") {
+                $('#exibicao').val(val_dosagem + suf_dosagem + ', ' + forma + ' ' + qtd + suf_qtd)
+            } else {
+                $('#exibicao').val(val_dosagem + suf_dosagem + ', ' + forma + ' ' + qtd + suf_qtd)
+            }
+
+            // $('#exibicao').val(suf_dosagem + val_dosagem + suf_qtd + qtd)
+        }
+
+
+        document.getElementById('id_imagem').onchange = function (evt) {
+            var tgt = evt.target || window.event.srcElement,
+                files = tgt.files;
+
+            // FileReader support
+            if (FileReader && files && files.length) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    document.getElementById('id_thumbnail_imagem').src = fr.result;
+                }
+                fr.readAsDataURL(files[0]);
+            }
+
+            // Not supported
+            else {
+                // fallback -- perhaps submit the input to an iframe and temporarily store
+                // them on the server until the user's session ends.
+            }
+        }
+
+    })();
+
+
+    $(window).on('load', function (event) {
+       $('#id_video').blur();
+       var t = $('#id_imagem').parent().children('a');
+       $('#id_thumbnail_imagem').attr('src', $(t).attr('href'));
+    });
+    </script>
+{% endblock js %}
+

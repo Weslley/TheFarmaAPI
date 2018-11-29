@@ -201,10 +201,11 @@ class ImagemInline(admin.StackedInline):
     extra = 1
 
 class ApresentacaoAdmin(admin.ModelAdmin):
-    inlines = [ImagemInline]
+    # inlines = [ImagemInline]
     readonly_fields = ('codigo_barras', 'registro_ms', 'produto', 'nome')
     fields = (
         'produto', 'codigo_barras', 'registro_ms', 'nome',
+        'imagem',
         'identificado', 'comercializado', 'pbm',
         'forma_farmaceutica', 'embalagem',
         'dosagem', 'sufixo_dosagem',
@@ -213,7 +214,7 @@ class ApresentacaoAdmin(admin.ModelAdmin):
     list_filter = ('forma_farmaceutica', 'comercializado', 'identificado', 'pbm')
     list_display = (
         'nome', 'get_nome_da_apresentacao', 'produto',
-        'codigo_barras', 'get_possui_imagem', 'identificado'
+        'codigo_barras', 'identificado'
     )
     search_fields = ('codigo_barras', 'registro_ms', 'produto__nome')
 
@@ -233,13 +234,13 @@ class ApresentacaoAdmin(admin.ModelAdmin):
 
     get_nome_da_apresentacao.short_description = 'Nome Formatado'
 
-    def get_possui_imagem(self, obj):
-        if obj.imagens:
-            if obj.imagens.exists():
-                return "Sim"
-        return "Não"
+    # def get_possui_imagem(self, obj):
+    #     if obj.imagens:
+    #         if obj.imagens.exists():
+    #             return "Sim"
+    #     return "Não"
 
-    get_possui_imagem.short_description = 'Possui Imagem'
+    # get_possui_imagem.short_description = 'Possui Imagem'
 
 admin.site.register(Embalagem)
 admin.site.register(Sufixo)
