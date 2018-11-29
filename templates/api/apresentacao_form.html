@@ -26,6 +26,10 @@
             float: left;
             margin-right: 10px;
         }
+        #exibicao {
+            font-size: 25px;
+            margin-left: 50px;
+        }
     </style>
 
     <div class="row">
@@ -116,10 +120,9 @@
                                         <span id="helpBlock" class="help-block">{{ form.forma_farmaceutica.errors }}</span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-8">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">Nome Formatado</label>
-                                        <input id="exibicao" type="text" class="form-control" disabled value="">
+                                        <span id="exibicao"></span>
                                     </div>
                                 </div>
                             </div>
@@ -182,6 +185,12 @@
             var val_dosagem = $('#id_dosagem').val();
             var qtd = $('#id_quantidade').val();
 
+            if ($('#id_embalagem').children("option:selected").val() != "") {
+                var embalagem = $('#id_embalagem').children("option:selected").text();
+            } else {
+                var embalagem = $('#id_embalagem').children("option:selected").val();
+            }
+
             if ($('#id_forma_farmaceutica').children("option:selected").val() != "") {
                 var forma = $('#id_forma_farmaceutica').children("option:selected").text();
             } else {
@@ -200,17 +209,11 @@
                 var suf_qtd = $('#id_sufixo_quantidade').children("option:selected").val();
             }
 
-            if (suf_qtd != "") {
-                $('#exibicao').val(val_dosagem + suf_dosagem + ', ' + forma + ' ' + qtd + suf_qtd)
-            } else {
-                $('#exibicao').val(val_dosagem + suf_dosagem + ', ' + forma + ' ' + qtd + suf_qtd)
-            }
-
-            // $('#exibicao').val(suf_dosagem + val_dosagem + suf_qtd + qtd)
+            $('#exibicao').text(val_dosagem + suf_dosagem + ', ' + forma + ' com ' + qtd + suf_qtd);
         }
 
 
-        document.getElementById('id_imagem').onchange = function (evt) {
+        document.getElementById('id_imagem_0').onchange = function (evt) {
             var tgt = evt.target || window.event.srcElement,
                 files = tgt.files;
 
