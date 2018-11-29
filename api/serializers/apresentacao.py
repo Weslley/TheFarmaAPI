@@ -43,8 +43,11 @@ class ImagemApresentacaoSerializer(serializers.ModelSerializer):
 
 class ApresentacaoBusca(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
-    imagens = serializers.SerializerMethodField()
-    imagem = serializers.SerializerMethodField()
+    imagem = VersatileImageFieldSerializer(
+        sizes=[
+            ('square_crop', 'crop__400x400'),
+        ]
+    )
     unidade = serializers.CharField(source='unidade.nome')
     pmc = serializers.SerializerMethodField()
     data_atualizacao = serializers.SerializerMethodField()
@@ -95,30 +98,6 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
         return round(preco, 2)
 
-    def get_imagem(self, obj):
-        qs = obj.imagens.order_by('-capa').first()
-        serializer = ImagemApresentacaoSerializer(instance=qs, context=self.context)
-        data = serializer.data['imagem']
-
-        # verificando se tem um tipo caso não possua imagens
-        if not data and obj.unidade:
-            request = self.context['request']
-            data = request.build_absolute_uri(obj.unidade.imagem.url)
-
-        return data
-
-    def get_imagens(self, obj):
-        qs = obj.imagens.order_by('-capa')
-        serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
-        data = [_['imagem'] for _ in serializer.data]
-
-        # verificando se tem um tipo caso não possua imagens
-        if not data and obj.unidade:
-            request = self.context['request']
-            data.append(request.build_absolute_uri(obj.unidade.imagem.url))
-
-        return data
-
 
 class ProdutoFabricante(serializers.ModelSerializer):
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
@@ -151,11 +130,9 @@ class ProdutoCompletoSerializer(ProdutoSimplesSerializer):
 class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
     pmc = serializers.SerializerMethodField()
-    # imagens = serializers.SerializerMethodField()
     imagem = VersatileImageFieldSerializer(
         sizes=[
-            ('thumbnail', 'thumbnail__100x100'),
-            ('medium_square_crop', 'crop__400x400'),
+            ('square_crop', 'crop__400x400'),
         ]
     )
     unidade = serializers.CharField(source='unidade.nome')
@@ -168,10 +145,9 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             'codigo_barras',
             'nome',
             'preco',
-            # 'imagens',
+            'imagem',
             'unidade',
             'produto',
-            'imagem',
             'pmc',
             'quantidade',
             'classe_terapeutica'
@@ -190,30 +166,6 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
         preco = locale.currency(preco, grouping=True, symbol=None)
         return preco
-
-    # def get_imagens(self, obj):
-    #     qs = obj.imagens.order_by('-capa')
-    #     serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
-    #     data = [_['imagem'] for _ in serializer.data]
-
-    #     # verificando se tem um tipo caso não possua imagens
-    #     if not data and obj.unidade:
-    #         request = self.context['request']
-    #         data.append(request.build_absolute_uri(obj.unidade.imagem.url))
-
-    #     return data
-
-    def get_imagem(self, obj):
-        qs = obj.imagens.order_by('-capa').first()
-        serializer = ImagemApresentacaoSerializer(instance=qs, context=self.context)
-        data = serializer.data['imagem']
-
-        # verificando se tem um tipo caso não possua imagens
-        if not data and obj.unidade:
-            request = self.context['request']
-            data = request.build_absolute_uri(obj.unidade.imagem.url)
-
-        return data
 
     def get_pmc(self, obj):
         cidade = self.context['cidade']
@@ -236,7 +188,11 @@ class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):
 
 
 class ApresentacaoListSerializer(serializers.ModelSerializer):
-    imagem = serializers.SerializerMethodField()
+    imagem = VersatileImageFieldSerializer(
+        sizes=[
+            ('square_crop', 'crop__400x400'),
+        ]
+    )
     unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoSimplesSerializer()
     pmc = serializers.SerializerMethodField()
@@ -244,31 +200,6 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Apresentacao
         fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc', 'classe_terapeutica', 'codigo_barras')
-
-    def get_imagem(self, obj):
-        qs = obj.imagens.order_by('-capa').first()
-        serializer = ImagemApresentacaoSerializer(instance=qs, context=self.context)
-        data = serializer.data['imagem']
-
-        # verificando se tem um tipo caso não possua imagens
-        if not data and obj.unidade:
-            if 'request' in self.context:
-                request = self.context['request']
-                return request.build_absolute_uri(obj.unidade.imagem.url) if obj.unidade.imagem.url else None
-            else:
-                return '{}{}/{}/'.format(
-                    settings.HTTPS,
-                    Site.objects.get_current().domain,
-                    obj.unidade.imagem.url
-                )
-        elif data:
-            return '{}{}{}'.format(
-                settings.HTTPS,
-                Site.objects.get_current().domain,
-                data
-            )
-        else:
-            return None
 
     def get_pmc(self, obj):
         cidade = self.context['cidade'] if 'cidade' in self.context else None
