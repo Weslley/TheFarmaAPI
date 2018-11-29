@@ -4,6 +4,8 @@ from decimal import Decimal
 from django.contrib.sites.models import Site
 from rest_framework import serializers
 
+from versatileimagefield.serializers import VersatileImageFieldSerializer
+
 from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.models.estoque import Estoque
 from api.models.produto import Produto
@@ -149,8 +151,13 @@ class ProdutoCompletoSerializer(ProdutoSimplesSerializer):
 class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
     pmc = serializers.SerializerMethodField()
-    imagens = serializers.SerializerMethodField()
-    imagem = serializers.SerializerMethodField()
+    # imagens = serializers.SerializerMethodField()
+    imagem = VersatileImageFieldSerializer(
+        sizes=[
+            ('thumbnail', 'thumbnail__100x100'),
+            ('medium_square_crop', 'crop__400x400'),
+        ]
+    )
     unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoFabricante()
 
@@ -161,7 +168,7 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             'codigo_barras',
             'nome',
             'preco',
-            'imagens',
+            # 'imagens',
             'unidade',
             'produto',
             'imagem',
@@ -184,17 +191,17 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         preco = locale.currency(preco, grouping=True, symbol=None)
         return preco
 
-    def get_imagens(self, obj):
-        qs = obj.imagens.order_by('-capa')
-        serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
-        data = [_['imagem'] for _ in serializer.data]
+    # def get_imagens(self, obj):
+    #     qs = obj.imagens.order_by('-capa')
+    #     serializer = ImagemApresentacaoSerializer(instance=qs, many=True, context=self.context)
+    #     data = [_['imagem'] for _ in serializer.data]
 
-        # verificando se tem um tipo caso não possua imagens
-        if not data and obj.unidade:
-            request = self.context['request']
-            data.append(request.build_absolute_uri(obj.unidade.imagem.url))
+    #     # verificando se tem um tipo caso não possua imagens
+    #     if not data and obj.unidade:
+    #         request = self.context['request']
+    #         data.append(request.build_absolute_uri(obj.unidade.imagem.url))
 
-        return data
+    #     return data
 
     def get_imagem(self, obj):
         qs = obj.imagens.order_by('-capa').first()

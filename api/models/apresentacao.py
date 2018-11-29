@@ -1,5 +1,7 @@
 from django.db import models, transaction
 
+from versatileimagefield.fields import VersatileImageField, PPOIField
+
 from api.models.configuracao import Configuracao
 from api.models.produto import Produto
 from api.models.unidade import Unidade
@@ -71,6 +73,10 @@ class Sufixo(models.Model):
         return self.nome
 
 
+def generate_apresentacao_filename(self, filename):
+    return 'apresentacoes/{0}/{1}'.format(self.id, filename)
+
+
 class Apresentacao(models.Model):
     codigo_barras = models.BigIntegerField(null=True, blank=True, unique=True)
     nome = models.CharField(max_length=200, null=True, blank=True)
@@ -85,12 +91,19 @@ class Apresentacao(models.Model):
     ranking_compra = models.BigIntegerField(default=0)
     patrocinio = models.BigIntegerField(default=0)
 
+    imagem = VersatileImageField(
+        upload_to=generate_apresentacao_filename,
+        ppoi_field='apresentacao_ppoi',
+        null=True, blank=True
+    )
+    apresentacao_ppoi = PPOIField()
+
     forma_farmaceutica = models.ForeignKey(
         FormaFarmaceutica, related_name='apresentacoes',
         null=True
     )
     embalagem = models.ForeignKey(
-        Embalagem, related_name='apresentacoes', null=True
+        Embalagem, related_name='apresentacoes', null=True, blank=True
     )
     dosagem = models.DecimalField(
         null=True, max_digits=15, decimal_places=2
@@ -116,7 +129,7 @@ class Apresentacao(models.Model):
 
     def __str__(self):
         return self.nome if self.nome else self.produto.nome
-    
+
     @property
     def nome_apresentacao(self):
         if self.sufixo_quantidade:
