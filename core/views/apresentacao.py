@@ -38,3 +38,7 @@ class ApresentacaoDetail(UpdateView, AdminBaseMixin):
         'quantidade', 'sufixo_quantidade', 'imagem', 'forma_farmaceutica'
     )
     success_url = reverse_lazy('apresentacao-admin-list')
+
+    def get_success_url(self):
+        url = self.success_url + '?identificado_order=desc'
+        return url
