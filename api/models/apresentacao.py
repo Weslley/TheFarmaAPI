@@ -112,6 +112,22 @@ class Apresentacao(models.Model):
         Sufixo, related_name='apresentacoes_com_sufixo_dosagem',
         null=True, verbose_name='Sufixo da Dosagem'
     )
+
+    segunda_dosagem = models.DecimalField(
+        null=True, blank=True, max_digits=15, decimal_places=2
+    )
+    sufixo_segunda_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_segunda_dosagem',
+        null=True, blank=True, verbose_name='Sufixo da Segunda Dosagem'
+    )
+    terceira_dosagem = models.DecimalField(
+        null=True, blank=True, max_digits=15, decimal_places=2
+    )
+    sufixo_terceira_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_teceira_dosagem',
+        null=True, blank=True, verbose_name='Sufixo da Terceira Dosagem'
+    )
+
     quantidade = models.DecimalField(
         null=True, max_digits=15, decimal_places=2
     )
@@ -122,7 +138,7 @@ class Apresentacao(models.Model):
     )
 
     comercializado = models.BooleanField(default=True)
-    pbm = models.NullBooleanField()
+    pbm = models.BooleanField(default=False)
     identificado = models.BooleanField(default=False)
 
     objects = ApresentacaoManager()

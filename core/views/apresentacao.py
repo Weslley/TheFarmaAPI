@@ -35,7 +35,10 @@ class ApresentacaoDetail(UpdateView, AdminBaseMixin):
     pk_url_kwarg = 'id'
     fields = (
         'dosagem', 'embalagem', 'sufixo_dosagem', 'identificado',
-        'quantidade', 'sufixo_quantidade', 'imagem', 'forma_farmaceutica'
+        'segunda_dosagem', 'sufixo_segunda_dosagem',
+        'terceira_dosagem', 'sufixo_terceira_dosagem',
+        'pbm', 'comercializado', 'quantidade',
+        'sufixo_quantidade', 'imagem', 'forma_farmaceutica'
     )
     success_url = reverse_lazy('apresentacao-admin-list')
 

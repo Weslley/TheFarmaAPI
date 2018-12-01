@@ -119,6 +119,54 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">2˚ dosagem</label>
+                                        {{ form.segunda_dosagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
+                                        <span id="helpBlock" class="help-block">{{ form.segunda_dosagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Sufixo da 2˚ dosagem</label>
+                                        {{ form.sufixo_segunda_dosagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
+                                        <span id="helpBlock" class="help-block">{{ form.sufixo_segunda_dosagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">3˚ dosagem</label>
+                                        {{ form.terceira_dosagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
+                                        <span id="helpBlock" class="help-block">{{ form.terceira_dosagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">Sufixo da 3˚ dosagem</label>
+                                        {{ form.sufixo_terceira_dosagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
+                                        <span id="helpBlock" class="help-block">{{ form.sufixo_terceira_dosagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.pbm.label }}</label>
+                                        {{ form.pbm }}
+                                        <span id="helpBlock" class="help-block">{{ form.pbm.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.comercializado.label }}</label>
+                                        {{ form.comercializado }}
+                                        <span id="helpBlock" class="help-block">{{ form.comercializado.errors }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group label-floating">
                                         <label class="control-label">{{ form.forma_farmaceutica.label }}</label>
@@ -177,6 +225,19 @@
         document.getElementById('id_dosagem').onchange = function(evt) {
             update_exibicao();
         }
+        document.getElementById('id_sufixo_segunda_dosagem').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_segunda_dosagem').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_sufixo_terceira_dosagem').onchange = function(evt) {
+            update_exibicao();
+        }
+        document.getElementById('id_terceira_dosagem').onchange = function(evt) {
+            update_exibicao();
+        }
+        
         document.getElementById('id_sufixo_quantidade').onchange = function(evt) {
             update_exibicao();
         }
@@ -190,6 +251,9 @@
         function update_exibicao() {
             var val_dosagem = $('#id_dosagem').val();
             var qtd = $('#id_quantidade').val();
+
+            var val_segunda_dosagem = $('#id_segunda_dosagem').val();
+            var val_terceira_dosagem = $('#id_terceira_dosagem').val();
 
             if ($('#id_embalagem').children("option:selected").val() != "") {
                 var embalagem = $('#id_embalagem').children("option:selected").text();
@@ -209,13 +273,34 @@
                 var suf_dosagem = $('#id_sufixo_dosagem').children("option:selected").val();
             }
 
+            if ($('#id_sufixo_segunda_dosagem').children("option:selected").val() != "") {
+                var suf_segunda_dosagem = $('#id_sufixo_segunda_dosagem').children("option:selected").text();
+            } else {
+                var suf_segunda_dosagem = $('#id_sufixo_segunda_dosagem').children("option:selected").val();
+            }
+
+            if ($('#id_sufixo_terceira_dosagem').children("option:selected").val() != "") {
+                var suf_terceira_dosagem = $('#id_sufixo_terceira_dosagem').children("option:selected").text();
+            } else {
+                var suf_terceira_dosagem = $('#id_sufixo_terceira_dosagem').children("option:selected").val();
+            }
+
             if ($('#id_sufixo_quantidade').children("option:selected").val() != "") {
                 var suf_qtd = $('#id_sufixo_quantidade').children("option:selected").text();
             } else {
                 var suf_qtd = $('#id_sufixo_quantidade').children("option:selected").val();
             }
 
-            $('#exibicao').text(val_dosagem + suf_dosagem + ', ' + forma + ' com ' + qtd + suf_qtd);
+            if (val_segunda_dosagem != 0) {
+                $('#exibicao').text(
+                    val_dosagem + suf_dosagem +
+                    ' + ' + val_segunda_dosagem + suf_segunda_dosagem +
+                    ' + '+ val_terceira_dosagem + suf_terceira_dosagem + ', ' +
+                    forma + ' com ' + qtd + suf_qtd
+                );
+            } else {
+                $('#exibicao').text(val_dosagem + suf_dosagem + ', ' + forma + ' com ' + qtd + suf_qtd);
+            }
         }
 
 
