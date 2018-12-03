@@ -26,6 +26,7 @@ class ApresentacaoList(ListMixin, AdminBaseMixin):
     columns = [
         {'lookup': 'codigo_barras', 'name': 'Código de Barras'},
         {'lookup': 'produto__nome', 'name': 'Produto'},
+        {'lookup': 'produto__laboratorio__nome', 'name': 'Laboratório'},
         {'lookup': 'identificado', 'name': 'Identificado', 'js_function': 'booleanfield'}
     ]
 
