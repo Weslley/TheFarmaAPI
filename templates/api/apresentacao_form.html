@@ -28,7 +28,6 @@
         }
         #exibicao {
             font-size: 25px;
-            margin-left: 50px;
         }
     </style>
 
@@ -41,12 +40,10 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab_1">
-
-
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">Codigos de codigo_barras</label>
+                                        <label class="control-label">Código de Barras</label>
                                         <input type="text" class="form-control" disabled value="{{ apresentacao.codigo_barras }}">
                                         <span id="helpBlock" class="help-block">{{ form.codigo_barras.errors }}</span>
                                     </div>
@@ -75,14 +72,6 @@
                             <div class="row">
                                 <div class="col-md-2">
                                     <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.embalagem.label }}</label>
-                                        {{ form.embalagem|addclass:"form-control" }}
-                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
-                                        <span id="helpBlock" class="help-block">{{ form.embalagem.errors }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group label-floating">
                                         <label class="control-label">{{ form.dosagem.label }}</label>
                                         {{ form.dosagem|addclass:"form-control" }}
                                         <span id="helpBlock" class="help-block">{{ form.dosagem.errors }}</span>
@@ -95,30 +84,6 @@
                                         <span id="helpBlock" class="help-block">{{ form.sufixo_dosagem.errors }}</span>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.quantidade.label }}</label>
-                                        {{ form.quantidade|addclass:"form-control" }}
-                                        <span id="helpBlock" class="help-block">{{ form.quantidade.errors }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.sufixo_quantidade.label }}</label>
-                                        {{ form.sufixo_quantidade|addclass:"form-control" }}
-                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
-                                        <span id="helpBlock" class="help-block">{{ form.sufixo_quantidade.errors }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.identificado.label }}</label>
-                                        {{ form.identificado }}
-                                        <span id="helpBlock" class="help-block">{{ form.identificado.errors }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-2">
                                     <div class="form-group label-floating">
                                         <label class="control-label">2˚ dosagem</label>
@@ -151,6 +116,47 @@
                                         <span id="helpBlock" class="help-block">{{ form.sufixo_terceira_dosagem.errors }}</span>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.embalagem.label }}</label>
+                                        {{ form.embalagem|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
+                                        <span id="helpBlock" class="help-block">{{ form.embalagem.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.forma_farmaceutica.label }}</label>
+                                        {{ form.forma_farmaceutica|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.forma_farmaceutica.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.quantidade.label }}</label>
+                                        {{ form.quantidade|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">{{ form.quantidade.errors }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.sufixo_quantidade.label }}</label>
+                                        {{ form.sufixo_quantidade|addclass:"form-control" }}
+                                        <span id="helpBlock" class="help-block">Não obrigatório</span>
+                                        <span id="helpBlock" class="help-block">{{ form.sufixo_quantidade.errors }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group label-floating">
+                                        <label class="control-label">{{ form.identificado.label }}</label>
+                                        {{ form.identificado|disable_checkbox }}
+                                        <span id="helpBlock" class="help-block">{{ form.identificado.errors }}</span>
+                                    </div>
+                                </div>
                                 <div class="col-md-2">
                                     <div class="form-group label-floating">
                                         <label class="control-label">{{ form.pbm.label }}</label>
@@ -165,16 +171,7 @@
                                         <span id="helpBlock" class="help-block">{{ form.comercializado.errors }}</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group label-floating">
-                                        <label class="control-label">{{ form.forma_farmaceutica.label }}</label>
-                                        {{ form.forma_farmaceutica|addclass:"form-control" }}
-                                        <span id="helpBlock" class="help-block">{{ form.forma_farmaceutica.errors }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     <div class="form-group label-floating">
                                         <span id="exibicao"></span>
                                     </div>

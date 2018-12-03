@@ -9,6 +9,11 @@ def addclass(field, css):
     return field.as_widget(attrs={"class": css})
 
 
+@register.filter(name='disable_checkbox')
+def disable_checkbox(field):
+    return field.as_widget(attrs={"onclick": "return false;"})
+
+
 @register.filter(name='addplaceholder')
 def addplaceholder(field, value):
     return field.as_widget(attrs={"placeholder": value})
