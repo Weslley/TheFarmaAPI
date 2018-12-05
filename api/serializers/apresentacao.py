@@ -51,6 +51,7 @@ class ApresentacaoBusca(serializers.ModelSerializer):
     unidade = serializers.CharField(source='unidade.nome')
     pmc = serializers.SerializerMethodField()
     data_atualizacao = serializers.SerializerMethodField()
+    nome = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
@@ -66,6 +67,9 @@ class ApresentacaoBusca(serializers.ModelSerializer):
             'data_atualizacao',
             'classe_terapeutica'
         )
+
+    def get_nome(self, obj):
+        obj.nome_apresentacao
 
     def get_data_atualizacao(self, obj):
         return int(obj.data_atualizacao.timestamp() * 1000)
@@ -137,6 +141,7 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     )
     unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoFabricante()
+    nome = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
@@ -152,6 +157,9 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             'quantidade',
             'classe_terapeutica'
         )
+
+    def get_nome(self, obj):
+        return obj.nome_apresentacao
 
     def get_preco(self, obj):
         cidade = self.context['cidade']
