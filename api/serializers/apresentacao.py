@@ -52,6 +52,8 @@ class ApresentacaoBusca(serializers.ModelSerializer):
     pmc = serializers.SerializerMethodField()
     data_atualizacao = serializers.SerializerMethodField()
     nome = serializers.SerializerMethodField()
+    embalagem = serializers.SerializerMethodField()
+    forma_farmaceutica = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
@@ -59,6 +61,8 @@ class ApresentacaoBusca(serializers.ModelSerializer):
             'id',
             'codigo_barras',
             'nome',
+            'embalagem',
+            'forma_farmaceutica',
             'preco',
             'imagens',
             'unidade',
@@ -70,6 +74,14 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
     def get_nome(self, obj):
         obj.nome_apresentacao
+    
+    def get_embalagem(self, obj):
+        if obj.embalagem:
+            return obj.embalagem.tipo
+    
+    def get_forma_farmaceutica(self, obj):
+        if obj.forma_farmaceutica:
+            return obj.forma_farmaceutica.nome
 
     def get_data_atualizacao(self, obj):
         return int(obj.data_atualizacao.timestamp() * 1000)
@@ -142,6 +154,8 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoFabricante()
     nome = serializers.SerializerMethodField()
+    embalagem = serializers.SerializerMethodField()
+    forma_farmaceutica = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
@@ -149,6 +163,8 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             'id',
             'codigo_barras',
             'nome',
+            'embalagem',
+            'forma_farmaceutica',
             'preco',
             'imagem',
             'unidade',
@@ -160,6 +176,14 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
 
     def get_nome(self, obj):
         return obj.nome_apresentacao
+
+    def get_embalagem(self, obj):
+        if obj.embalagem:
+            return obj.embalagem.tipo
+    
+    def get_forma_farmaceutica(self, obj):
+        if obj.forma_farmaceutica:
+            return obj.forma_farmaceutica.nome
 
     def get_preco(self, obj):
         cidade = self.context['cidade']
