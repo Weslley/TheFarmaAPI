@@ -99,8 +99,8 @@ def alterar_status_contas():
 	for conta_a_fechar in contas_a_fechar:
 		if conta_a_fechar.data_faturamento:
 			if conta_a_fechar.data_faturamento <= today:
-				conta_aberta.status = StatusPagamentoConta.FECHADA
-				conta_aberta.save()
+				conta_a_fechar.status = StatusPagamentoConta.FECHADA
+				conta_a_fechar.save()
 
 	# Vencer contas abertas que passaram do vencimento
 	contas_abertas = Conta.objects.filter(
