@@ -1,8 +1,12 @@
 from django.db import models, transaction
 
+from versatileimagefield.fields import VersatileImageField, PPOIField
+
 from api.models.configuracao import Configuracao
 from api.models.produto import Produto
 from api.models.unidade import Unidade
+
+import locale
 
 
 class ApresentacaoManager(models.Manager):
@@ -50,6 +54,31 @@ class ApresentacaoManager(models.Manager):
             print(e)
 
 
+class FormaFarmaceutica(models.Model):
+    nome = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.nome
+
+
+class Embalagem(models.Model):
+    tipo = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.tipo
+
+
+class Sufixo(models.Model):
+    nome = models.CharField(max_length=75)
+
+    def __str__(self):
+        return self.nome
+
+
+def generate_apresentacao_filename(self, filename):
+    return 'apresentacoes/{0}/{1}'.format(self.id, filename)
+
+
 class Apresentacao(models.Model):
     codigo_barras = models.BigIntegerField(null=True, blank=True, unique=True)
     nome = models.CharField(max_length=200, null=True, blank=True)
@@ -58,16 +87,129 @@ class Apresentacao(models.Model):
     data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
     ativo = models.BooleanField(default=True)
     unidade = models.ForeignKey(Unidade, null=True, blank=True)
-    quantidade = models.IntegerField(default=0)
     classe_terapeutica = models.CharField(max_length=254, null=True, blank=True)
     ranking_visualizacao = models.BigIntegerField(default=0)
     ranking_proposta = models.BigIntegerField(default=0)
     ranking_compra = models.BigIntegerField(default=0)
     patrocinio = models.BigIntegerField(default=0)
+
+    imagem = VersatileImageField(
+        upload_to=generate_apresentacao_filename,
+        ppoi_field='apresentacao_ppoi',
+        null=True, blank=True
+    )
+    apresentacao_ppoi = PPOIField()
+
+    forma_farmaceutica = models.ForeignKey(
+        FormaFarmaceutica, related_name='apresentacoes',
+        null=True
+    )
+    embalagem = models.ForeignKey(
+        Embalagem, related_name='apresentacoes', null=True, blank=True
+    )
+    dosagem = models.DecimalField(
+        null=True, max_digits=15, decimal_places=2
+    )
+    sufixo_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_dosagem',
+        null=True, verbose_name='Sufixo da Dosagem'
+    )
+
+    segunda_dosagem = models.DecimalField(
+        null=True, blank=True, max_digits=15, decimal_places=2
+    )
+    sufixo_segunda_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_segunda_dosagem',
+        null=True, blank=True, verbose_name='Sufixo da Segunda Dosagem'
+    )
+    terceira_dosagem = models.DecimalField(
+        null=True, blank=True, max_digits=15, decimal_places=2
+    )
+    sufixo_terceira_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_teceira_dosagem',
+        null=True, blank=True, verbose_name='Sufixo da Terceira Dosagem'
+    )
+
+    quantidade = models.DecimalField(
+        null=True, max_digits=15, decimal_places=2
+    )
+    sufixo_quantidade = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_quantidade',
+        blank=True, null=True, verbose_name='Sufixo da Quantidade',
+        help_text="Não obrigatório"
+    )
+
+    comercializado = models.BooleanField(default=True)
+    pbm = models.BooleanField(default=False)
+    identificado = models.BooleanField(default=False)
+
     objects = ApresentacaoManager()
 
     def __str__(self):
         return self.nome if self.nome else self.produto.nome
+
+    @property
+    def nome_apresentacao(self):
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+        def clean_decimal(decimal_value):
+            dc_tuple = decimal_value.as_tuple()
+            exp_tuple = dc_tuple.digits[dc_tuple.exponent:]
+            if max(exp_tuple) == 0:
+                return int(
+                    ''.join(
+                        [str(_) for _ in dc_tuple.digits[:dc_tuple.exponent]]
+                    )
+                )
+            return locale.currency(decimal_value, grouping=True, symbol=None)
+
+        if not self.identificado:
+            return self.nome
+
+        default_decimal_fields = ['dosagem', 'quantidade']
+        extra_decimal_fields = ['segunda_dosagem', 'terceira_dosagem']
+        fmt_values = {
+            df_field:clean_decimal(getattr(self, df_field))
+            for df_field in default_decimal_fields
+        }
+
+        extra = []
+        for extra_field in extra_decimal_fields:
+            result = getattr(self, extra_field)
+            if result:
+                fmt_values[extra_field] = clean_decimal(result)
+                extra.append(extra_field)
+
+        dosagem = fmt_values.get('dosagem')
+        quantidade = fmt_values.get('quantidade')
+        if extra:
+            segunda_dosagem = fmt_values.get('segunda_dosagem', None)
+            terceira_dosagem = fmt_values.get('terceira_dosagem', None)
+            prefixo_apresentacao = '{}{}'.format(dosagem, self.sufixo_dosagem)
+
+            if segunda_dosagem:
+                prefixo_apresentacao += '+{}{}'.format(
+                    segunda_dosagem, self.sufixo_segunda_dosagem
+                )
+            if terceira_dosagem:
+                prefixo_apresentacao += '+{}{}'.format(
+                    terceira_dosagem, self.sufixo_terceira_dosagem
+                )
+
+        else:
+            prefixo_apresentacao = '{}{}'.format(dosagem, self.sufixo_dosagem)
+
+        if self.sufixo_quantidade:
+            final_apresentacao = ", {} com {}{}".format(
+                self.forma_farmaceutica.nome, quantidade,
+                self.sufixo_quantidade
+            )
+        else:
+            final_apresentacao = ", {} {}".format(
+                quantidade, self.forma_farmaceutica.nome.lower()
+            )
+
+        return prefixo_apresentacao + final_apresentacao
 
     @property
     def ranking(self):

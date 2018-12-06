@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'^lucas-admin/', admin.site.urls),
     url(r'^admin/', include(core_urls)),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

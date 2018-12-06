@@ -147,9 +147,9 @@ class ProdutoIndicadorVenda(generics.ListAPIView):
         if principio_ativo:
             filter_kwargs['principio_ativo_id'] = principio_ativo   
 
-        regiao = self.request.GET.get('regiao', None)
-        if regiao:
-            filter_kwargs['apresentacoes__itens_vendidos__pedido__bairro__regiao_id'] = regiao   
+        # regiao = self.request.GET.get('regiao', None)
+        # if regiao:
+        #     filter_kwargs['apresentacoes__itens_vendidos__pedido__bairro__regiao_id'] = regiao   
 
         select_rel = ['principio_ativo', 'laboratorio']
         vendas_annotate = Count(

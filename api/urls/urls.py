@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from api.urls import (apresentacao, atualizacao, auth, bairro, banco, cidade,
                       cliente, estoque, farmacia, laboratorio, pedido, post,
                       principio_ativo, produto, representante_legal, secao,
-                      tabela_preco, uf, regiao, notificacao)
+                      tabela_preco, uf, regiao, notificacao, conta)
 from api.views.financeiro import urls as financeiro_urls
 from api.views.root import HomeApiView
 
@@ -13,6 +13,9 @@ urlpatterns = [
     url(r'^ultima_atualizacao/', include(atualizacao)),
 
     url(r'^auth/', include(auth)),
+
+    # Contas
+    url(r'^contas/', include(conta)),
 
     # Farmacias
     url(r'^farmacias/', include(farmacia)),

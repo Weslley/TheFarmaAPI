@@ -3,23 +3,14 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from pyrebase import pyrebase
 
-from api.models.pedido import Pedido
+from api.models.pedido import Pedido, LogData
 from api.tasks.pedido import init_proposta
 
-# from api.models.cidade import Cidade
 from api.models.curtida import Curtida
-# from api.models.farmacia import Farmacia
-# from api.models.laboratorio import Fabricante
-# from api.models.medicamento import Produto
 from api.models.post import Post
-# from api.models.principio_ativo import PrincipioAtivo
-# from api.serializers.cidade import CidadeSerializer
-# from api.serializers.farmacia import FarmaciaSerializer
-# from api.serializers.laboratorio import LaboratorioSerializer
-# from api.serializers.medicamento import MedicamentoSerializer
 from api.serializers.post import PostExportSerializer
 
-# from api.serializers.principio_ativo import PrincipioAtivoSerializer
+import locale
 
 
 def update_model(model_name, data, remove=False):
@@ -36,6 +27,19 @@ def update_model(model_name, data, remove=False):
             db.child(table).child(str(data['id'])).set(data)
     except Exception as err:
         print(err)
+
+
+@receiver(post_save, sender=Pedido)
+def create_log_de_datas(sender, instance, **kwargs):
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+    data = instance.data_criacao
+    mes_pedido = data.strftime('%B')
+    ano_pedido = data.year
+
+    LogData.objects.get_or_create(
+        mes=mes_pedido, ano=ano_pedido,
+        farmacia=instance.farmacia
+    )
 
 
 @receiver(post_save, sender=Post)

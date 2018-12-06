@@ -125,6 +125,11 @@
                     <i class="fa fa-user"></i> <span>Perfil</span>
                 </a>
             </li>
+            <li class="menu-item" id="menu_apresentacao">
+                <a href="{% url 'apresentacao-admin-list' %}">
+                    <i class="fa fa-newspaper-o"></i> <span>Apresentações</span>
+                </a>
+            </li>
             {% if user.is_superuser %}
                 <li class="menu-item" id="menu_parceiro">
                     <a href="{% url 'parceiro-admin-list' %}">

@@ -217,10 +217,11 @@ class ApresentacaoBuscaFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(name="produto__nome", lookup_expr='exact')
     secao = django_filters.CharFilter(name="produto__secao", lookup_expr='nome__exact')
     subsecao = django_filters.CharFilter(name="produto__subsecao", lookup_expr='nome__exact')
+    codigo_barras = django_filters.NumberFilter(name="codigo_barras", lookup_expr="exact")
 
     class Meta:
         model = Apresentacao
-        fields = ['nome', 'secao', 'subsecao']
+        fields = ['nome', 'secao', 'subsecao', 'codigo_barras']
 
 
 class LaboratorioFilter(django_filters.FilterSet):

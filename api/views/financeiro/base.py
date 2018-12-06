@@ -1,102 +1,132 @@
-import calendar
-import locale
-from datetime import date
-
-from django.db.models import F, Q, Sum
+from django.db.models import Q, Sum
 from rest_framework import generics
 from rest_framework.response import Response
 
 from api.mixins.base import IsAuthenticatedRepresentanteMixin
-from api.models.conta_pagar import ContaPagar
-from api.models.enums.status_conta_receber import StatusContaReceber
+from api.models.conta import Conta
+from api.models.pedido import Pedido, LogData
 from api.models.enums.status_pedido import StatusPedido
-from api.models.pedido import Pedido
-from api.serializers.conta_receber_farmacia import \
-    AnnotationContaReceberSerializer
-from api.serializers.pedido import AnnotationPedidoSerializer
+from api.serializers.conta import ContaMinimalSerializer
+from api.serializers.pedido import PedidoTotaisSerializer, \
+    PedidoMinimalSerializer, LogDataSerializer
+
+from datetime import datetime, date
+import calendar
+import locale
+
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 
+class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
+    """
+    Resumo da listagem de vendas
+    """
+    def get(self, request, *args, **kwargs):
+        representante = self.get_object()
+
+        params = request.query_params
+        flag = True
+        filtro = {}
+
+        if params.get('mes'):
+            data_ref = datetime.strptime(params.get('mes'), '%B')
+            filtro.update(
+                {'data_criacao__month': data_ref.month}
+            )
+            flag = False
+
+        if params.get('ano'):
+            filtro.update(
+                {'data_criacao__year': params.get('ano')}
+            )
+            flag = False
+
+        if flag:
+            hoje = datetime.now()
+            filtro = {
+                'data_criacao__year': hoje.year,
+                'data_criacao__month': hoje.month,
+                'data_criacao__day': hoje.day
+            }
+
+        pedidos_do_periodo = Pedido.objects\
+            .filter(
+                status=StatusPedido.ENTREGUE,
+                farmacia__representantes=representante,
+                **filtro
+            )
+
+        valores_pedidos = pedidos_do_periodo.aggregate(
+            bruto=Sum('valor_bruto'),
+            liquido=Sum('valor_liquido')
+        )
+
+        logs = LogData.objects.filter(farmacia__representantes=representante)
+
+        for k, v in valores_pedidos.items():
+            if v == None:
+                valores_pedidos[k] = 0
+
+        data = {
+            'periodos': LogDataSerializer(logs, many=True).data,
+            'resumo': {
+                'valor_bruto': valores_pedidos.get('bruto'),
+                'valor_liquido': valores_pedidos.get('liquido'),
+                'quantidade': pedidos_do_periodo.count()
+            },
+            'data': PedidoMinimalSerializer(pedidos_do_periodo, many=True).data,
+        }
+        return Response(data)
+
+    def get_object(self):
+        self.check_object_permissions(self.request, self.request.user.representante_farmacia)
+        return self.request.user.representante_farmacia
+
+
 class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
-
-    def ultimas_datas(self, status, limite=4):
-        ultimos_models = ContaPagar.objects.filter(
-            status=status, pedido__farmacia__representantes=self.get_object()
-        ).distinct('data_vencimento')[:limite]
-
-        return ultimos_models.values_list('data_vencimento')
-
 
     def get(self, request, *args, **kwargs):
         representante = self.get_object()
 
         # Filtrando as ultimas 4 vendas
-        pedidos = Pedido.objects.filter(
+        contas = Conta.objects.filter(
             farmacia__representantes=representante
-        ).distinct('id').order_by('-id')[:4]
+        ).order_by('-data_vencimento')
 
-        ppedidos = Pedido.objects\
-            .exclude(
-                Q(status=StatusPedido.CANCELADO_PELA_FARMACIA) | 
-                Q(status=StatusPedido.CANCELADO_PELO_CLIENTE)
+        hoje = datetime.now()
+        pedidos_de_hoje = Pedido.objects\
+            .filter(
+                status=StatusPedido.ENTREGUE,
+                farmacia__representantes=representante,
+                data_criacao__year=hoje.year,
+                data_criacao__month=hoje.month,
+                data_criacao__day=hoje.day
             )\
-            .filter(farmacia__representantes=representante)\
-            .order_by('contas_receber__data_criacao')\
-            .annotate(data_criacao=F('contas_receber__data_criacao'))\
-            .values('data_criacao')\
-            .annotate(
-                valor_bruto=Sum('contas_receber__valor_parcela'),
-                valor_liquido=Sum(
-                    F('contas_receber__valor_parcela') -
-                    F('contas_receber__valor_comissao')
-                )
+            .aggregate(
+                bruto=Sum('valor_bruto'),
+                liquido=Sum('valor_liquido')
             )
-
-        # Filtrando as 4 ultimas contas recebidas       
-        datas_contas_recebidas = self.ultimas_datas(StatusContaReceber.PAGA, limite=50)
-        contas_recebidas = ContaPagar.objects\
-            .filter(
-                data_vencimento__in=datas_contas_recebidas,
-                status=StatusContaReceber.PAGA
-            )\
-            .order_by('-data_vencimento')\
-            .values('data_vencimento')\
-            .annotate(valor_liquido=Sum('valor_liquido'))
-
-        # Filtrando as próximas 4 contas a receber
-        datas_contas_a_receber = self.ultimas_datas(StatusContaReceber.ABERTA, limite=50)
-        contas_a_receber = ContaPagar.objects\
-            .filter(
-                data_vencimento__in=datas_contas_a_receber,
-                status=StatusContaReceber.ABERTA
-            )\
-            .order_by('data_vencimento')\
-            .values('data_vencimento')\
-            .annotate(valor_liquido=Sum('valor_liquido'))
 
         # Valores calculados de rendimento de cada mês
         values = []
         for mes in range(1, 13):
             query = Pedido.objects\
-                .exclude(
-                    Q(status=StatusPedido.CANCELADO_PELA_FARMACIA) | 
-                    Q(status=StatusPedido.CANCELADO_PELO_CLIENTE)
-                )\
                 .filter(
+                    status=StatusPedido.ENTREGUE,
                     log__data_criacao__month=mes,
                     log__data_criacao__year=date.today().year,
                     farmacia__representantes=representante,
                 )\
-                .aggregate(total=Sum('contas_receber__valor_parcela'))
+                .aggregate(total=Sum('valor_bruto'))
 
             valor = float(query['total']) if query['total'] else 0
             values.append(valor)
 
         data = {
-            'pedidos': AnnotationPedidoSerializer(ppedidos, many=True).data,
-            'contas_recebidas': AnnotationContaReceberSerializer(contas_recebidas, many=True).data,
-            'contas_a_receber': AnnotationContaReceberSerializer(contas_a_receber, many=True).data,
+            'conta_atual': ContaMinimalSerializer(contas.first(), many=False).data,
+            'contas': ContaMinimalSerializer(contas[:6], many=True).data,
+            'vendas_hoje': PedidoTotaisSerializer(pedidos_de_hoje, many=False).data,
             'rendimentos': {
                 'labels': [n.upper() for n in calendar.month_name if n],
                 'values': values

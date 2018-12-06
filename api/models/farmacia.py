@@ -80,8 +80,8 @@ class Farmacia(models.Model):
     servico_estoque = models.BooleanField(
         verbose_name='Habilitar Estoque', default=False
     )
-    dia_faturamento = models.IntegerField(
-        verbose_name='Dia de Faturamento', 
+    dia_pagamento = models.IntegerField(
+        verbose_name='Dia de Pagamento',
         choices=FATURAMENTO_CHOICES, default=20
     )
     percentual_similar = models.DecimalField(
@@ -187,12 +187,17 @@ class Farmacia(models.Model):
             F('quantidade') * F('valor_unitario'), output_field=models.DecimalField(max_digits=15, decimal_places=2)
         ))
         return resultado['valor_proposta']
+    
+    def get_valor_frete(self, pedido):
+        return self.valor_frete if pedido.delivery else 0
 
     def get_valor_proposta_com_frete(self, pedido):
         resultado = self.get_itens_proposta(pedido).aggregate(valor_proposta=Sum(
             F('quantidade') * F('valor_unitario'), output_field=models.DecimalField(max_digits=15, decimal_places=2)
         ))
-        return resultado['valor_proposta'] + self.valor_frete
+
+        frete = self.valor_frete if pedido.delivery else 0
+        return resultado['valor_proposta'] + frete
 
     def get_quantidade_maxima_parcelas(self, pedido):
         conf = Configuracao.objects.first()

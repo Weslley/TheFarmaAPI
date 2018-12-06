@@ -21,7 +21,7 @@ from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums import PagadorContas
 from api.models.farmacia import Farmacia
 from api.models.log import Log
-from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido
+from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, LogData
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.serializers.farmacia import FarmaciaListSerializer, FarmaciaEnderecoSerializer
 from api.servico_pagamento import tipo_servicos
@@ -39,10 +39,56 @@ class PagamentoCartao(object):
     pass
 
 
+class LogDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogData
+        fields = (
+            'mes',
+            'ano'
+        )
+
+
 class AnnotationPedidoSerializer(serializers.Serializer):
     data_criacao = serializers.DateTimeField()
     valor_bruto = serializers.CharField()
     valor_liquido = serializers.CharField()
+
+
+class PedidoMinimalSerializer(serializers.ModelSerializer):
+    data_atualizacao = serializers.SerializerMethodField()
+    data_criacao = serializers.SerializerMethodField()
+    cliente = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pedido
+        fields = (
+            "id",
+            "status",
+            "forma_pagamento",
+            "delivery",
+            "valor_liquido",
+            "data_atualizacao",
+            "data_criacao",
+            "cliente",
+            "valor_frete",
+            "valor_comissao_administradora",
+            "valor_comissao_thefarma",
+            "valor_bruto"
+        )
+
+    def get_data_atualizacao(self, obj):
+        return obj.log.data_atualizacao
+
+    def get_data_criacao(self, obj):
+        return obj.log.data_criacao
+    
+    def get_cliente(self, obj):
+        return str(obj.cliente)
+
+
+class PedidoTotaisSerializer(serializers.Serializer):
+    liquido = serializers.CharField()
+    bruto = serializers.CharField()
 
 
 class ItemPedidoCreateSerializer(serializers.ModelSerializer):
@@ -225,7 +271,7 @@ class PedidoSerializer(PedidoCreateSerializer):
 
     def get_bairro(self, obj):
         if obj.bairro:
-            return obj.bairro.nome
+            return obj.bairro
         return ''
 
     def get_farmacia(self, obj):
@@ -258,6 +304,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
     propostas = serializers.SerializerMethodField()
     farmacia = serializers.SerializerMethodField()
     bairro = serializers.SerializerMethodField()
+    views = serializers.SerializerMethodField()
     cartao = CartaoSerializer()
 
     def get_propostas(self, obj):
@@ -274,6 +321,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             "id",
             "valor_frete",
             "status",
+            "views",
             "log",
             "forma_pagamento",
             "cep",
@@ -306,9 +354,14 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
             'valor_frete': {'read_only': True},
         }
 
+    def get_views(self, obj):
+        if obj.views:
+            return obj.views
+        return 0
+
     def get_bairro(self, obj):
         if obj.bairro:
-            return obj.bairro.nome
+            return obj.bairro
         return ''
 
     def get_farmacia(self, obj):
@@ -356,7 +409,7 @@ class PropostaSerializer(serializers.ModelSerializer):
 
     def get_bairro(self, obj):
         if obj.bairro:
-            return obj.bairro.nome
+            return obj.bairro
         return ''
 
     def get_tempo(self, obj):

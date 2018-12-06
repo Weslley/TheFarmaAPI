@@ -1,10 +1,12 @@
 from django.db.models import Q
 from django.http.response import Http404
+from django.http import JsonResponse
 # from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import DjangoFilterBackend
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView, \
     GenericAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from api.filters import OrderingFilter, PropostaFilter
@@ -49,6 +51,22 @@ class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
         if self.request.method.lower() == 'get':
             return PedidoSerializer
         return PedidoCreateSerializer
+
+
+class PropostaAddView(APIView):
+    def get_object(self, id):
+        try:
+            return Pedido.objects.get(id=id)
+        except Pedido.DoesNotExist:
+            raise Http404('Nenhum pedido encontrado.')
+
+    def post(self, request, id, format=None):
+        pedido = self.get_object(id)
+        actual_views = int(0 if pedido.views is None else pedido.views)
+        pedido.views = actual_views + 1
+        pedido.save()
+
+        return Response({})
 
 
 class PedidoRetrieve(RetrieveAPIView, IsClienteAuthenticatedMixin):

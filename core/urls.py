@@ -2,6 +2,7 @@
 
 from django.conf.urls import url
 
+from core.views.apresentacao import *
 from core.views.atualizacao import *
 from core.views.bairro import *
 from core.views.cidade import *
@@ -17,6 +18,15 @@ from core.views.usuarios import *
 urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^desativar_usuario/(?P<id>[0-9]+)/(?P<fk_id>[0-9]+)/(?P<model>[a-z]+)/$', desativa_usuario, name='desativar-usuario'),
+
+    # Apresentacoes
+    url(r'^apresentacao/$', ApresentacaoList.as_view(), name='apresentacao-admin-list'),
+    url(r'^apresentacao/(?P<id>[0-9]+)/$', ApresentacaoDetail.as_view(), name='apresentacao-admin-view'),
+    # url(r'^apresentacao/adicionar/$', PostCreate.as_view(), name='post-admin-add'),
+    # url(r'^apresentacao/(?P<id>[0-9]+)/$', ApresentacaoDetail.as_view(), name='post-admin-view'),
+    # url(r'^apresentacao/(?P<id>[0-9]+)/editar/$', ApresentacaoUpdate.as_view(), name='post-admin-update'),
+    # url(r'^apresentacao/(?P<id>[0-9]+)/remover/$', PostDelete.as_view(), name='post-admin-delete'),
+
     # Post
     url(r'^posts/$', PostList.as_view(), name='post-admin-list'),
     url(r'^posts/adicionar/$', PostCreate.as_view(), name='post-admin-add'),

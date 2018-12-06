@@ -26,52 +26,64 @@ services:
     expose:
       - "8000"
     restart: always
-    environment:
-     - DEBUG=False
-     - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
-     - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
-     - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
-     - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
-     - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
-     - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
-     - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
-     - CORS_ORIGIN_WHITELIST=localhost:8000
-     - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
-     - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
-     - CIELO_SANDBOX=True
-     - REDIS_CHANNELS_HOST=api.thefarma.com.br
-     - REDIS_CHANNELS_PORT=32769
-     
+    env_file:
+      - .env
+    depends_on:
+      - redis_channels
+      - redis_celery
 
   worker_default:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas --hostname=worker_default"
+    # command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,contas --hostname=worker_default"
+    # command: bash -c "celery -A thefarmaapi worker -l debug --autoscale=10,3 --queues=default,update_cliente,propostas,contas --hostname=worker_default"
+    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,periodicos --hostname=worker_default"
     volumes:
       - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
     restart: always
-    environment:
-     - DEBUG=False
-     - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
-     - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
-     - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
-     - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
-     - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
-     - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
-     - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
-     - CORS_ORIGIN_WHITELIST=localhost:8000
-     - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
-     - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
-     - CIELO_SANDBOX=True
-     - REDIS_CHANNELS_HOST=api.thefarma.com.br
-     - REDIS_CHANNELS_PORT=32769
+    env_file:
+      - .env
+    depends_on:
+      - redis_channels
+      - redis_celery
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "celery -A thefarmaapi beat -l debug"
+    volumes:
+      - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
+    env_file:
+      - .env
+    depends_on:
+      - redis_channels
+      - redis_celery
+
+  worker_channels:
+    build: .
+    container_name: worker_channels
+    command: bash -c "python manage.py runworker"
+    volumes:
+      - static-data:/thefarmaapi/staticfiles
+      - media-data:/thefarmaapi/media
+    expose:
+      - "8000"
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - redis_channels
+      - redis_celery
 
   channels:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/thefarmaapi.pem:certKey=/etc/certificates/thefarmaapi.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
+    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/api.thefarma.com.br.pem:certKey=/etc/certificates/api.thefarma.com.br.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
     volumes:
       - media-data:/thefarmaapi/media
       - ./config/prod/ssl:/etc/certificates
@@ -79,21 +91,20 @@ services:
       - "8000"
       - "443"
     restart: always
-    environment:
-     - DEBUG=False
-     - BROKER_URL_INI=redis://api.thefarma.com.br:32768/0
-     - DATABASE_URL=postgres://postgres:the183adminfarma@api.thefarma.com.br/api
-     - DB_FIREBASE_URL=https://thefarma-f3206.firebaseio.com
-     - DB_FIREBASE_AUTH_DOMAIN=thefarma-f3206.firebaseapp.com
-     - DB_FIREBASE_API_KEY=5f1083d6039ac7599d435f45206efc766d2f1bcf
-     - DB_FIREBASE_STORAGE_BUCKET=gs://thefarma-f3206.appspot.com
-     - DB_FIREBASE_SERVICE_ACCOUNT=thefarma-5f1083d6039a.json
-     - CORS_ORIGIN_WHITELIST=localhost:8000
-     - CIELO_MERCHANT_ID=75f57cc2-dd9b-4464-bf40-3c2eeda97ec4
-     - CIELO_MERCHANT_KEY=AVNXHCPNDASETGZGTQGIKIVTEECJMQSWDONXCLUA
-     - CIELO_SANDBOX=True
-     - REDIS_CHANNELS_HOST=api.thefarma.com.br
-     - REDIS_CHANNELS_PORT=32769
+    env_file:
+      - .env
+    depends_on:
+      - redis_channels
+      - redis_celery
+
+  redis_channels:
+    image: redis:alpine
+    command: redis-server
+    container_name: redis_channels
+
+  redis_celery:
+    image: redis:alpine
+    container_name: redis_celery
 
 volumes:
   static-data:

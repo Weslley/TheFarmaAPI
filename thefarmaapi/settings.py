@@ -57,7 +57,9 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'awesome_mixins',
     'django_filters',
-    'channels'
+    'channels',
+    'storages',
+    'versatileimagefield',
 ]
 
 INSTALLED_APPS = (DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS)
@@ -160,8 +162,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Backends de atutenticação
 AUTHENTICATION_BACKENDS = (
@@ -190,16 +192,41 @@ PYREBASE_CONFIG = {
    "serviceAccount": config('DB_FIREBASE_SERVICE_ACCOUNT')
 }
 
+AWS_ACCESS_KEY_ID = 'AKIAIETYIAFF74EPJ6MA'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_DEFAULT_ACL = 'bucket-owner-full-control'
+AWS_STORAGE_BUCKET_NAME = 'thefarma-bkt'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_LOCATION = 'static'
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+MEDIAFILES_LOCATION = 'media'
+DEFAULT_FILE_STORAGE = 'thefarmaapi.storage_backends.MediaStorage'
 LOGIN_URL = '/admin/login/'
 LOGOUT_URL = '/admin/logout/'
 LOGIN_REDIRECT_URL = '/admin/'
 
 # Celery
-BROKER_URL = config('BROKER_URL_INI')
-CELERY_ACCEPT_CONTENT = ['json']
+CELERY_BROKER_URL = 'redis://redis_celery:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis_celery:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+# Comentario temporario / Workers com tasks normais nao executam com beat
+# CELERY_TIMEZONE = TIME_ZONE
+# CELERY_BEAT_SCHEDULE = {
+#     'task-check-billing': {
+#         'task': 'faturamento',
+#         'schedule': 60.0,
+#     },
+# }
 
 # CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=casting.to_tuple(','))
 CORS_ORIGIN_ALLOW_ALL = True
@@ -208,13 +235,13 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [(config('REDIS_CHANNELS_HOST'), config('REDIS_CHANNELS_PORT', cast=int))],
+            'hosts': [('redis://redis_channels:6379/1')],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }
 }
 
 # HTTPS = config('HTTPS', default='https://')
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 FAKER_DOMAIN_EMAIL = config('FAKER_DOMAIN_EMAIL', default='thefarma_domain')

@@ -10,10 +10,12 @@ from api.models.apresentacao import Apresentacao
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
 from api.models.cliente import Cliente
+from api.models.conta import Conta
 from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
                               StatusPagamentoCartao, StatusPedido)
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.tipo_produto import TipoProduto
+from api.models.enums.status_pedido_faturamento import StatusPedidoFaturamento
 from api.models.farmacia import Farmacia
 from api.models.log import Log
 from django.contrib.postgres.fields import JSONField
@@ -28,6 +30,17 @@ class Pedido(models.Model):
 
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_faturamento = models.DateTimeField(null=True, blank=True)
+    status_faturamento = models.IntegerField(
+        choices=StatusPedidoFaturamento.choices(),
+        default=StatusPedidoFaturamento.NAO_FATURADO,
+        null=True
+    )
+    faturamento = models.ForeignKey(
+        Conta, on_delete=models.SET_NULL, related_name='pedidos',
+        null=True, blank=True
+    )
+
+    views = models.IntegerField(default=0, null=True, blank=True)
 
     delivery = models.BooleanField(default=True)
     valor_frete = models.DecimalField(
@@ -81,7 +94,7 @@ class Pedido(models.Model):
     complemento = models.CharField(max_length=100, null=True, blank=True)
     cidade = models.CharField(max_length=150, null=True, blank=True)
     uf = models.CharField(max_length=2, null=True, blank=True)
-    bairro = models.ForeignKey('Bairro', null=True, blank=True)
+    bairro = models.CharField(max_length=150, null=True, blank=True)
     nome_endereco = models.CharField(max_length=40, null=True, blank=True)
     nome_destinatario = models.CharField(max_length=80, null=True, blank=True)
     latitude = models.FloatField()
@@ -177,7 +190,7 @@ class Pedido(models.Model):
                 'itens': farmacia.get_itens_proposta(self),
                 'status': farmacia.get_status_proposta(self),
                 'valor_total': farmacia.get_valor_proposta(self),
-                'valor_frete': farmacia.valor_frete,
+                'valor_frete': farmacia.get_valor_frete(self),
                 'valor_total_com_frete': farmacia.get_valor_proposta_com_frete(self),
                 'quantidade_maxima_parcelas': farmacia.get_quantidade_maxima_parcelas(self)
             }
@@ -323,3 +336,14 @@ class ItemPropostaPedido(models.Model):
         :return:
         """
         return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade
+
+
+class LogData(models.Model):
+    mes = models.CharField(max_length=75)
+    ano = models.IntegerField()
+    farmacia = models.ForeignKey(
+        Farmacia, null=True, related_name='logs_pedidos'
+    )
+
+    def __str__(self):
+        return '{} {}'.format(self.mes, self.ano)

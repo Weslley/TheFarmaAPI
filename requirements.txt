@@ -103,3 +103,6 @@ vine==1.1.4
 wcwidth==0.1.7
 wrapt==1.10.11
 zope.interface==4.4.2
+boto3==1.9.53
+django-storages==1.7.1
+django-versatileimagefield==1.10

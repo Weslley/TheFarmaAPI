@@ -112,5 +112,5 @@ staticfiles/*
 mediafiles/*
 media/*
 thefarmateste-firebase-adminsdk-d4m34-a4496add17.json
-**.DS_Store
+.DS_Store
 cieloapi3/
