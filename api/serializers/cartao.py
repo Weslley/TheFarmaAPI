@@ -37,7 +37,7 @@ class CartaoSerializer(serializers.ModelSerializer):
 
         if Cartao.objects.filter(
             numero_cartao=secure_card_number, bandeira=attrs['bandeira'],
-            cliente=attrs['cliente'], cvv=attrs['cvv']
+            cliente=attrs['cliente'], cvv=attrs['cvv'], deletado=False
         ).exists():
             raise ValidationError('Este cartão já foi cadastrado.')
 
