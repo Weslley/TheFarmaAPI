@@ -32,15 +32,17 @@ class CartaoSerializer(serializers.ModelSerializer):
         request = self.context['request']
         attrs['bandeira'] = self.card.brand
         attrs['cliente'] = request.user.cliente
-        attrs['numero_cartao'] = attrs['numero_cartao'][-4:]
+        attrs['numero_cartao'] = attrs['numero_cartao']
+        secure_card_number = attrs['numero_cartao'][-4:]
 
         if Cartao.objects.filter(
-            numero_cartao=attrs['numero_cartao'], bandeira=attrs['bandeira'],
+            numero_cartao=secure_card_number, bandeira=attrs['bandeira'],
             cliente=attrs['cliente'], cvv=attrs['cvv']
         ).exists():
             raise ValidationError('Este cartão já foi cadastrado.')
 
         attrs['token'] = ServicoCielo.create_token(attrs)
+        attrs['numero_cartao'] = secure_card_number
         return attrs
 
     def create(self, validated_data):
