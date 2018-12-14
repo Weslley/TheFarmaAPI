@@ -33,19 +33,15 @@ def exportar(path, channel=None):
         try:
             for item in apresentacoes:
                 #linha da saida do arquivo
-                linha = ''
-                #intera nos campos
-                for key, value in item.items():
-                    linha += '{}:{} '.format(key,value)
-                #quebra de linha
-                linha = linha + '\n'
+                linha = '{} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n'.format(item['codigo_barras'], item['dosagem'], item['sufixo_dosagem_id'], item['segunda_dosagem'], item['sufixo_segunda_dosagem_id'], item['terceira_dosagem'], item['sufixo_terceira_dosagem_id'], item['embalagem_id'], item['forma_farmaceutica_id'], item['quantidade'], item['sufixo_quantidade_id'], item['identificado'], item['pbm'], item['comercializado'], item['imagem'])
                 #salva no arquivo
                 f.write(linha)
                 ok = ok + 1
                 set_message(pusher_conn, 'update_message', '{} Produto exportado [OK]'.format(item['codigo_barras']))
-        except:
+        except Exception as e:
             error += 1
-            print('Produto não exportado [FAIL]'.format(item['codigo_barras']))
+            print('Produto não exportado [FAIL]')
+            print(str(e))
     #print balanço final
     print('Produtos {} OK\n Produtos {} FAIL'.format(ok,error))
 

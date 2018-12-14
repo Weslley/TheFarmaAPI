@@ -1,6 +1,7 @@
 from django.db import transaction
+from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, \
-    RetrieveAPIView, RetrieveUpdateAPIView
+    RetrieveAPIView, RetrieveUpdateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from api.mixins.base import IsRepresentanteAuthenticatedMixin, IsClienteAuthenticatedMixin
@@ -156,3 +157,13 @@ class CartaoUpdateDelete(RetrieveUpdateDestroyAPIViewNoPatch, IsClienteAuthentic
     def perform_destroy(self, instance):
         instance.deletado = True
         instance.save()
+
+class FcmUpdate(GenericAPIView):
+    """
+    Atualiza o fcm do cliente
+    """
+    def post(self,request,*args,**kwargs):
+        cliente = Cliente.objects.get(usuario_id=request.user.id)
+        cliente.fcm_token = request.data.get('fcm',None)
+        cliente.save()
+        return Response({'fcm':cliente.fcm_token})

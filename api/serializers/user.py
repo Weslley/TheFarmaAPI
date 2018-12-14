@@ -30,7 +30,7 @@ class LoginClienteSerializer(serializers.ModelSerializer):
     celular = serializers.IntegerField(required=False, write_only=True)
     codigo_sms = serializers.IntegerField(required=False, write_only=True)
     token = serializers.CharField(max_length=250, read_only=True, source='auth_token.key')
-
+    fcm = serializers.CharField(required=False)
     user_queryset = User.objects.exclude(representante_farmacia__isnull=False, cliente__isnull=False)
 
     class Meta:
@@ -42,7 +42,8 @@ class LoginClienteSerializer(serializers.ModelSerializer):
             'facebook_id',
             'celular',
             'codigo_sms',
-            'token'
+            'token',
+            'fcm',
         )
 
     def validate_login_type(self, data):
@@ -216,10 +217,16 @@ class LoginClienteSerializer(serializers.ModelSerializer):
             user.last_login = datetime.now()
             user.save()
             token, created = Token.objects.get_or_create(user=user)
+            #verifica se mandou o fcm token
+            fcm = validated_data.pop('fcm',None)
+            if fcm:
+                cliente = Cliente.objects.get(usuario_id=user.id)
+                cliente.fcm_token = fcm
+                cliente.save()
             if not created:
                 token.delete()
                 Token.objects.create(user=user)
-
+            
             return user
 
 
