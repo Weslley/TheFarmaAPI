@@ -79,7 +79,7 @@ def update_dados_medicamentos(path, channel=None):
 
                     med_temp = MedicamentoApExport.objects.filter(
                         laboratorio_id=med_temp['laboratorio_id'],
-                        descricao=med_temp['descricao'],
+                        descricao=med_temp['descricao'].capitalize(),
                         principioAtivo_id=med_temp['principioAtivo_id']
                     ).first()
 
@@ -95,7 +95,7 @@ def update_dados_medicamentos(path, channel=None):
                 for med in medicamentos:
                     apresentacoes = MedicamentoApExport.objects.filter(
                         laboratorio_id=med.laboratorio_id,
-                        descricao=med.nome,
+                        descricao=med.nome.capitalize(),
                         principioAtivo_id=med.principio_ativo_id
                     ).exclude(codbarras='')
 
