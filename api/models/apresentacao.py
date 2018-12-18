@@ -76,7 +76,7 @@ class Sufixo(models.Model):
 
 
 def generate_apresentacao_filename(self, filename):
-    return 'apresentacoes/{0}/{1}'.format(self.codigo_barras, filename)
+    return 'apresentacoes/{0}/{1}'.format(str(self.codigo_barras).zfill(14), filename)
 
 
 class Apresentacao(models.Model):
