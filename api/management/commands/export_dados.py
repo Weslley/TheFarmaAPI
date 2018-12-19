@@ -35,23 +35,27 @@ class Command(BaseCommand):
         update_dados_medicamentos(path)
 
 
-def update_dados_medicamentos(path, channel=None):
-    pusher_conn = Message(channel) if channel else None
+def update_dados_medicamentos(path, channel='logs_command_line'):
+    pusher_conn = Message('logs_command_line')
     laboratorios = {}
     principios_ativos = {}
     medicamentos_dict = {}
     medicamentos = []
-    set_message(pusher_conn, 'update_message', '')
+    #set_message(pusher_conn, 'update_message', '')
     time.sleep(1.5)
-    set_message(pusher_conn, 'update_message', 'Inicializando dados do arquivo')
+    #set_message(pusher_conn, 'update_message', {'msg':'Inicializando dados do arquivo'})
     try:
         with open(path, 'r', encoding="ISO-8859-1") as arq:
             with transaction.atomic():
                 # Apagando todos os temporarios
                 MedicamentoApExport.objects.all().delete()
+                #le todas as linhas
                 lines = arq.readlines()
                 cont = 0
+                #intera em cada linha
                 for line in lines:
+                    set_message(pusher_conn, 'update_message', {'msg':'Linha {}'.format(cont)})
+                    #os dois primeiros digitos eh o tipo da linha(laboratiorio, medicamento, produto...)
                     tipo = int(line[:2])
                     cont += 1
                     if tipo == TIPO_LABORATORIO:
@@ -63,39 +67,40 @@ def update_dados_medicamentos(path, channel=None):
                     elif tipo == TIPO_MEDICAMENTO:
                         med = add_medicamento_temp(line)
                         medicamentos_dict[med.id] = med
-
+                #recupera os medicamentos temporarios salvos, excluindo os sem codigo de barras
                 medicamentos_temporarios = MedicamentoApExport.objects.exclude(codbarras='').values(
                     'laboratorio_id',
                     'descricao',
                     'principioAtivo_id'
                 ).distinct()
 
-                # Gerando os medicamentos
+                # Gerando os medicamentos(produtos)
                 MAX_MED = medicamentos_temporarios.count()
-                set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.')
+                #set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.')
                 time.sleep(2)
                 cont = 0
+                #intera em todos os temporarios para criar uma lista de produtos
                 for med_temp in medicamentos_temporarios:
 
                     med_temp = MedicamentoApExport.objects.filter(
                         laboratorio_id=med_temp['laboratorio_id'],
-                        descricao=med_temp['descricao'].capitalize(),
+                        descricao=med_temp['descricao'],
                         principioAtivo_id=med_temp['principioAtivo_id']
                     ).first()
-
+                    #verifica se tem e se nao tiver criar
                     medicamentos.append(get_or_create_medicamento(med_temp))
                     percent = int((50 / MAX_MED) * cont)
                     cont += 1
-                    set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.<br/>{}%'.format(percent))
+                    #set_message(pusher_conn, 'update_message', {'msg':'Carregando e criando os medicamentos.<br/>{}%'.format(percent)})
 
                 # Gerando as apresentaçãoes
                 MAX_MED = len(medicamentos)
-                set_message(pusher_conn, 'update_message', 'Atualizando apresentações.<br/>{}%'.format(percent))
+                #set_message(pusher_conn, 'update_message', {'msg':'Atualizando apresentações.<br/>{}%'.format(percent)})
                 cont = 0
                 for med in medicamentos:
                     apresentacoes = MedicamentoApExport.objects.filter(
                         laboratorio_id=med.laboratorio_id,
-                        descricao=med.nome.capitalize(),
+                        descricao=med.nome,
                         principioAtivo_id=med.principio_ativo_id
                     ).exclude(codbarras='')
 
@@ -107,12 +112,12 @@ def update_dados_medicamentos(path, channel=None):
 
                     med_percent = (50 / MAX_MED) * cont
                     cont += 1
-                    set_message(pusher_conn, 'update_message', 'Atualizando apresentações.<br/>{}%'.format(int(percent + med_percent)))
+                    #set_message(pusher_conn, 'update_message', {'msg':'Atualizando apresentações.<br/>{}%'.format(int(percent + med_percent))})
 
                 time.sleep(1)
-                set_message(pusher_conn, 'update_message', 'Atualização concluida.')
+                #set_message(pusher_conn, 'update_message', 'Atualização concluida.')
                 time.sleep(2)
-                set_message(pusher_conn, 'stop_load', '')
+                #set_message(pusher_conn, 'stop_load', '')
                 print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentacoes\n{} tabelas de preco'.format(
                     len(laboratorios),
                     len(principios_ativos),
@@ -148,12 +153,14 @@ def get_or_create_apresentacao(ap_temp, medicamento):
     try:
         exist, obj = exist_apresentacao(ap_temp)
         if exist:
+            obj.nome = obj.nome.capitalize()
+            obj.save()
             return obj
 
         if ap_temp.codbarras != '' and ap_temp.codbarras != '0':
             return Apresentacao.objects.create(
                 codigo_barras=ap_temp.codbarras,
-                nome=ap_temp.apresentacao,
+                nome=ap_temp.apresentacao.capitalize(),
                 registro_ms=ap_temp.registroMS,
                 produto=medicamento
             )
@@ -178,6 +185,8 @@ def exist_medicamento(med_temp):
 def get_or_create_medicamento(med_temp):
     exist, obj = exist_medicamento(med_temp)
     if exist:
+        obj.nome = obj.nome.capitalize()
+        obj.save()
         return obj
 
     return Produto.objects.create(
@@ -288,7 +297,11 @@ def add_medicamento_temp(line):
     :return:
     """
     try:
-        return MedicamentoApExport.objects.get(id=int(line[2:8] if len(line[2:8].strip()) else 0))
+        tmp = MedicamentoApExport.objects.get(id=int(line[2:8] if len(line[2:8].strip()) else 0))
+        tmp.descricao = tpm.descricao.capitalize()
+        tmp.apresentacao = tpm.apresentacao.capitalize()
+        tmp.save()
+        return tmp
     except MedicamentoApExport.DoesNotExist:
         return MedicamentoApExport.objects.create(
             id=int(line[2:8]),
@@ -304,8 +317,8 @@ def add_medicamento_temp(line):
             lista=line[68:69].strip(),
             vazio=line[69:70].strip(),
             generico=False if line[70:71] == 'N' else True,
-            descricao=line[71:106].strip().upper(),
-            apresentacao=line[106:151].strip().upper(),
+            descricao=line[71:106].strip().capitalize(),
+            apresentacao=line[106:151].strip().capitalize(),
             dataVigencia=date(day=int(line[151:159].strip()[0:2]), month=int(line[151:159].strip()[2:4]), year=int(line[151:159].strip()[4:8])) if len(line[151:159].strip()) == 8 else None,
             dataDesconhecida=date(day=int(line[159:167].strip()[0:2]), month=int(line[159:167].strip()[2:4]), year=int(line[159:167].strip()[4:8])) if len(line[159:167].strip()) == 8 else None,
             pmf19=Decimal(line[167:175]) / 100 if Decimal(line[167:175]) != Decimal(0) else Decimal(0),
