@@ -69,7 +69,10 @@ class PropostaAddView(APIView):
         pedido.save()
         #notificacao fcm
         enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id)
-
+        print('chegou aqui')
+        print('chegou aqui')
+        print('chegou aqui')
+        print('chegou aqui')
         return Response({})
 
 
@@ -240,6 +243,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             instance.save()
             #evento fcm
             quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
+            print(quantidade)
             if (len(quantidade)==1):
                 enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id)
             else:
@@ -251,6 +255,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             #gera mensagem no fcm
             #evento fcm
             quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
+            print(quantidade)
             if (len(quantidade)==1):
                 enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id)
             else:
