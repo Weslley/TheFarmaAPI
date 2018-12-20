@@ -108,11 +108,11 @@ class Apresentacao(models.Model):
         Embalagem, related_name='apresentacoes', null=True, blank=True
     )
     dosagem = models.DecimalField(
-        null=True, max_digits=15, decimal_places=3
+        null=True, max_digits=15, decimal_places=3, blank=True
     )
     sufixo_dosagem = models.ForeignKey(
         Sufixo, related_name='apresentacoes_com_sufixo_dosagem',
-        null=True, verbose_name='Sufixo da Dosagem'
+        null=True, verbose_name='Sufixo da Dosagem', blank=True
     )
 
     segunda_dosagem = models.DecimalField(
