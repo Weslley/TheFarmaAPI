@@ -108,7 +108,7 @@ class Apresentacao(models.Model):
         Embalagem, related_name='apresentacoes', null=True, blank=True
     )
     dosagem = models.DecimalField(
-        null=True, max_digits=15, decimal_places=2
+        null=True, max_digits=15, decimal_places=3
     )
     sufixo_dosagem = models.ForeignKey(
         Sufixo, related_name='apresentacoes_com_sufixo_dosagem',
@@ -116,14 +116,14 @@ class Apresentacao(models.Model):
     )
 
     segunda_dosagem = models.DecimalField(
-        null=True, blank=True, max_digits=15, decimal_places=2
+        null=True, blank=True, max_digits=15, decimal_places=3
     )
     sufixo_segunda_dosagem = models.ForeignKey(
         Sufixo, related_name='apresentacoes_com_sufixo_segunda_dosagem',
         null=True, blank=True, verbose_name='Sufixo da Segunda Dosagem'
     )
     terceira_dosagem = models.DecimalField(
-        null=True, blank=True, max_digits=15, decimal_places=2
+        null=True, blank=True, max_digits=15, decimal_places=3
     )
     sufixo_terceira_dosagem = models.ForeignKey(
         Sufixo, related_name='apresentacoes_com_sufixo_teceira_dosagem',
