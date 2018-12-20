@@ -16,7 +16,7 @@ from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pedido import StatusPedido
 from api.pagination import SmallResultsSetPagination, MinResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
-from api.models.pedido import Pedido
+from api.models.pedido import Pedido, ItemPropostaPedido
 from api.models.notificacao import TipoNotificacaoTemplate
 from api.utils.firebase_utils import enviar_notif
 from api.consumers import FarmaciaConsumer
@@ -67,6 +67,8 @@ class PropostaAddView(APIView):
         actual_views = int(0 if pedido.views is None else pedido.views)
         pedido.views = actual_views + 1
         pedido.save()
+        #notificacao fcm
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,instance.cliente.id)
 
         return Response({})
 
@@ -209,8 +211,6 @@ class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedM
         # Cancelando o proposta
         farmacia = request.user.representante_farmacia.farmacia
         instance.itens_proposta.filter(farmacia=farmacia).update(status=StatusItemProposta.CANCELADO)
-        #notificacao fcm
-        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.FARMACIA_CANCELOU,instance.cliente.id)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
@@ -238,12 +238,24 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
             instance.save()
+            #evento fcm
+            quantidade = ItemPropostaPedido.objects.filter(pedido_id=instance.id)
+            if (len(quantidade)==1):
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id)
+            else:
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P,instance.cliente.id)
         else:
             # confirmando envio
             instance.status = StatusPedido.ENVIADO
             instance.save()
             #gera mensagem no fcm
-            
+            #evento fcm
+            quantidade = ItemPropostaPedido.objects.filter(pedido_id=instance.id)
+            if (len(quantidade)==1):
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id)
+            else:
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_P,instance.cliente.id) 
+
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
