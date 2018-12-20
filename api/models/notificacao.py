@@ -3,6 +3,18 @@ from django.contrib.postgres.fields import JSONField
 from .enums.tipo_notificacao import TipoNotificacao
 
 
+class TipoNotificacaoTemplate():
+    VISUALIZADO = 1
+    NOVA_PROPOSTA = 2
+    SEM_RESPOSTA = 8
+    MEDICAMENTO_AGUARDANDO_RETIRADA_S = 4
+    MEDICAMENTO_AGUARDANDO_RETIRADA_P = 5
+    MEDICAMENTO_SAIU_ENTREGA_P = 6
+    MEDICAMENTO_FORAM_ENTREGUE_S = 9
+    MEDICAMENTO_FORAM_ENTREGUE_P = 7
+    FARMACIA_CANCELOU = 10
+
+
 class Notificacao(models.Model):
     tipo = models.IntegerField(choices=TipoNotificacao.choices())
     titulo = models.CharField(max_length=50)
@@ -19,3 +31,9 @@ class Notificacao(models.Model):
 
     def __str__(self):
         return self.titulo
+
+class NotificacoesTemplate(models.Model):
+    tela = models.IntegerField(null=True,blank=True)
+    titulo = models.CharField(max_length=50,null=True,blank=True)
+    mensagem = models.TextField(null=True, blank=True)
+    tipo = models.IntegerField(null=True,blank=True)
