@@ -11,6 +11,7 @@ from api.models.enums.status_pedido import StatusPedido
 from api.serializers.cartao import CartaoSerializer
 from api.utils.generics import print_exception
 from api.utils.firebase_utils import enviar_notif
+from api.models.notificacao import Notificacao, NotificacoesTemplate, TipoNotificacaoTemplate
 
 from django.db import transaction
 from rest_framework import serializers
@@ -533,8 +534,9 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
                 if not _item.quantidade:
                     _item.possui = False
                     _item.save()
-        print(instance.cliente.fcm_token)
-        enviar_notif(instance.cliente.fcm_token,'TheFarma','Você recebeu uma proposta, confira no app :)')
+        
+        #pusher notification
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id)
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
 
 

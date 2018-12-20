@@ -17,6 +17,8 @@ from api.models.enums.status_pedido import StatusPedido
 from api.pagination import SmallResultsSetPagination, MinResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
 from api.models.pedido import Pedido
+from api.models.notificacao import TipoNotificacaoTemplate
+from api.utils.firebase_utils import enviar_notif
 from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
     PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer
@@ -207,7 +209,8 @@ class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedM
         # Cancelando o proposta
         farmacia = request.user.representante_farmacia.farmacia
         instance.itens_proposta.filter(farmacia=farmacia).update(status=StatusItemProposta.CANCELADO)
-
+        #notificacao fcm
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.FARMACIA_CANCELOU,instance.cliente.id)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
@@ -239,7 +242,8 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             # confirmando envio
             instance.status = StatusPedido.ENVIADO
             instance.save()
-
+            #gera mensagem no fcm
+            
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
