@@ -84,7 +84,7 @@ class Apresentacao(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
     registro_ms = models.CharField(max_length=17, null=True, blank=True)
     produto = models.ForeignKey(Produto, related_name='apresentacoes')
-    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now=True)
     ativo = models.BooleanField(default=True)
     unidade = models.ForeignKey(Unidade, null=True, blank=True)
     classe_terapeutica = models.CharField(max_length=254, null=True, blank=True)
