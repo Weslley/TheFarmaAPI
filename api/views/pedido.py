@@ -16,7 +16,7 @@ from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pedido import StatusPedido
 from api.pagination import SmallResultsSetPagination, MinResultsSetPagination
 from api.mixins.base import IsClienteAuthenticatedMixin, IsRepresentanteAuthenticatedMixin, FarmaciaSerializerContext
-from api.models.pedido import Pedido, ItemPropostaPedido
+from api.models.pedido import Pedido, ItemPropostaPedido, ItemPedido
 from api.models.notificacao import TipoNotificacaoTemplate
 from api.utils.firebase_utils import enviar_notif
 from api.consumers import FarmaciaConsumer
@@ -68,7 +68,7 @@ class PropostaAddView(APIView):
         pedido.views = actual_views + 1
         pedido.save()
         #notificacao fcm
-        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,instance.cliente.id)
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id)
 
         return Response({})
 
@@ -239,7 +239,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             instance.status = StatusPedido.ENTREGUE
             instance.save()
             #evento fcm
-            quantidade = ItemPropostaPedido.objects.filter(pedido_id=instance.id)
+            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
             if (len(quantidade)==1):
                 enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id)
             else:
@@ -250,7 +250,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             instance.save()
             #gera mensagem no fcm
             #evento fcm
-            quantidade = ItemPropostaPedido.objects.filter(pedido_id=instance.id)
+            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
             if (len(quantidade)==1):
                 enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id)
             else:
