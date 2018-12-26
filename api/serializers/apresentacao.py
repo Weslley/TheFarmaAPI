@@ -13,6 +13,7 @@ from api.models.uf import Uf
 from api.serializers.principio_ativo import PrincipioAtivoBasicSerializer
 from api.serializers.tabela_preco import TabelaPrecoSerializer
 from django.conf import settings
+from django.db.models import Avg
 
 
 class ApresentacaoSerializer(serializers.ModelSerializer):
@@ -209,12 +210,13 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         except Exception as err:
             pass
         #calcula preco medio dos ultimos 100
-        if not pmc:
+        if (pmc == 0):
+            print('aqui')
             try:
                 ultimo_preco = UltimoPreco.objects.values('id','valor')\
-                                            .filter(apresentacao_id=id)[:100]\
+                                            .filter(apresentacao_id=obj.id)[:100]\
                                             .aggregate(Avg('valor'))
-                pmc = ultimo_preco['valor_unitario__avg']
+                pmc = ultimo_preco['valor__avg']
             except Exception as err:
                 pass
 
