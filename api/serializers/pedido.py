@@ -531,7 +531,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
             serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
             if serializer.is_valid():
                 _item = serializer.save()
-                self.atualiza_preco_farmacia(item)
+                self.atualiza_preco_farmacia(_item)
                 # Caso a quantidade seja zero coloca como não possui
                 if not _item.quantidade:
                     _item.possui = False
