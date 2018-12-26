@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from rest_framework import serializers
 
 from versatileimagefield.serializers import VersatileImageFieldSerializer
-
+from api.models.ultimo_preco import UltimoPreco
 from api.models.apresentacao import Apresentacao, ImagemApresentacao
 from api.models.estoque import Estoque
 from api.models.produto import Produto
@@ -208,6 +208,15 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             pmc = tabela.pmc
         except Exception as err:
             pass
+        #calcula preco medio dos ultimos 100
+        if not pmc:
+            try:
+                ultimo_preco = UltimoPreco.objects.values('id','valor')\
+                                            .filter(apresentacao_id=id)[:100]\
+                                            .aggregate(Avg('valor'))
+                pmc = ultimo_preco['valor_unitario__avg']
+            except Exception as err:
+                pass
 
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
         pmc = locale.currency(pmc, grouping=True, symbol=None)
