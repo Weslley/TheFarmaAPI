@@ -211,12 +211,11 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             pass
         #calcula preco medio dos ultimos 100
         if (pmc == 0):
-            print('aqui')
             try:
                 ultimo_preco = UltimoPreco.objects.values('id','valor')\
                                             .filter(apresentacao_id=obj.id)[:100]\
                                             .aggregate(Avg('valor'))
-                pmc = ultimo_preco['valor__avg']
+                pmc = ultimo_preco['valor__avg'] if ultimo_preco['valor__avg'] else 0
             except Exception as err:
                 pass
 
