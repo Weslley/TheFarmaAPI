@@ -12,7 +12,7 @@ from api.serializers.cartao import CartaoSerializer
 from api.utils.generics import print_exception
 from api.utils.firebase_utils import enviar_notif
 from api.models.notificacao import Notificacao, NotificacoesTemplate, TipoNotificacaoTemplate
-
+from api.models.ultimo_preco import UltimoPreco
 from django.db import transaction
 from rest_framework import serializers
 
@@ -525,19 +525,30 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         itens_proposta = [item for item in self.initial_data['itens_proposta']]
 
         for item in itens_proposta:
+
             item_proposta = instance.itens_proposta.get(id=item['id'])
             item_proposta.status = StatusItemProposta.ENVIADO
             serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
             if serializer.is_valid():
                 _item = serializer.save()
+                self.atualiza_preco_farmacia(item)
                 # Caso a quantidade seja zero coloca como não possui
                 if not _item.quantidade:
                     _item.possui = False
                     _item.save()
-        
         #pusher notification
         enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id)
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
+
+    def atualiza_preco_farmacia(self,item):
+        """
+        Atualiza o ulitmo preco que a farmacia ofereceu no produto, caso nao tenha eh criado
+        """
+        ultimo_preco, created = UltimoPreco.objects.get_or_create(farmacia_id=item.farmacia.id,apresentacao_id=item.apresentacao.id)
+        ultimo_preco.valor = item.valor_unitario
+        ultimo_preco.save()
+
+
 
 
 class PagamentoCartaoSerializer(serializers.ModelSerializer):
