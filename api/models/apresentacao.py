@@ -130,6 +130,15 @@ class Apresentacao(models.Model):
         null=True, blank=True, verbose_name='Sufixo da Terceira Dosagem'
     )
 
+    quarta_dosagem = models.DecimalField(
+        null=True, blank=True, max_digits=15, decimal_places=3
+    )
+
+    sufixo_quarta_dosagem = models.ForeignKey(
+        Sufixo, related_name='apresentacoes_com_sufixo_quarta_dosagem',
+        null=True, blank=True, verbose_name='Sufixo da Quarta Dosagem'
+    )
+
     quantidade = models.DecimalField(
         null=True, max_digits=15, decimal_places=2
     )
@@ -203,6 +212,10 @@ class Apresentacao(models.Model):
             final_apresentacao = ", {} com {}{}".format(
                 self.forma_farmaceutica.nome, quantidade,
                 self.sufixo_quantidade
+            )
+        elif self.forma_farmaceutica.nome in ['Comprimidos','Cápsula','Pílula','Pastilha','Comprimido efervescente','Comprimido revestido','Cápsulas moles','Comprimido mastigável','Comprimido liberação prolongada','Cápsula gel mole','Comprimido sublingual'] :
+            final_apresentacao = ", {} {}".format(
+                quantidade, self.forma_farmaceutica.nome.lower()
             )
         else:
             final_apresentacao = ", {} {}".format(
