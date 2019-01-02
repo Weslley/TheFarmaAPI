@@ -1,18 +1,20 @@
 from django.db.models import Q, Sum
-from rest_framework import generics
+from rest_framework import generics,permissions, status
 from rest_framework.response import Response
 
 from api.mixins.base import IsAuthenticatedRepresentanteMixin
 from api.models.conta import Conta
-from api.models.pedido import Pedido, LogData
+from api.models.pedido import Pedido, LogData, ItemPropostaPedido, ItemPedido
 from api.models.enums.status_pedido import StatusPedido
 from api.serializers.conta import ContaMinimalSerializer
 from api.serializers.pedido import PedidoTotaisSerializer, \
     PedidoMinimalSerializer, LogDataSerializer
-
+from api.serializers.medicamento import MedicamentoRelatorio
+from django.db.models import F
 from datetime import datetime, date
 import calendar
 import locale
+import decimal
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -138,3 +140,55 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
     def get_object(self):
         self.check_object_permissions(self.request, self.request.user.representante_farmacia)
         return self.request.user.representante_farmacia
+
+
+class MedicamentosMaisVendidos(generics.GenericAPIView):
+    """
+    Recupera os medicamentos mais vendidos
+    recebe via parametro url(mes,ano)
+    """
+
+    def get(self,request,*args, **kwargs):
+        #int vars
+        mes = self.request.GET.get('mes',None)
+        ano = self.request.GET.get('ano',None)
+        if not (mes and ano):
+            return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
+        representante = self.get_object()
+        total_liquido = decimal.Decimal(0)
+        total_bruto = decimal.Decimal(0)
+        medicamentos = []
+
+        #pega todos os pedidos entregues
+        pedidos = Pedido.objects.filter(
+            status=StatusPedido.ENTREGUE,
+            farmacia__representantes=representante,
+            data_criacao__year=ano,
+            data_criacao__month=mes,
+        )
+
+        #calcula o total bruto e liquido
+        #intera nos itens dos pedidos que a farmacia vendeu
+        for pedido in pedidos:
+            itens_pedido = ItemPedido.objects.filter(
+                pedido=pedido,
+            )
+            #somatorio
+            for item in itens_pedido:
+                total_bruto += item.total_bruto
+                total_liquido += item.total_liquido
+                medicamentos.append(MedicamentoRelatorio(item).data)
+
+        #recupera os medicamentos
+
+        return Response({
+            'total_numero_vendas':len(pedidos),
+            'total_liquido':'R$ {}'.format(total_liquido),
+            'total_bruto':'R$ {}'.format(total_bruto),
+            'medicamentos':medicamentos
+        })
+    
+    def get_object(self):
+        self.check_object_permissions(self.request, self.request.user.representante_farmacia)
+        return self.request.user.representante_farmacia
+    
