@@ -8,6 +8,7 @@ class MedicamentoRelatorio(serializers.ModelSerializer):
     valor_liquido = serializers.SerializerMethodField()
     valor_bruto = serializers.SerializerMethodField()
     nome_produto = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = ItemPedido
@@ -35,3 +36,6 @@ class MedicamentoRelatorio(serializers.ModelSerializer):
 
     def get_valor_bruto(self,obj):
         return 'R$ {}'.format(obj.total_bruto)
+    
+    def get_id(self,obj):
+        return obj.apresentacao.produto.id

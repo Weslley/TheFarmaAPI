@@ -33,6 +33,7 @@ from api.utils import get_client_browser, get_client_ip  # , status_transacao_ca
 from api.utils import get_user_lookup, get_tempo_proposta
 from datetime import datetime, timedelta
 from .log import LogSerializer
+import locale
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -841,3 +842,22 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             FarmaciaConsumer.checkout(instance, farmacia)
 
         return instance
+
+
+class VendaPedido(serializers.ModelSerializer):
+    data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ItemPedido
+        fields = ('pedido','data','quantidade','total_liquido')
+    
+    def get_data(self,obj):
+        return obj.pedido.data_criacao.strftime('%d %b %Y %H:%M')
+    
+    def to_representation(self,instance):
+        """
+        formata a saida
+        """
+        ret = super().to_representation(instance)
+        ret['total_liquido'] = locale.currency(ret['total_liquido'])
+        return ret

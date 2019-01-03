@@ -8,9 +8,9 @@ from api.models.pedido import Pedido, LogData, ItemPropostaPedido, ItemPedido
 from api.models.enums.status_pedido import StatusPedido
 from api.serializers.conta import ContaMinimalSerializer
 from api.serializers.pedido import PedidoTotaisSerializer, \
-    PedidoMinimalSerializer, LogDataSerializer
+    PedidoMinimalSerializer, LogDataSerializer, VendaPedido
 from api.serializers.medicamento import MedicamentoRelatorio
-from django.db.models import F
+from django.db.models import F, Q
 from datetime import datetime, date
 import calendar
 import locale
@@ -144,7 +144,7 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
 
 class MedicamentosMaisVendidos(generics.GenericAPIView):
     """
-    Recupera os medicamentos mais vendidos
+    Recupera as vendas dos medicamentos
     recebe via parametro url(mes,ano)
     """
 
@@ -155,8 +155,6 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
         if not (mes and ano):
             return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
         representante = self.get_object()
-        total_liquido = decimal.Decimal(0)
-        total_bruto = decimal.Decimal(0)
         medicamentos = []
 
         #pega todos os pedidos entregues
@@ -167,28 +165,66 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
             data_criacao__month=mes,
         )
 
+        valores = pedidos.aggregate(bruto=Sum('valor_bruto'),liquido=Sum('valor_liquido'))
         #calcula o total bruto e liquido
         #intera nos itens dos pedidos que a farmacia vendeu
         for pedido in pedidos:
             itens_pedido = ItemPedido.objects.filter(
                 pedido=pedido,
             )
-            #somatorio
+            #add in rs
             for item in itens_pedido:
-                total_bruto += item.total_bruto
-                total_liquido += item.total_liquido
                 medicamentos.append(MedicamentoRelatorio(item).data)
 
         #recupera os medicamentos
 
         return Response({
             'total_numero_vendas':len(pedidos),
-            'total_liquido':'R$ {}'.format(total_liquido),
-            'total_bruto':'R$ {}'.format(total_bruto),
+            'total_liquido':'{}'.format(locale.currency(valores['liquido'])),
+            'total_bruto':'R$ {}'.format(locale.currency(valores['bruto'])),
             'medicamentos':medicamentos
         })
     
     def get_object(self):
         self.check_object_permissions(self.request, self.request.user.representante_farmacia)
         return self.request.user.representante_farmacia
+
+class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
+    """
+    recupera detalhes das vendas de um produto
+    recebe via parametro url(mes,ano)
+    """
+
+    def get(self,request,*args, **kwargs):
+        representante = self.get_object()
+        mes = request.GET.get('mes',None)
+        ano = request.GET.get('ano',None)
+        rs_vendas = []
+        id = self.kwargs.get('id')
+        if not (mes and ano):
+            return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
+        
+        #recupera todas os pedidos que contem o medicamento
+        itens_pedido = ItemPedido.objects.filter( 
+            Q(pedido__farmacia__representantes=representante) \
+            & Q(pedido__data_criacao__year=ano)\
+            & Q(pedido__data_criacao__month=mes)\
+            & Q(apresentacao__produto__id=id)
+        )
+
+        valores = itens_pedido.aggregate(liquido=Sum('total_liquido'),bruto=Sum('total_bruto'))
+
+        #monta todas as vendas
+        for item in itens_pedido:
+            rs_vendas.append(VendaPedido(item).data)
+        
+        return Response({
+            'total_vendas':len(itens_pedido),
+            'total_liquido':locale.currency(valores['liquido']),
+            'total_bruto':locale.currency(valores['bruto']),
+            'vendas':rs_vendas,
+        })
     
+    def get_object(self):
+        self.check_object_permissions(self.request, self.request.user.representante_farmacia)
+        return self.request.user.representante_farmacia
