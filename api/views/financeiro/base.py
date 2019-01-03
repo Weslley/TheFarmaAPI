@@ -200,6 +200,8 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
         mes = request.GET.get('mes',None)
         ano = request.GET.get('ano',None)
         rs_vendas = []
+        valor_liquido = decimal.Decimal(0)
+        valor_bruto = decimal.Decimal(0)
         id = self.kwargs.get('id')
         if not (mes and ano):
             return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
@@ -212,7 +214,9 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
             & Q(apresentacao__produto__id=id)
         )
 
-        valores = itens_pedido.aggregate(liquido=Sum('total_liquido'),bruto=Sum('total_bruto'))
+        for item in itens_pedido:
+            valor_liquido += item.total_liquido
+            valor_bruto += item.total_bruto
 
         #monta todas as vendas
         for item in itens_pedido:
@@ -220,8 +224,8 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
         
         return Response({
             'total_vendas':len(itens_pedido),
-            'total_liquido':locale.currency(valores['liquido']),
-            'total_bruto':locale.currency(valores['bruto']),
+            'total_liquido':locale.currency(valor_liquido),
+            'total_bruto':locale.currency(valor_bruto),
             'vendas':rs_vendas,
         })
     
