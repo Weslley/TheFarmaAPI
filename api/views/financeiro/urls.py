@@ -1,6 +1,12 @@
 from django.conf.urls import url
 
-from api.views.financeiro.base import ResumoFinanceiro, ResumoListagemVendas, MedicamentosMaisVendidos, MedicamentosMaisVendidosDetalhes
+from api.views.financeiro.base import (
+    ResumoFinanceiro,
+    MaisVendidosNaRegiao,
+    ResumoListagemVendas,
+    MedicamentosMaisVendidos,
+    MedicamentosMaisVendidosDetalhes
+)
 
 urlpatterns = [
     # Raiz
@@ -8,5 +14,6 @@ urlpatterns = [
     url(r'^vendas/', ResumoListagemVendas.as_view(), name='financeiro-sales-api-view'),
     url(r'^mais_vendido/$', MedicamentosMaisVendidos.as_view(), name='financeiro-more-saled-api-view'),
     url(r'^mais_vendido/(?P<id>[0-9]+)/$', MedicamentosMaisVendidosDetalhes.as_view(), name='financeiro-more-saled-api-detail'),
+    url(r'^mais_vendidos_raio/$', MaisVendidosNaRegiao.as_view(), name='financeiro-more-saled-in-thunder'),
 
 ]

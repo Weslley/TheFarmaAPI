@@ -15,6 +15,8 @@ from datetime import datetime, date
 import calendar
 import locale
 import decimal
+from api.utils.geo import get_pedidos_in_radius
+from api.models.farmacia import Farmacia
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -228,6 +230,40 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
             'total_bruto':locale.currency(valor_bruto),
             'vendas':rs_vendas,
         })
+    
+    def get_object(self):
+        self.check_object_permissions(self.request, self.request.user.representante_farmacia)
+        return self.request.user.representante_farmacia
+
+
+class MaisVendidosNaRegiao(generics.GenericAPIView):
+    """
+    relatorio de medicamentos mais pedidos na regiao da farmacia
+    """
+
+    def get(self,request,*args, **kwargs):
+        representante = self.get_object()
+        mes = request.GET.get('mes',None)
+        ano = request.GET.get('ano',None)
+        #verifica se foi passado
+        if not (mes and ano):
+            return Response({
+                'error':'Mes e Ano sao requeridos'
+            },status=status.HTTP_400_BAD_REQUEST)
+        else:
+            #cria o range de datas
+            data_inicio = datetime(int(ano),int(mes),1)
+            try:
+                data_final = datetime(int(ano),int(mes),31)
+            except:
+                data_final = datetime(int(ano),int(mes),30)
+                if mes == 2:
+                    data_final = datetime(int(ano),int(mes),28)
+        #recupera as localizacoes da farmacia
+        farmacia = Farmacia.objects.get(representantes=representante)
+        pedidos = get_pedidos_in_radius(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final,farmacia.id,StatusPedido.ENTREGUE)
+        #recupera os pedidos
+        return Response(pedidos)
     
     def get_object(self):
         self.check_object_permissions(self.request, self.request.user.representante_farmacia)
