@@ -65,7 +65,12 @@ class ApresentacaoPorEstadoList(generics.ListAPIView):
         unidade_federativa = self.kwargs['uf']
         nome_cidade = self.request.GET.get('cidade')
 
+
         cidades = Cidade.objects.filter(uf__sigla=unidade_federativa)
+        if(not len(cidades)):
+            cidades = Cidade.objects.filter(uf__sigla='PI')
+        
+        
 
         if nome_cidade:
             nome_cidade = nome_cidade.strip()
