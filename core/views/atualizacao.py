@@ -7,7 +7,7 @@ from api.models.atualizacao import Atualizacao
 from core.forms import AtualizacaoForm
 from core.tasks.task import update_dados_medicamentos
 from core.views.mixins import AdminBaseMixin
-from urllib
+import urllib
 
 
 class AtualizacaoList(ListMixin, AdminBaseMixin):
