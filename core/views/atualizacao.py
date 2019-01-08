@@ -7,6 +7,7 @@ from api.models.atualizacao import Atualizacao
 from core.forms import AtualizacaoForm
 from core.tasks.task import update_dados_medicamentos
 from core.views.mixins import AdminBaseMixin
+from urllib
 
 
 class AtualizacaoList(ListMixin, AdminBaseMixin):
@@ -37,6 +38,8 @@ class AtualizacaoCreate(CreateView, AdminBaseMixin):
         instance.usuario = self.request.user
         instance.save()
         #recupera arquivo
-        path = get_url_pre_signed('media/' + str(instance.arquivo))
+        url = get_url_pre_signed('media/' + str(instance.arquivo))
+        data = urllib.request.urlopen(url)
+        path = data.read()
         update_dados_medicamentos.apply_async([path, self.request.session.session_key], queue='default')
         return super(AtualizacaoCreate, self).form_valid(form)
