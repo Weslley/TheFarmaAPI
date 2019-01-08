@@ -5,7 +5,7 @@ class Message(object):
     """
     Mensagem para enviar via pusher
     """
-    def __init__(self, channel=None, event=None, data=None):
+    def __init__(self, channel='logs_command_line', event='logs', data=None):
         """
         Construtor
         :param channel: Canal
@@ -19,6 +19,7 @@ class Message(object):
             app_id='290714',
             key='2e48b48ce3b0da0fa501',
             secret='c2580e52f54ccaf543ab',
+            cluster='mt1',
             ssl=True
         )
 

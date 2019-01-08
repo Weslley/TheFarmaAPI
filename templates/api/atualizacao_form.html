@@ -6,7 +6,7 @@
   Atualização
 {% endblock header %}
 
-{% block conteudo %}
+{% block content %}
 
 <style type="text/css">
     .form-group input[type=file]{
@@ -23,6 +23,11 @@
         display: block !important;
         position: initial !important;
         font-size: 12px !important;
+    }
+
+    .rs {
+        overflow-y: scroll;
+        height: 25 px;
     }
 </style>
 
@@ -57,16 +62,36 @@
                 </div>
             </div>
         </form>
+        <div id="rs">
+
+        </div>
     </div>
 
 
 {% endblock %}
 
 {% block js %}
+<script src="https://js.pusher.com/4.3/pusher.min.js"></script>
     <script type="text/javascript">
         $(window).on('load', function () {
             $('.active').removeClass('active');
             $('#menu_atualizacao').addClass('active');
         });
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+        var rs = document.getElementById('rs')
+
+        var pusher = new Pusher('2e48b48ce3b0da0fa501', {
+            cluster: 'mt1',
+            forceTLS: true
+        });
+
+        var channel = pusher.subscribe('logs_command_line');
+            channel.bind('update_message', function(data) {
+                rs.innerHTML += '<p>' + data.mensagem + '</p>';
+        });
     </script>
+
+   
 {% endblock js %}

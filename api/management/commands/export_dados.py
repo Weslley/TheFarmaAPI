@@ -34,7 +34,6 @@ class Command(BaseCommand):
         path = str(options['file'][0])
         update_dados_medicamentos(path)
 
-
 def update_dados_medicamentos(path, channel='logs_command_line'):
     pusher_conn = Message('logs_command_line')
     laboratorios = {}
@@ -76,7 +75,7 @@ def update_dados_medicamentos(path, channel='logs_command_line'):
 
                 # Gerando os medicamentos(produtos)
                 MAX_MED = medicamentos_temporarios.count()
-                #set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.')
+                set_message(pusher_conn, 'update_message', 'Carregando e criando os medicamentos.')
                 time.sleep(2)
                 cont = 0
                 #intera em todos os temporarios para criar uma lista de produtos
@@ -95,7 +94,7 @@ def update_dados_medicamentos(path, channel='logs_command_line'):
 
                 # Gerando as apresentaçãoes
                 MAX_MED = len(medicamentos)
-                #set_message(pusher_conn, 'update_message', {'msg':'Atualizando apresentações.<br/>{}%'.format(percent)})
+                set_message(pusher_conn, 'update_message', {'msg':'Atualizando apresentações.<br/>{}%'.format(percent)})
                 cont = 0
                 for med in medicamentos:
                     apresentacoes = MedicamentoApExport.objects.filter(
@@ -115,9 +114,9 @@ def update_dados_medicamentos(path, channel='logs_command_line'):
                     #set_message(pusher_conn, 'update_message', {'msg':'Atualizando apresentações.<br/>{}%'.format(int(percent + med_percent))})
 
                 time.sleep(1)
-                #set_message(pusher_conn, 'update_message', 'Atualização concluida.')
+                set_message(pusher_conn, 'update_message', 'Atualização concluida.')
                 time.sleep(2)
-                #set_message(pusher_conn, 'stop_load', '')
+                set_message(pusher_conn, 'stop_load', '')
                 print('Concluido com sucesso\n{} laboratorios\n{} principios ativos\n{} medicamentos\n{} apresentacoes\n{} tabelas de preco'.format(
                     len(laboratorios),
                     len(principios_ativos),

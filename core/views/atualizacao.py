@@ -1,6 +1,7 @@
 from awesome_mixins.mixins.list import ListMixin
 from django.views.generic import CreateView
 from rest_framework.reverse import reverse_lazy
+from api.utils.as3 import get_url_pre_signed
 
 from api.models.atualizacao import Atualizacao
 from core.forms import AtualizacaoForm
@@ -35,5 +36,7 @@ class AtualizacaoCreate(CreateView, AdminBaseMixin):
         instance = form.save(commit=False)
         instance.usuario = self.request.user
         instance.save()
-        update_dados_medicamentos.apply_async([instance.arquivo.path, self.request.session.session_key], queue='default')
+        #recupera arquivo
+        path = get_url_pre_signed('media/' + str(instance.arquivo))
+        update_dados_medicamentos.apply_async([path, self.request.session.session_key], queue='default')
         return super(AtualizacaoCreate, self).form_valid(form)
