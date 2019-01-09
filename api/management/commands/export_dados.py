@@ -2,6 +2,7 @@ import time
 from datetime import date, datetime
 from decimal import Decimal
 
+import os
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
@@ -11,6 +12,8 @@ from api.models.principio_ativo import PrincipioAtivo
 from api.models.produto import MedicamentoApExport, Produto
 from api.models.tabela_preco import TabelaPreco
 from api.models.uf import Uf
+from api.utils.as3 import get_url_pre_signed,download_file
+import urllib
 from api.utils import tipo_produto
 from misc.pusher_message import Message
 
@@ -40,13 +43,12 @@ def update_dados_medicamentos(path, channel='logs_command_line'):
     principios_ativos = {}
     medicamentos_dict = {}
     medicamentos = []
-    #set_message(pusher_conn, 'update_message', '')
+    set_message(pusher_conn, 'update_message', '')
     time.sleep(1.5)
-    #set_message(pusher_conn, 'update_message', {'msg':'Inicializando dados do arquivo'})
+    set_message(pusher_conn, 'update_message', {'msg':'Inicializando dados do arquivo'})
     #recupera o arquivo
-    url = get_url_pre_signed('media/' + str(path))
-    data = urllib.request.urlopen(url)
-    path = data.read()
+    path = download_file('media/' + path)
+    print(path)
     try:
         with open(path, 'r', encoding="ISO-8859-1") as arq:
             with transaction.atomic():
@@ -134,6 +136,10 @@ def update_dados_medicamentos(path, channel='logs_command_line'):
         set_message(pusher_conn, 'update_message', 'Erro ao realizar atualização.')
         time.sleep(2)
         set_message(pusher_conn, 'stop_load', '')
+    try:
+        os.remove(path)
+    except:
+        print('nao apagou o arquivo')
 
 
 def set_message(conn, method, message):

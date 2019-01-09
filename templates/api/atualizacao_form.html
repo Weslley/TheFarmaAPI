@@ -89,7 +89,7 @@
 
         var channel = pusher.subscribe('logs_command_line');
             channel.bind('update_message', function(data) {
-                rs.innerHTML += '<p>' + data.mensagem + '</p>';
+                rs.innerHTML += '<p>' + data.mensagem.msg + '</p>';
         });
     </script>
 
