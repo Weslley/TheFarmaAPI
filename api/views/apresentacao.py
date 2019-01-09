@@ -55,7 +55,7 @@ class ApresentacaoExport(generics.ListAPIView):
 
 
 class ApresentacaoPorEstadoList(generics.ListAPIView):
-    queryset = Apresentacao.objects.all()
+    queryset = Apresentacao.objects.all().exclude(comercializado=False)
     serializer_class = ApresentacaoBuscaProduto
     pagination_class = SmallResultsSetPagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)

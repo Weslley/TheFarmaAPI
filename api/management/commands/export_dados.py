@@ -43,6 +43,10 @@ def update_dados_medicamentos(path, channel='logs_command_line'):
     #set_message(pusher_conn, 'update_message', '')
     time.sleep(1.5)
     #set_message(pusher_conn, 'update_message', {'msg':'Inicializando dados do arquivo'})
+    #recupera o arquivo
+    url = get_url_pre_signed('media/' + str(path))
+    data = urllib.request.urlopen(url)
+    path = data.read()
     try:
         with open(path, 'r', encoding="ISO-8859-1") as arq:
             with transaction.atomic():

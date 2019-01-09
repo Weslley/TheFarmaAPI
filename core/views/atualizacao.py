@@ -38,6 +38,5 @@ class AtualizacaoCreate(CreateView, AdminBaseMixin):
         instance.usuario = self.request.user
         instance.save()
         #recupera arquivo
-        path = download_file('media/' + str(instance.arquivo))
-        update_dados_medicamentos.apply_async([path, self.request.session.session_key], queue='default')
+        update_dados_medicamentos.apply_async([instance.arquivo, self.request.session.session_key], queue='default')
         return super(AtualizacaoCreate, self).form_valid(form)
