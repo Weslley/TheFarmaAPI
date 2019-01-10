@@ -27,7 +27,7 @@ class Pedido(models.Model):
     cliente = models.ForeignKey(Cliente)
     farmacia = models.ForeignKey(Farmacia, null=True, related_name='pedidos')
     log = models.OneToOneField(Log)
-
+    data_atualizacao = models.DateTimeField(auto_now=True,blank=True,null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_faturamento = models.DateTimeField(null=True, blank=True)
     status_faturamento = models.IntegerField(
@@ -110,6 +110,8 @@ class Pedido(models.Model):
     json_captura = JSONField(null=True)
     pagamento_status = models.IntegerField(null=True, blank=True)
     captura_status = models.IntegerField(null=True, blank=True)
+
+    farmacias_receberam = models.CharField(null=True,blank=True,max_length=200)
 
     def __str__(self):
         return 'Pedido {}'.format(self.id)

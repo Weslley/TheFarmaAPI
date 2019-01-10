@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.http.response import Http404
 from django.http import JsonResponse
+from api.models.farmacia import Farmacia
 # from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import DjangoFilterBackend
@@ -22,6 +23,7 @@ from api.utils.firebase_utils import enviar_notif
 from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
     PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer
+from rest_framework import permissions, status as stts
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -284,3 +286,45 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class UltimosPedidos(GenericAPIView):
+
+    def get_queryset(self):
+        return Pedido.objects.order_by('-data_atualizacao','-id').all()[:20]
+
+    def get(self,request,*args, **kwargs):
+        if self.request.user.is_anonymous():
+            return Response({'error':'token não informado'},status=stts.HTTP_403_FORBIDDEN)
+        #init vars
+        qs = self.get_queryset()
+        rs = []
+        farmacias = []
+        for item in qs:
+            #recupera todas as farmacias que receberam
+            try:
+                for farmacia_id in item.farmacias_receberam.split(','):
+                    farmacias.append(Farmacia.objects.get(pk=farmacia_id).nome_fantasia)
+            except:
+                farmacias = []
+            #prepara o retorno para cada pedido
+            rs.append({
+                'id':item.id,
+                'data':item.data_atualizacao.strftime('%d %B %Y %H:%M'),
+                'status':item.status,
+                'farmacias':farmacias
+            })
+            #zera
+            farmacias = []
+
+        return Response(rs)
+    
+    @staticmethod
+    def get_nome_status(status):
+        if status == 0:
+            return 'ABERTO'
+        elif status == 1 :
+            return 'ACEITO'
+        elif status == 2 :
+            return 'AGUARDANDO_ENVIO_FARMACIA'
+        

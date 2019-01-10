@@ -1,10 +1,95 @@
 {% extends 'components/new_base.html' %}
 {% load staticfiles %}
 
-{% block header %}
-  Dashboard
-{% endblock header %}
+{% block content-header %}
+<section class="content-header">
+    <h1>
+        Dashboard
+        <small>Listagem dos ultimos pedidos</small>
+    </h1>
+</section>
+{% endblock %}
 
-{% block conteudo %}
+{% block content %}
+  <div class="row">
+      <div class="col-md-12">
+          <div class="box">
+            <table class="table">
+              <thead>
+                <th>#Id</th>
+                <th>Ult Atualização</th>
+                <th>Status</th>
+                <th>Farmacias</th>
+              </thead>
+              <tbody id="result">
+                  <tr>
+                    <td nowrap="">
+                      <p>#12547</p>
+                    </td>
+                    <td nowrap="">
+                      <p>19 nov 2019 15:50</p>
+                    </td>
+                    <td nowrap="">
+                      <p>RECEBIDA</p>
+                    </td>
+                    <td nowrap="">
+                      <p>DROGASIL, FARMACAIO</p>
+                    </td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+  </div>
+{% endblock %}
 
+
+{% block js %}
+    <script type="text/javascript">
+        (function () {
+            //vars
+            const token = '{{ token }}'
+            //chama pela primeira vez
+            getPedidos()
+            //chama infinitamente de 7.5s em 7.5s
+            setInterval(getPedidos, 7500);
+
+            function getPedidos(){
+              $.ajax({
+                url: 'http://localhost:8000/pedidos/ultimos_pedido',
+                type: "GET",
+                headers:{
+                  Authorization: `Token ${token}`,
+                },
+                success: function(data, textStatus, algo) {
+                  $('#result').html('')
+                  data.forEach(el => {
+                    $('#result').html(
+                      $('#result').html()+`
+                      <tr>
+                        <td nowrap="">
+                          <p>#${el.id}</p>
+                        </td>
+                        <td nowrap="">
+                          <p>${el.data}</p>
+                        </td>
+                        <td nowrap="">
+                          <p>RECEBIDA</p>
+                        </td>
+                        <td nowrap="">
+                          <p>DROGASIL, FARMACAIO</p>
+                        </td>
+                      </tr>
+                      `
+                    )  
+                  });
+                },
+                error: function(data, textStatus) {
+                  console.log(data);
+                  console.log(textStatus);
+                }
+              });
+            }
+        })();
+    </script>
 {% endblock %}
