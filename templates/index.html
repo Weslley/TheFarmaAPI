@@ -62,8 +62,13 @@
                   Authorization: `Token ${token}`,
                 },
                 success: function(data, textStatus, algo) {
+                  console.log(data);
                   $('#result').html('')
                   data.forEach(el => {
+                    let farmacias = '';
+                    el.farmacias.forEach(function(key,obj){
+                      farmacias += ' ' + key + ',';
+                    });
                     $('#result').html(
                       $('#result').html()+`
                       <tr>
@@ -77,7 +82,7 @@
                           <p>RECEBIDA</p>
                         </td>
                         <td nowrap="">
-                          <p>DROGASIL, FARMACAIO</p>
+                          <p>${farmacias}</p>
                         </td>
                       </tr>
                       `

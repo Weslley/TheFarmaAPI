@@ -26,6 +26,7 @@ def init_proposta(id_pedido):
 
     busca = True
     farmacias_enviadas = []
+    rs_visualizadas = ''
 
     # # alteração para globo
     # queryset = Farmacia.objects.order_by('-data_criacao')[:2]
@@ -74,7 +75,11 @@ def init_proposta(id_pedido):
                 pedido.gerar_proposta(farmacias_sem_proposta)
                 # enviando para as farmaias selecionadas
                 FarmaciaConsumer.send_propostas(pedido, farmacias_sem_proposta)
-
+                #salva nos pedidos as farmacias que receberam
+                for fa in farmacias_enviadas:
+                    rs_visualizadas += str(fa.id) + ','
+                pedido.farmacias_receberam = rs_visualizadas
+                pedido.save()
         else:
             # Status Sem Proposta caso nao existam farmacias proximas
             pedido.status = StatusPedido.SEM_PROPOSTA

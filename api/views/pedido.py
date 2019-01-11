@@ -304,14 +304,17 @@ class UltimosPedidos(GenericAPIView):
             #recupera todas as farmacias que receberam
             try:
                 for farmacia_id in item.farmacias_receberam.split(','):
-                    farmacias.append(Farmacia.objects.get(pk=farmacia_id).nome_fantasia)
+                    try:
+                        farmacias.append(Farmacia.objects.get(pk=farmacia_id).nome_fantasia)
+                    except:
+                        pass
             except:
                 farmacias = []
             #prepara o retorno para cada pedido
             rs.append({
                 'id':item.id,
                 'data':item.data_atualizacao.strftime('%d %B %Y %H:%M'),
-                'status':item.status,
+                'status':self.get_nome_status(item.status),
                 'farmacias':farmacias
             })
             #zera
@@ -327,4 +330,17 @@ class UltimosPedidos(GenericAPIView):
             return 'ACEITO'
         elif status == 2 :
             return 'AGUARDANDO_ENVIO_FARMACIA'
-        
+        elif status == 3 :
+            return 'AGUARDANDO_RETIRADA_CLIENTE'
+        elif status == 4 :
+            return 'ENVIADO'
+        elif status == 5 :
+            return 'ENTREGUE'
+        elif status == 6 :
+            return 'CANCELADO_PELA_FARMACIA'
+        elif status == 7 :
+            return 'CANCELADO_PELO_CLIENTE'
+        elif status == 8 :
+            return 'SEM_PROPOSTA'
+        elif status == 9 :
+            return 'TIMEOUT'
