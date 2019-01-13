@@ -36,5 +36,5 @@ class Notificacao(models.Model):
 class NotificacoesTemplate(models.Model):
     tela = models.IntegerField(null=True,blank=True)
     titulo = models.CharField(max_length=50,null=True,blank=True)
-    mensagem = models.TextField(null=True, blank=True)
+    menssagem = models.TextField(null=True, blank=True)
     tipo = models.IntegerField(null=True,blank=True)

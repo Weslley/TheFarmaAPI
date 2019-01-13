@@ -13,6 +13,7 @@ def enviar_notif(fcm_token,tipo,cliente_id,extra_data=None):
     #template da notificacao
     template_notif = NotificacoesTemplate.objects.get(tipo=tipo)
 
+
     #header da requisicao pro fire base
     headers = {
         'Authorization': 'Key={}'.format(config('FIREBASE_CHAVE_SERVIDOR')),
@@ -24,11 +25,11 @@ def enviar_notif(fcm_token,tipo,cliente_id,extra_data=None):
         'collapse_key':'type_a',
         'notification':{
             'title':template_notif.titulo,
-            'body':template_notif.mensagem
+            'body':template_notif.menssagem
         },
         'data':{
             'body':template_notif.titulo,
-            'title':template_notif.mensagem,
+            'title':template_notif.menssagem,
             'screen':template_notif.tela,
         }
     }
@@ -37,17 +38,19 @@ def enviar_notif(fcm_token,tipo,cliente_id,extra_data=None):
         #envia para o firebase
         r = requests.post('https://fcm.googleapis.com/fcm/send',headers=headers,json=body)
         response_json = r.json()
-        print(response_json['sucess'])
         #cria uma notificacao para o usuario
-        Notificacao.objects.create({
+        data_notificacao = {
             'tipo':0,
-            'titulo': template_notif.titulo if template_notif.titulo else template_notif.menssagem,
+            'titulo': template_notif.titulo if template_notif.titulo else None,
             'mensagem': template_notif.menssagem,
             'visualizada':False,
             'cliente_id':cliente_id
-        })
+        }
+        #salva
+        Notificacao.objects.create(**data_notificacao)
+
         if response_json['sucess'] == 1:
             return {'status':True,'messagem':'success','extra_data':response_json}
     except Exception as e:
         print(str(e))
-        return {'status':False,'extra_data':str(e)}
+        return {'status':False,'error':str(e)}

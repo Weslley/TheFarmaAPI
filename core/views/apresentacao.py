@@ -2,7 +2,7 @@ from awesome_mixins.mixins.list import ListMixin
 from django.views.generic import UpdateView
 from django.views.generic import CreateView
 from rest_framework.reverse import reverse_lazy
-
+import datetime
 # from api.models.atualizacao import Atualizacao
 # from core.forms import AtualizacaoForm
 # from core.tasks.task import update_dados_medicamentos
@@ -39,10 +39,15 @@ class ApresentacaoDetail(UpdateView, AdminBaseMixin):
         'segunda_dosagem', 'sufixo_segunda_dosagem',
         'terceira_dosagem', 'sufixo_terceira_dosagem',
         'pbm', 'comercializado', 'quantidade',
-        'sufixo_quantidade', 'imagem', 'forma_farmaceutica'
+        'sufixo_quantidade', 'imagem', 'forma_farmaceutica', 'data_atualizacao_manual'
     )
     success_url = reverse_lazy('apresentacao-admin-list')
 
     def get_success_url(self):
         url = self.success_url + '?identificado_order=desc'
         return url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["agora"] = str(datetime.datetime.now())
+        return context

@@ -151,6 +151,7 @@ class Apresentacao(models.Model):
     comercializado = models.BooleanField(default=True)
     pbm = models.BooleanField(default=False)
     identificado = models.BooleanField(default=False)
+    data_atualizacao_manual = models.DateTimeField(blank=True,null=True)
 
     objects = ApresentacaoManager()
 
