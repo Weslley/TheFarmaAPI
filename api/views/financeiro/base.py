@@ -15,7 +15,7 @@ from datetime import datetime, date
 import calendar
 import locale
 import decimal
-from api.utils.geo import get_pedidos_in_radius
+from api.utils.geo import get_pedidos_in_radius, get_mais_visualizados
 from api.models.farmacia import Farmacia
 
 
@@ -207,7 +207,7 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
         id = self.kwargs.get('id')
         if not (mes and ano):
             return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
-        
+
         #recupera todas os pedidos que contem o medicamento
         itens_pedido = ItemPedido.objects.filter( 
             Q(pedido__farmacia__representantes=representante) \
@@ -228,6 +228,7 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
             'total_vendas':len(itens_pedido),
             'total_liquido':locale.currency(valor_liquido),
             'total_bruto':locale.currency(valor_bruto),
+            'nome_produto':itens_pedido[0].apresentacao.produto.nome,
             'vendas':rs_vendas,
         })
     
@@ -264,6 +265,38 @@ class MaisVendidosNaRegiao(generics.GenericAPIView):
         pedidos = get_pedidos_in_radius(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final,farmacia.id,StatusPedido.ENTREGUE)
         #recupera os pedidos
         return Response(pedidos)
+    
+    def get_object(self):
+        self.check_object_permissions(self.request, self.request.user.representante_farmacia)
+        return self.request.user.representante_farmacia
+
+
+class MaisPesquisadoNoRaio(generics.GenericAPIView):
+    """
+    Recupero os mais pequisados na regiao
+    """
+
+    def get(self,request, *args, **kwargs):
+        representante = self.get_object()
+        ano = self.request.GET.get('ano',None)
+        mes = self.request.GET.get('mes',None)
+        if not (ano and mes):
+            return Response({'ano_mes':'Esses campos são requesitos'},status=status.HTTP_400_BAD_REQUEST)
+        else:
+            #cria o range de datas
+            data_inicio = datetime(int(ano),int(mes),1)
+            try:
+                data_final = datetime(int(ano),int(mes),31)
+            except:
+                data_final = datetime(int(ano),int(mes),30)
+                if mes == 2:
+                    data_final = datetime(int(ano),int(mes),28)
+        #recupera a lista de pesquisados 
+        farmacia = Farmacia.objects.get(representantes=representante)
+        pedidos = get_mais_visualizados(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final)
+
+        return Response(pedidos)
+    
     
     def get_object(self):
         self.check_object_permissions(self.request, self.request.user.representante_farmacia)

@@ -5,7 +5,8 @@ from api.views.financeiro.base import (
     MaisVendidosNaRegiao,
     ResumoListagemVendas,
     MedicamentosMaisVendidos,
-    MedicamentosMaisVendidosDetalhes
+    MedicamentosMaisVendidosDetalhes,
+    MaisPesquisadoNoRaio
 )
 
 urlpatterns = [
@@ -15,5 +16,6 @@ urlpatterns = [
     url(r'^mais_vendido/$', MedicamentosMaisVendidos.as_view(), name='financeiro-more-saled-api-view'),
     url(r'^mais_vendido/(?P<id>[0-9]+)/$', MedicamentosMaisVendidosDetalhes.as_view(), name='financeiro-more-saled-api-detail'),
     url(r'^mais_vendidos_raio/$', MaisVendidosNaRegiao.as_view(), name='financeiro-more-saled-in-thunder'),
+    url(r'^mais_pesquisado_raio/$', MaisPesquisadoNoRaio.as_view(), name='financeiro-more-search-in-thunder'),
 
 ]
