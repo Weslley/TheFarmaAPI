@@ -155,7 +155,8 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
         mes = self.request.GET.get('mes',None)
         ano = self.request.GET.get('ano',None)
         if not (mes and ano):
-            return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
+            mes = datetime.now().month
+            ano = datetime.now().year
         representante = self.get_object()
         medicamentos = []
 
@@ -206,8 +207,9 @@ class MedicamentosMaisVendidosDetalhes(generics.GenericAPIView):
         valor_bruto = decimal.Decimal(0)
         id = self.kwargs.get('id')
         if not (mes and ano):
-            return Response({'error':'Parametros mes e ano são necessario'},status=status.HTTP_400_BAD_REQUEST)
-
+            mes = datetime.now().month
+            ano = datetime.now().year
+        
         #recupera todas os pedidos que contem o medicamento
         itens_pedido = ItemPedido.objects.filter( 
             Q(pedido__farmacia__representantes=representante) \
@@ -248,18 +250,17 @@ class MaisVendidosNaRegiao(generics.GenericAPIView):
         ano = request.GET.get('ano',None)
         #verifica se foi passado
         if not (mes and ano):
-            return Response({
-                'error':'Mes e Ano sao requeridos'
-            },status=status.HTTP_400_BAD_REQUEST)
-        else:
-            #cria o range de datas
-            data_inicio = datetime(int(ano),int(mes),1)
-            try:
-                data_final = datetime(int(ano),int(mes),31)
-            except:
-                data_final = datetime(int(ano),int(mes),30)
-                if mes == 2:
-                    data_final = datetime(int(ano),int(mes),28)
+            mes = datetime.now().month
+            ano = datetime.now().year
+        
+        #cria o range de datas
+        data_inicio = datetime(int(ano),int(mes),1)
+        try:
+            data_final = datetime(int(ano),int(mes),31)
+        except:
+            data_final = datetime(int(ano),int(mes),30)
+            if mes == 2:
+                data_final = datetime(int(ano),int(mes),28)
         #recupera as localizacoes da farmacia
         farmacia = Farmacia.objects.get(representantes=representante)
         pedidos = get_pedidos_in_radius(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final,farmacia.id,StatusPedido.ENTREGUE)
@@ -280,17 +281,18 @@ class MaisPesquisadoNoRaio(generics.GenericAPIView):
         representante = self.get_object()
         ano = self.request.GET.get('ano',None)
         mes = self.request.GET.get('mes',None)
-        if not (ano and mes):
-            return Response({'ano_mes':'Esses campos são requesitos'},status=status.HTTP_400_BAD_REQUEST)
-        else:
-            #cria o range de datas
-            data_inicio = datetime(int(ano),int(mes),1)
-            try:
-                data_final = datetime(int(ano),int(mes),31)
-            except:
-                data_final = datetime(int(ano),int(mes),30)
-                if mes == 2:
-                    data_final = datetime(int(ano),int(mes),28)
+        if not (mes and ano):
+            mes = datetime.now().month
+            ano = datetime.now().year
+        
+        #cria o range de datas
+        data_inicio = datetime(int(ano),int(mes),1)
+        try:
+            data_final = datetime(int(ano),int(mes),31)
+        except:
+            data_final = datetime(int(ano),int(mes),30)
+            if mes == 2:
+                data_final = datetime(int(ano),int(mes),28)
         #recupera a lista de pesquisados 
         farmacia = Farmacia.objects.get(representantes=representante)
         pedidos = get_mais_visualizados(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final)
