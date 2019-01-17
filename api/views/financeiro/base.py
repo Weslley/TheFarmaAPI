@@ -12,8 +12,10 @@ from api.serializers.pedido import PedidoTotaisSerializer, \
 from api.serializers.medicamento import MedicamentoRelatorio
 from django.db.models import F, Q
 from datetime import datetime, date
+from django.db.models import FloatField
 import calendar
 import locale
+from itertools import groupby
 import decimal
 from api.utils.geo import get_pedidos_in_radius, get_mais_visualizados
 from api.models.farmacia import Farmacia
@@ -21,6 +23,10 @@ from api.models.farmacia import Farmacia
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
+
+def paginar_resultado(query,page):
+    quantidade = 15
+    return query[quantidade*page:quantidade*(page+1)]
 
 class ResumoListagemVendas(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
     """
@@ -118,8 +124,8 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
             query = Pedido.objects\
                 .filter(
                     status=StatusPedido.ENTREGUE,
-                    log__data_criacao__month=mes,
-                    log__data_criacao__year=date.today().year,
+                    data_criacao__month=mes,
+                    data_criacao__year=date.today().year,
                     farmacia__representantes=representante,
                 )\
                 .aggregate(total=Sum('valor_bruto'))
@@ -150,36 +156,88 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
     recebe via parametro url(mes,ano)
     """
 
+
     def get(self,request,*args, **kwargs):
         #int vars
         mes = self.request.GET.get('mes',None)
+        page = int(self.request.GET.get('page',0))
         ano = self.request.GET.get('ano',None)
+        #filtros para as datas das querys
+        filtros_pedido = {
+            'data_criacao__year':ano,
+            'data_criacao__month':mes,
+        }
+        filtros_itens_pedido = {
+            'pedido__data_criacao__year':ano,
+            'pedido__data_criacao__month':mes,
+        }
+        #se nao for passado nada, seta como o dia o filtro das datas
         if not (mes and ano):
-            mes = datetime.now().month
-            ano = datetime.now().year
+            hoje = datetime.now()
+            mes = hoje.month
+            ano = hoje.year
+            dia = hoje.day
+            filtros_pedido.update({'pedido__data_criacao__day':dia})
+            filtros_itens_pedido.update({'pedido__data_criacao__day':dia})
+            
         representante = self.get_object()
         medicamentos = []
+        quantidade = 0
+        valor_bruto = 0
+        valor_liquido = 0
 
         #pega todos os pedidos entregues
         pedidos = Pedido.objects.filter(
             status=StatusPedido.ENTREGUE,
             farmacia__representantes=representante,
-            data_criacao__year=ano,
-            data_criacao__month=mes,
+            **filtros_pedido
         )
 
-        valores = pedidos.aggregate(bruto=Sum('valor_bruto'),liquido=Sum('valor_liquido'))
-        #calcula o total bruto e liquido
         #intera nos itens dos pedidos que a farmacia vendeu
-        for pedido in pedidos:
-            itens_pedido = ItemPedido.objects.filter(
-                pedido=pedido,
-            )
-            #add in rs
-            for item in itens_pedido:
-                medicamentos.append(MedicamentoRelatorio(item).data)
+        itens_pedido = ItemPedido.objects.filter(
+            pedido__status=StatusPedido.ENTREGUE,
+            pedido__farmacia__representantes=representante,
+            **filtros_itens_pedido
+        )\
+        .annotate(
+            valor_liquido=Sum(F('quantidade_atendida') * F('valor_unitario'),output_field=FloatField()),
+            valor_bruto=Sum(F('quantidade') * F('valor_unitario'),output_field=FloatField())
+        )\
+        .values(
+            'valor_liquido',
+            'valor_bruto',
+            'quantidade',
+            'apresentacao__codigo_barras',
+            'apresentacao__produto__id',
+            'apresentacao__produto__nome',
+            'apresentacao__produto__laboratorio__nome',
+        ).order_by('apresentacao__produto__id')
 
-        #recupera os medicamentos
+        #calcula o total bruto e liquido
+        valores = itens_pedido.aggregate(bruto=Sum('valor_bruto'),liquido=Sum('valor_liquido'))
+
+        itens_pedido = paginar_resultado(itens_pedido,page)
+
+        #agrupa
+        for key, group in groupby(list(itens_pedido), key=lambda x:x['apresentacao__produto__id']):
+            for item in group:
+                quantidade += item['quantidade']
+                valor_liquido += item['valor_liquido']
+                valor_bruto += item['valor_bruto']
+            #acabou o produto add no medicamentos
+            medicamentos.append({
+                'valor_liquido':valor_liquido,
+                'valor_bruto':valor_bruto,
+                'quantidade':quantidade,
+                'id':item['apresentacao__produto__id'],
+                'nome_produto':item['apresentacao__produto__nome'],
+                'fabricante':item['apresentacao__produto__laboratorio__nome'],
+                'codigo_barras':item['apresentacao__codigo_barras'],
+            })
+            #resetar
+            quantidade = 0
+            valor_bruto = 0
+            valor_liquido = 0
 
         return Response({
             'total_numero_vendas':len(pedidos),
@@ -248,22 +306,21 @@ class MaisVendidosNaRegiao(generics.GenericAPIView):
         representante = self.get_object()
         mes = request.GET.get('mes',None)
         ano = request.GET.get('ano',None)
+        farmacia = Farmacia.objects.get(representantes=representante)
         #verifica se foi passado
         if not (mes and ano):
-            mes = datetime.now().month
-            ano = datetime.now().year
+            pedidos = get_pedidos_in_radius(farmacia.latitude,farmacia.longitude,farmacia.id,6,StatusPedido.ENTREGUE,hoje=True)
+        else:
+            #cria o range de datas
+            data_inicio = datetime(int(ano),int(mes),1)
+            try:
+                data_final = datetime(int(ano),int(mes),31)
+            except:
+                data_final = datetime(int(ano),int(mes),30)
+                if mes == 2:
+                    data_final = datetime(int(ano),int(mes),28)
+            pedidos = get_pedidos_in_radius(farmacia.latitude,farmacia.longitude,6,farmacia.id,StatusPedido.ENTREGUE,data_final=data_final,data_inicio=data_inicio,hoje=False)
         
-        #cria o range de datas
-        data_inicio = datetime(int(ano),int(mes),1)
-        try:
-            data_final = datetime(int(ano),int(mes),31)
-        except:
-            data_final = datetime(int(ano),int(mes),30)
-            if mes == 2:
-                data_final = datetime(int(ano),int(mes),28)
-        #recupera as localizacoes da farmacia
-        farmacia = Farmacia.objects.get(representantes=representante)
-        pedidos = get_pedidos_in_radius(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final,farmacia.id,StatusPedido.ENTREGUE)
         #recupera os pedidos
         return Response(pedidos)
     
@@ -281,21 +338,23 @@ class MaisPesquisadoNoRaio(generics.GenericAPIView):
         representante = self.get_object()
         ano = self.request.GET.get('ano',None)
         mes = self.request.GET.get('mes',None)
-        if not (mes and ano):
-            mes = datetime.now().month
-            ano = datetime.now().year
-        
-        #cria o range de datas
-        data_inicio = datetime(int(ano),int(mes),1)
-        try:
-            data_final = datetime(int(ano),int(mes),31)
-        except:
-            data_final = datetime(int(ano),int(mes),30)
-            if mes == 2:
-                data_final = datetime(int(ano),int(mes),28)
-        #recupera a lista de pesquisados 
+        page = int(self.request.GET.get('page',0))
         farmacia = Farmacia.objects.get(representantes=representante)
-        pedidos = get_mais_visualizados(farmacia.latitude,farmacia.longitude,6,data_inicio,data_final)
+        if not (mes and ano):
+            hoje = True
+            pedidos = get_mais_visualizados(farmacia.latitude,farmacia.longitude,6,page=page,hoje=hoje)
+        else:
+            #cria o range de datas
+            data_inicio = datetime(int(ano),int(mes),1)
+            try:
+                data_final = datetime(int(ano),int(mes),31)
+            except:
+                data_final = datetime(int(ano),int(mes),30)
+                if mes == 2:
+                    data_final = datetime(int(ano),int(mes),28)
+            pedidos = get_mais_visualizados(farmacia.latitude,farmacia.longitude,6,page=page,data_final=data_final,data_inicio=data_inicio)
+        #recupera a lista de pesquisados 
+        
 
         return Response(pedidos)
     
