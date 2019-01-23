@@ -16,3 +16,7 @@ class TabelaPreco(models.Model):
         verbose_name = 'Tabela de preço'
         verbose_name_plural = 'Tabela de preços'
         unique_together = ('apresentacao', 'icms')
+
+class PrecoSugerido(models.Model):
+    apresentacao = models.ForeignKey(Apresentacao, related_name='preco_sugerido_tabelas')
+    valor = models.DecimalField(max_digits=15, decimal_places=2, default=0,null=True,blank=True)
