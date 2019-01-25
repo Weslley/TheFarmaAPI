@@ -5,6 +5,7 @@ import requests
 import datetime
 import random
 import dateutil
+import time
 
 fake_do_fake = {'id': 1352, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 12298, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}, {'apresentacao': 8332, 'quantidade': 4, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
 #fake_do_fake = {'id': 1319, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 126, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
@@ -19,10 +20,12 @@ class Command(BaseCommand):
     quantidade = random.randint(1,5)
     latitude = '-5.0635121'
     longitude = '-42.796581'
+    farmacia = {}
+    cliente = {}
     header_cliente = {} #header das requisicoes para o cliente
     header_farmacia = {} #header para as requisicoes da farmacia
-    #url_base = 'https://api.thefarma.com.br/' #url base do sistema
-    url_base = 'http://localhost:8000/' #url base do sistema
+    url_base = 'https://api.thefarma.com.br/' #url base do sistema
+    #url_base = 'http://localhost:8000/' #url base do sistema
     url_pedido = 'pedidos/' #fazer pedido
     url_login = 'auth/farmacia/login/' #farmacia
     url_login_cliente_final = 'auth/login/' #cliente(app)
@@ -55,6 +58,15 @@ class Command(BaseCommand):
             proposta = self.fazer_proposta(pedido) #faz a proposta
         else:
             print('Erro ao fazer pedido!')
+        if proposta:
+            aceita = self.aceita_proposta(pedido)
+        else:
+            print('Erro ao fazer proposta!')
+        if aceita:
+            entrega = self.entrega_pedido(pedido)
+            print(entrega)
+        else:
+            print('Erro ao aceitar!')
     
     def login_cliente_final(self,username,password,type=0):
         """
@@ -84,13 +96,14 @@ class Command(BaseCommand):
 
     def logar(self,email,password):
         """
-        Faz o login no the farma
+        Faz o login da farmacia no the farma 
         """
         r = requests.post(self.url_login,data={
             'email':email,
             'password':password
         })
         if r.status_code == 200:
+            self.farmacia = r.json()
             print('Login OK')
         else:
             return None
@@ -127,7 +140,7 @@ class Command(BaseCommand):
             'latitude':self.latitude,
             'longitude':self.longitude,
             'delivery':False,
-            'forma_pagamento':0
+            'forma_pagamento':1
         }
         headers = {
             'Authorization':'Token {}'.format(self.token_final)
@@ -182,17 +195,19 @@ class Command(BaseCommand):
         pedido_id: Int  
         return: Dict
         """
-        url = self.get_url_pedido_proposta()
+        url = self.get_url_pedido_proposta(pedido)
         itens_proposta = [] 
         data_proposta = {
             'id':pedido['id']
         }
+        pedido = self.get_itens_pedido(pedido,self.header_farmacia)
+        print(pedido)
         
         #monta os pedidos
-        for item in pedido['itens']:
+        for item in pedido['itens_proposta']:
             itens_proposta.append({
                 'quantidade':random.randint(1,item['quantidade']),
-                'id':item['apresentacao'],
+                'id':item['id'],
                 'valor_unitario':"{0:.2f}".format(random.uniform(1, 50)),
                 'possui':True,
             })
@@ -208,17 +223,15 @@ class Command(BaseCommand):
             print(err)
             return None
         
-
     def get_itens_pedido(self,pedido,header):
         """
         Recupera os itens pedidos de um pedido  
         pedido: Dict  
         return: Dict  
         """
-        url = self.get_url_pedido_proposta()
+        url = self.get_url_pedido_proposta(pedido)
         r = requests.get(url,headers=header)
         try:
-            print(r.json())
             return r.json()
         except Exception as err:
             print(str(err))
@@ -232,4 +245,63 @@ class Command(BaseCommand):
         return: String  
         """
         return '{}pedidos/{}/propostas/'.format(self.url_base,pedido['id']) #formata url
+    
+    def get_url_pedido_checkout(self,pedido):
+        """
+        Recupera a url da proposta de um pedido  
+        pedido: Dict  
+        return: String  
+        """
+        return '{}pedidos/{}/checkout/'.format(self.url_base,pedido['id']) #formata url
 
+    def aceita_proposta(self,pedido):
+        """
+        Faz o cliente aceitar uma proposta  
+        pedido: Dict  
+        return: Dict 
+        """
+        url = self.get_url_pedido_checkout(pedido)
+        troco = self.calcula_troco(pedido)
+        data = {
+            'troco':troco,
+            'farmacia':self.farmacia['id'],
+            'forma_pagamento':1,
+        }
+        #faz requisicao
+        r = requests.patch(url,headers=self.header_cliente,json=data)
+        try:
+            return r.json()
+        except:
+            return None
+
+    
+    def calcula_troco(self,pedido):
+        """
+        Calcula o total da proposta e gera um valor de troco  
+        pedido: Dict  
+        return: Float  
+        """
+        url = self.get_url_pedido_proposta(pedido)
+        total = 0
+        data = self.get_itens_pedido(pedido,self.header_farmacia)
+
+        for item in data['itens_proposta']:
+            total += float(item['valor_unitario'])*float(item['quantidade'])
+        
+        total += random.randint(0,20)
+        return total
+    
+    def entrega_pedido(self,pedido):
+        """
+        Farmacia informa que o pedido foi entregue  
+        pedido: Dict  
+        return: Dict  
+        """
+        url = ' {}pedidos/{}/confirmar_entrega/'.format(self.url_base,pedido['id'])
+        r = requests.post(url,headers=self.header_farmacia,json={})
+        try:
+            return r.json()
+        except Exception as err:
+            print(str(err))
+            return None
+        
