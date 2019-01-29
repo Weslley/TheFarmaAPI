@@ -1,14 +1,17 @@
 from django.core.management.base import BaseCommand
 from api.models.endereco import Endereco
 from api.models.apresentacao import Apresentacao
+from api.models.pedido import Pedido
 import requests
 import datetime
 import random
 import dateutil
 import time
+from api.tasks.contas import faturar_pedido
 
-fake_do_fake = {'id': 1352, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 12298, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}, {'apresentacao': 8332, 'quantidade': 4, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
+#fake_do_fake = {'id': 1352, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 12298, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}, {'apresentacao': 8332, 'quantidade': 4, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
 #fake_do_fake = {'id': 1319, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 126, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
+fake_do_fake = {'id': 1362, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1368, 'data_criacao': 1548710920638, 'data_atualizacao': 1548710920639, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 1, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery': False, 'troco': '0.00', 'itens': [{'apresentacao': 9644, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
 
 class Command(BaseCommand):
     registrar = False
@@ -22,6 +25,7 @@ class Command(BaseCommand):
     longitude = '-42.796581'
     farmacia = {}
     cliente = {}
+    meses = 3
     header_cliente = {} #header das requisicoes para o cliente
     header_farmacia = {} #header para as requisicoes da farmacia
     url_base = 'https://api.thefarma.com.br/' #url base do sistema
@@ -41,7 +45,7 @@ class Command(BaseCommand):
         if rs_login:
             self.token = rs_login['token']
         else:
-            return None    
+            return None
         #logar usuario final
         rs_login_usuario_final = self.login_cliente_final('lucasresone@gmail.com','poupou123')
         if rs_login_usuario_final:
@@ -51,23 +55,37 @@ class Command(BaseCommand):
             return None
         self.gera_mes() # gera os meses que deve ser feito as vendas
         self.monta_headers() #monta os headers
-        medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
-        #pedido = self.fazer_pedido(medicamentos_ids) #faz um pedido
-        pedido = fake_do_fake
-        if pedido:
-            proposta = self.fazer_proposta(pedido) #faz a proposta
-        else:
-            print('Erro ao fazer pedido!')
-        if proposta:
-            aceita = self.aceita_proposta(pedido)
-        else:
-            print('Erro ao fazer proposta!')
-        if aceita:
-            entrega = self.entrega_pedido(pedido)
-            print(entrega)
-        else:
-            print('Erro ao aceitar!')
-    
+        #cria vendas em todos os dias
+        
+        while(self.meses):
+            for i in range(1,31):
+                medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
+                pedido = self.fazer_pedido(medicamentos_ids) #faz um pedido
+                #pedido = fake_do_fake
+                if pedido:
+                    proposta = self.fazer_proposta(pedido) #faz a proposta
+                else:
+                    print('Erro ao fazer pedido!')
+                if proposta:
+                    aceita = self.aceita_proposta(pedido)
+                else:
+                    print('Erro ao fazer proposta!')
+                if aceita:
+                    entrega = self.entrega_pedido(pedido)
+                else:
+                    print('Erro ao aceitar!')
+                if entrega:
+                    pedido = self.altera_data_pedido(pedido,i,self.meses)
+                else:
+                    print('Erro ao entregrar')
+                try:
+                    faturar_pedido(pedido)
+                except Exception as err:
+                    print('ERROR\n\n')
+                    print(str(err))
+                self.meses -= 1
+                print('\n\n\MESES:{}\n\n'.format(self.meses))
+
     def login_cliente_final(self,username,password,type=0):
         """
         faz o login do usuario
@@ -108,6 +126,7 @@ class Command(BaseCommand):
         else:
             return None
         return r.json()
+
     
     def gera_mes(self):
         """
@@ -124,9 +143,10 @@ class Command(BaseCommand):
         return: List<Medicamento>
         """
         rs = []
-        ap = Apresentacao.objects.all()[:100]
+        ap = Apresentacao.objects.all()[:500]
         for i in range(self.quantidade):
-            rs.append(ap[random.randint(1,100)])
+            rs.append(ap[random.randint(1,500)])
+            print('Medicamento:' + str(rs[-1].id))
         return rs
     
     def fazer_pedido(self,medicamentos):
@@ -153,9 +173,11 @@ class Command(BaseCommand):
             })
         #add na requisicao
         data['itens'] = itens
-        print(data)
         r = requests.post(self.url_pedido,json=data,headers=headers)
         try:
+            print('retorno da criacao:')
+            print(r.json())
+            time.sleep(2)
             return r.json()
         except:
             print('Falha em fazer pedido')
@@ -201,7 +223,6 @@ class Command(BaseCommand):
             'id':pedido['id']
         }
         pedido = self.get_itens_pedido(pedido,self.header_farmacia)
-        print(pedido)
         
         #monta os pedidos
         for item in pedido['itens_proposta']:
@@ -213,11 +234,12 @@ class Command(BaseCommand):
             })
         #inclui no json
         data_proposta['itens_proposta'] = itens_proposta
-        print(data_proposta)
         #faz a request
         r = requests.patch(url,json=data_proposta,headers=self.header_farmacia)
-        print(r.status_code,r.json())
         try:
+            print('resultado da proposta')
+            print(r.json())
+            time.sleep(1)
             return r.json()
         except Exception as err:
             print(err)
@@ -232,6 +254,9 @@ class Command(BaseCommand):
         url = self.get_url_pedido_proposta(pedido)
         r = requests.get(url,headers=header)
         try:
+            print('resultado dos itens pedido')
+            print(r.json())
+            time.sleep(2)
             return r.json()
         except Exception as err:
             print(str(err))
@@ -263,13 +288,17 @@ class Command(BaseCommand):
         url = self.get_url_pedido_checkout(pedido)
         troco = self.calcula_troco(pedido)
         data = {
-            'troco':troco,
-            'farmacia':self.farmacia['id'],
+            'troco':float('{:.2f}'.format(troco)),
+            'farmacia':self.farmacia['farmacia_id'],
             'forma_pagamento':1,
+            'numero_parcelas:':1,
         }
+        print('checkout:')
         #faz requisicao
-        r = requests.patch(url,headers=self.header_cliente,json=data)
+        r = requests.put(url,headers=self.header_cliente,json=data)
         try:
+            print(r.json())
+            time.sleep(2)
             return r.json()
         except:
             return None
@@ -287,8 +316,10 @@ class Command(BaseCommand):
 
         for item in data['itens_proposta']:
             total += float(item['valor_unitario'])*float(item['quantidade'])
-        
+        print('troco:')
+        print(total)
         total += random.randint(0,20)
+        print(total)
         return total
     
     def entrega_pedido(self,pedido):
@@ -300,8 +331,38 @@ class Command(BaseCommand):
         url = ' {}pedidos/{}/confirmar_entrega/'.format(self.url_base,pedido['id'])
         r = requests.post(url,headers=self.header_farmacia,json={})
         try:
+            print('entrega o pedido:')
+            print(r.json())
+            time.sleep(2)
             return r.json()
         except Exception as err:
             print(str(err))
             return None
-        
+    
+    def altera_data_pedido(self,pedido,dias,mes):
+        """
+        Altera a data e o log da criacao  
+        pedido: Dict  
+        """
+        pedido = Pedido.objects.get(pk=pedido['id'])
+        if mes == 3:
+            data = self.mes1
+        elif mes == 2:
+            data = self.mes2
+        elif data == 1:
+            data = self.mes3
+        print(data)
+        try:
+            #atualiza a data do pedido
+            pedido.data_criacao = datetime.datetime(data.year,data.month,dias)
+            pedido.data_atualizacao = datetime.datetime(data.year,data.month,dias)
+            pedido.save()
+            #atualiza o log
+            pedido.log.data_criacao = datetime.datetime(data.year,data.month,dias)
+            pedido.log.data_atualizacao = datetime.datetime(data.year,data.month,dias)
+            pedido.log.save()
+            return pedido
+        except Exception as err:
+            print('Erro:\n\n')
+            print(str(err))
+            return False
