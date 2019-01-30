@@ -19,5 +19,5 @@ def setup_periodic_tasks(sender, **kwargs):
 @app.task(queue='periodicos')
 def call_period_tasks():
     from api.tasks.contas import faturamento, alterar_status_contas
-    faturamento()
+    #faturamento()
     alterar_status_contas()
