@@ -40,7 +40,7 @@ class Command(BaseCommand):
             email,senha = self.criar_farmacia()
             rs_login = self.logar(email,senha)
         else:
-            rs_login = self.logar('x@x.com','teste@1234')
+            rs_login = self.logar('z@z.com','admg2')
         #recupera token
         if rs_login:
             self.token = rs_login['token']
@@ -59,33 +59,32 @@ class Command(BaseCommand):
         
         while(self.meses):
             for i in range(1,31):
-                medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
-                pedido = self.fazer_pedido(medicamentos_ids) #faz um pedido
-                #pedido = fake_do_fake
-                if pedido:
-                    proposta = self.fazer_proposta(pedido) #faz a proposta
-                else:
-                    print('Erro ao fazer pedido!')
-                if proposta:
-                    aceita = self.aceita_proposta(pedido)
-                else:
-                    print('Erro ao fazer proposta!')
-                if aceita:
-                    entrega = self.entrega_pedido(pedido)
-                else:
-                    print('Erro ao aceitar!')
-                if entrega:
-                    pedido = self.altera_data_pedido(pedido,i,self.meses)
-                else:
-                    print('Erro ao entregrar')
                 try:
+                    medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
+                    pedido = self.fazer_pedido(medicamentos_ids) #faz um pedido
+                    #pedido = fake_do_fake
+                    if pedido:
+                        proposta = self.fazer_proposta(pedido) #faz a proposta
+                    else:
+                        print('Erro ao fazer pedido!')
+                    if proposta:
+                        aceita = self.aceita_proposta(pedido)
+                    else:
+                        print('Erro ao fazer proposta!')
+                    if aceita:
+                        entrega = self.entrega_pedido(pedido)
+                    else:
+                        print('Erro ao aceitar!')
+                    if entrega:
+                        pedido = self.altera_data_pedido(pedido,i,self.meses)
+                    else:
+                        print('Erro ao entregrar')
                     faturar_pedido(pedido)
                 except Exception as err:
                     print('ERROR\n\n')
                     print(str(err))
-                self.meses -= 1
-                print('\n\n\MESES:{}\n\n'.format(self.meses))
-
+            self.meses -= 1
+            print('\n\n\MESES:{}\n\n'.format(self.meses))
     def login_cliente_final(self,username,password,type=0):
         """
         faz o login do usuario
@@ -177,7 +176,7 @@ class Command(BaseCommand):
         try:
             print('retorno da criacao:')
             print(r.json())
-            time.sleep(2)
+            time.sleep(1)
             return r.json()
         except:
             print('Falha em fazer pedido')
@@ -256,7 +255,7 @@ class Command(BaseCommand):
         try:
             print('resultado dos itens pedido')
             print(r.json())
-            time.sleep(2)
+            time.sleep(1)
             return r.json()
         except Exception as err:
             print(str(err))
@@ -298,7 +297,7 @@ class Command(BaseCommand):
         r = requests.put(url,headers=self.header_cliente,json=data)
         try:
             print(r.json())
-            time.sleep(2)
+            time.sleep(1)
             return r.json()
         except:
             return None
@@ -333,7 +332,7 @@ class Command(BaseCommand):
         try:
             print('entrega o pedido:')
             print(r.json())
-            time.sleep(2)
+            time.sleep(1)
             return r.json()
         except Exception as err:
             print(str(err))
@@ -347,10 +346,13 @@ class Command(BaseCommand):
         pedido = Pedido.objects.get(pk=pedido['id'])
         if mes == 3:
             data = self.mes1
+            print(data.month)
         elif mes == 2:
             data = self.mes2
-        elif data == 1:
+            print(data.month)
+        elif mes == 1:
             data = self.mes3
+            print(data.month)
         print(data)
         try:
             #atualiza a data do pedido
@@ -365,4 +367,4 @@ class Command(BaseCommand):
         except Exception as err:
             print('Erro:\n\n')
             print(str(err))
-            return False
+            return pedido
