@@ -37,15 +37,31 @@ def get_faturamento(data_pedido, farmacia):
 		else:
 			# Se o dia do pedido for maior que dia de faturamento
 			# o pedido sera referente ao faturamento do mes posterior
-			dt_vencimento = data_pedido.replace(
-				day=dia_pagamento, month=(data_pedido.month + 1)
-			)
+			try:
+				dt_vencimento = data_pedido.replace(
+					day=dia_pagamento, month=(data_pedido.month + 1)
+				)
+			except:
+				if data_pedido.month == 12:
+					dt_vencimento = data_pedido.replace(
+						day=dia_pagamento, month=1, year=(data_pedido.year + 1)
+					)
+				else:
+					raise Exception('Erro ao gerar a data do faturamento')
 
 	else:
 		# Se o dia de faturamento esta entre 1 e 10
-		dt_vencimento = data_pedido.replace(
-			day=dia_pagamento, month=(data_pedido.month + 1)
-		)
+		try:
+			dt_vencimento = data_pedido.replace(
+				day=dia_pagamento, month=(data_pedido.month + 1)
+			)
+		except:
+			if data_pedido.month == 12:
+				dt_vencimento = data_pedido.replace(
+					day=dia_pagamento, month=1, year=(data_pedido.year + 1)
+				)
+			else:
+				raise Exception('Erro ao gerar a data do faturamento')
 
 	dt_faturamento = dt_vencimento - delay_faturamento
 	conta, created = Conta.objects.get_or_create(
