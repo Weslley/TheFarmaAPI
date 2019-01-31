@@ -20,4 +20,5 @@ def setup_periodic_tasks(sender, **kwargs):
 def call_period_tasks():
     from api.tasks.contas import faturamento, alterar_status_contas
     #faturamento()
-    alterar_status_contas()
+    #alterar_status_contas()
+    pass
