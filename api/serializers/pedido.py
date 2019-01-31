@@ -777,7 +777,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
                     'token': cartao.token
                 }
 
-                data = Pagamento.pagar(tipo_servicos.CIELO, venda)
+                """ data = Pagamento.pagar(tipo_servicos.CIELO, venda)
 
                 json_venda, json_captura = data['venda'], data['captura']
                 instance.json_venda = json_venda
@@ -787,8 +787,9 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
                 if json_captura:
                     instance.captura_status = int(json_captura['Status'])
-                    instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
-
+                    instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id) """
+                
+                instance.status_cartao = StatusPagamentoCartao.PAGAMENTO_CONFIRMADO 
                 instance.save()
             except ResponseCieloException as err:
                 print(err)
