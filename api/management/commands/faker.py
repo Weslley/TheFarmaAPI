@@ -40,7 +40,7 @@ class Command(BaseCommand):
             email,senha = self.criar_farmacia()
             rs_login = self.logar(email,senha)
         else:
-            rs_login = self.logar('z@z.com','admg2')
+            rs_login = self.logar('x@x.com','teste@1234')
         #recupera token
         if rs_login:
             self.token = rs_login['token']
@@ -55,31 +55,33 @@ class Command(BaseCommand):
             return None
         self.gera_mes() # gera os meses que deve ser feito as vendas
         self.monta_headers() #monta os headers
+        #recupera o cartao
+        cartao = self.get_cartoes_cliente(self.cliente)
         #cria vendas em todos os dias
-        
         while(self.meses):
             for i in range(1,31):
                 try:
-                    medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
-                    pedido = self.fazer_pedido(medicamentos_ids) #faz um pedido
-                    #pedido = fake_do_fake
-                    if pedido:
-                        proposta = self.fazer_proposta(pedido) #faz a proposta
-                    else:
-                        print('Erro ao fazer pedido!')
-                    if proposta:
-                        aceita = self.aceita_proposta(pedido)
-                    else:
-                        print('Erro ao fazer proposta!')
-                    if aceita:
-                        entrega = self.entrega_pedido(pedido)
-                    else:
-                        print('Erro ao aceitar!')
-                    if entrega:
-                        pedido = self.altera_data_pedido(pedido,i,self.meses)
-                    else:
-                        print('Erro ao entregrar')
-                    faturar_pedido(pedido)
+                    for j in range(1,random.randint(2,3)):
+                        medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
+                        pedido = self.fazer_pedido(medicamentos_ids) #faz um pedido
+                        #pedido = fake_do_fake
+                        if pedido:
+                            proposta = self.fazer_proposta(pedido) #faz a proposta
+                        else:
+                            print('Erro ao fazer pedido!')
+                        if proposta:
+                            aceita = self.aceita_proposta(pedido,cartao=cartao)
+                        else:
+                            print('Erro ao fazer proposta!')
+                        if aceita:
+                            entrega = self.entrega_pedido(pedido)
+                        else:
+                            print('Erro ao aceitar!')
+                        if entrega:
+                            pedido = self.altera_data_pedido(pedido,i,self.meses)
+                        else:
+                            print('Erro ao entregrar')
+                        faturar_pedido(pedido)
                 except Exception as err:
                     print('ERROR\n\n')
                     print(str(err))
@@ -100,6 +102,7 @@ class Command(BaseCommand):
         }
         r = requests.post(self.url_login_cliente_final,data=data)
         if r.status_code in [200,201]:
+            self.cliente = r.json()
             return r.json()
         else:
             print('Login Cliente Final OK')
@@ -278,7 +281,7 @@ class Command(BaseCommand):
         """
         return '{}pedidos/{}/checkout/'.format(self.url_base,pedido['id']) #formata url
 
-    def aceita_proposta(self,pedido):
+    def aceita_proposta(self,pedido,cartao=None):
         """
         Faz o cliente aceitar uma proposta  
         pedido: Dict  
@@ -292,6 +295,12 @@ class Command(BaseCommand):
             'forma_pagamento':1,
             'numero_parcelas:':1,
         }
+        if cartao:
+            data.update({
+                'forma_pagamento':0,
+                'cartao':cartao[0]['id'] 
+            })
+        print(data)
         print('checkout:')
         #faz requisicao
         r = requests.put(url,headers=self.header_cliente,json=data)
@@ -368,3 +377,18 @@ class Command(BaseCommand):
             print('Erro:\n\n')
             print(str(err))
             return pedido
+    
+    def get_cartoes_cliente(self,cliente):
+        """
+        Recupera o cartao do cliente
+        cliente: Dict
+        return: List<Dic>
+        """
+        url = '{}clientes/{}/cartoes/'.format(self.url_base,cliente['id'])
+        try:
+            r = requests.get(url,headers=self.header_cliente)
+            print(r.json())
+            return r.json()
+        except Exception as err:
+            print(str(err))
+            return None
