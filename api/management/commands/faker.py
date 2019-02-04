@@ -48,7 +48,7 @@ class Command(BaseCommand):
         else:
             return None
         #logar usuario final
-        rs_login_usuario_final = self.login_cliente_final('email@email.com','password')
+        rs_login_usuario_final = self.login_cliente_final('lucasresone@gmail.com','poupou123')
         if rs_login_usuario_final:
             self.token_final = rs_login_usuario_final['token']
         else:
@@ -104,6 +104,7 @@ class Command(BaseCommand):
         r = requests.post(self.url_login_cliente_final,data=data)
         if r.status_code in [200,201]:
             self.cliente = r.json()
+            print(r.json())
             return r.json()
         else:
             print('Login Cliente Final OK')

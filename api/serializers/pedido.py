@@ -15,6 +15,7 @@ from api.models.notificacao import Notificacao, NotificacoesTemplate, TipoNotifi
 from api.models.ultimo_preco import UltimoPreco
 from django.db import transaction
 from rest_framework import serializers
+from api.utils.usuario_teste import check_user_eh_teste, fazer_proposta_faker
 
 from api.models.endereco import Endereco
 from api.models.enums.forma_pagamento import FormaPagamento
@@ -225,6 +226,9 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                 item_data['pedido'] = pedido
                 item_data['valor_unitario'] = valor_unitario
                 ItemPedido.objects.create(**item_data)
+            #verifica se eh o usuario teste
+            if check_user_eh_teste(self.context['request'].user):
+                fazer_proposta_faker(pedido)
 
             return pedido
 
