@@ -116,7 +116,6 @@ class ProdutosBuscaNova(generics.ListAPIView):
         qs = qs.values('nome').annotate(dcount=Count('nome'))
         return qs
 
-
 class ProdutoIndicadorVenda(generics.ListAPIView):
     """
     Listar os produtos mais vendidos 

@@ -1,7 +1,7 @@
 import time
 from datetime import date, datetime
 from decimal import Decimal
-
+from unicodedata  import normalize
 import os
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -184,7 +184,7 @@ def exist_medicamento(med_temp):
         med = Produto.objects.get(
             principio_ativo_id=med_temp.principioAtivo_id,
             laboratorio_id=med_temp.laboratorio_id,
-            nome=med_temp.descricao,
+            nome=remover_acentos(med_temp.descricao),
         )
         return True, med
     except:
@@ -194,14 +194,14 @@ def exist_medicamento(med_temp):
 def get_or_create_medicamento(med_temp):
     exist, obj = exist_medicamento(med_temp)
     if exist:
-        obj.nome = obj.nome.capitalize()
+        obj.nome = remover_acentos(obj.nome.capitalize())
         obj.save()
         return obj
 
     return Produto.objects.create(
         principio_ativo_id=med_temp.principioAtivo_id,
         laboratorio_id=med_temp.laboratorio_id,
-        nome=med_temp.descricao,
+        nome=remover_acentos(med_temp.descricao),
         tipo=tipo_produto.GENERICO if med_temp.generico else tipo_produto.ETICO  # consultar com o gabriel
     )
 
@@ -341,3 +341,11 @@ def add_medicamento_temp(line):
             registroMS=line[231:246].strip(),
             portaria=line[246:256].strip(),
         )
+
+def remover_acentos(frase):
+    """
+    Remove os acentos de uma string
+    frase: String
+    return: String
+    """
+    return normalize('NFKD', frase).encode('ASCII', 'ignore').decode('ASCII')

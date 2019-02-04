@@ -1,6 +1,8 @@
 from django.db.models import Q
 from django.http.response import Http404
+from cieloApi3 import *
 from django.http import JsonResponse
+import json
 from api.models.farmacia import Farmacia
 # from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
@@ -24,6 +26,9 @@ from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
     PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer
 from rest_framework import permissions, status as stts
+from rest_framework.serializers import ValidationError
+from api.servico_pagamento.pagamento import Pagamento
+from api.servico_pagamento import tipo_servicos
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -344,3 +349,26 @@ class UltimosPedidos(GenericAPIView):
             return 'SEM_PROPOSTA'
         elif status == 9 :
             return 'TIMEOUT'
+    
+class CancelaPagamento(GenericAPIView, IsClienteAuthenticatedMixin):
+
+    def get_queryset(self):
+        return Pedido.objects.get(pk=self.kwargs.get('id',None))
+
+    def get(self,request, *args, **kwargs):
+        pedido = self.get_queryset()
+        json_venda = pedido.json_venda
+        try:
+            data_cancelamento = {
+                'payment_id':json_venda['Payment']['PaymentId']
+            }
+        except:
+            return Response({'detail':'Venda sem captura de json'},status=stts.HTTP_400_BAD_REQUEST)
+        if pedido.delivery:
+            data_cancelamento.update({'valor':pedido.valor_bruto_sem_frete + pedido.valor_frete})
+        else:
+            data_cancelamento.update({'valor':pedido.get_total_farmacia(pedido.farmacia)})
+        print(data_cancelamento)
+        rs = Pagamento.cancelar(tipo_servicos.CIELO,data_cancelamento)
+        print(rs)
+        return Response(status=stts.HTTP_200_OK)

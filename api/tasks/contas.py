@@ -48,7 +48,6 @@ def get_faturamento(data_pedido, farmacia):
 					)
 				else:
 					raise Exception('Erro ao gerar a data do faturamento')
-
 	else:
 		# Se o dia de faturamento esta entre 1 e 10
 		try:

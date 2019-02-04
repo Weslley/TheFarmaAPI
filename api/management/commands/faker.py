@@ -40,14 +40,15 @@ class Command(BaseCommand):
             email,senha = self.criar_farmacia()
             rs_login = self.logar(email,senha)
         else:
-            rs_login = self.logar('x@x.com','teste@1234')
+            rs_login = self.logar('f@f.com','admg2')
+            #rs_login = self.logar('x@x.com','teste@1234')
         #recupera token
         if rs_login:
             self.token = rs_login['token']
         else:
             return None
         #logar usuario final
-        rs_login_usuario_final = self.login_cliente_final('lucasresone@gmail.com','poupou123')
+        rs_login_usuario_final = self.login_cliente_final('email@email.com','password')
         if rs_login_usuario_final:
             self.token_final = rs_login_usuario_final['token']
         else:
@@ -56,7 +57,7 @@ class Command(BaseCommand):
         self.gera_mes() # gera os meses que deve ser feito as vendas
         self.monta_headers() #monta os headers
         #recupera o cartao
-        cartao = self.get_cartoes_cliente(self.cliente)
+        #cartao = self.get_cartoes_cliente(self.cliente)
         #cria vendas em todos os dias
         while(self.meses):
             for i in range(1,31):
@@ -70,7 +71,7 @@ class Command(BaseCommand):
                         else:
                             print('Erro ao fazer pedido!')
                         if proposta:
-                            aceita = self.aceita_proposta(pedido,cartao=cartao)
+                            aceita = self.aceita_proposta(pedido)
                         else:
                             print('Erro ao fazer proposta!')
                         if aceita:
@@ -181,7 +182,8 @@ class Command(BaseCommand):
             print(r.json())
             time.sleep(1)
             return r.json()
-        except:
+        except Exception as err:
+            print(err)
             print('Falha em fazer pedido')
             return None
 

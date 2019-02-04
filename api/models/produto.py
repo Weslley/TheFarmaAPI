@@ -18,7 +18,7 @@ class Produto(models.Model):
     secao = models.ForeignKey(Secao, null=True)
     subsecao = models.ForeignKey(Subsecao, null=True)
     sintomas = models.ManyToManyField(Sintoma, related_name='medicamentos_associados', blank=True)
-    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now_add=True)
+    data_atualizacao = models.DateTimeField(verbose_name='Data de atualização', auto_now=True)
     descricao = models.TextField(null=True)
 
     def __str__(self):

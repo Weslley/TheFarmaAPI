@@ -22,3 +22,4 @@ def call_period_tasks():
     #faturamento()
     #alterar_status_contas()
     pass
+    
