@@ -40,7 +40,6 @@ DEFAULT_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django.contrib.postgres',
 ]
 
 LOCAL_APPS = [
@@ -236,7 +235,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('redis://localhost:6379/1')],
+             'hosts': [('redis://redis_channels:6379/1')],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }
