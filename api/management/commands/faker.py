@@ -120,7 +120,7 @@ class Command(BaseCommand):
         """
         Faz o login da farmacia no the farma 
         """
-        r = requests.post(self.url_login,data={
+        r = requests.post(self.url_base + self.url_login,data={
             'email':email,
             'password':password
         })
@@ -212,7 +212,7 @@ class Command(BaseCommand):
         }
         #farmacia
         self.header_farmacia = {
-            'Authorization':'Token {}'.format(self.token)
+            'Authorization':'Token {}'.format(self.farmacia['token'])
         }
 
 
@@ -228,7 +228,6 @@ class Command(BaseCommand):
             'id':pedido['id']
         }
         pedido = self.get_itens_pedido(pedido,self.header_farmacia)
-        
         #monta os pedidos
         for item in pedido['itens_proposta']:
             itens_proposta.append({
