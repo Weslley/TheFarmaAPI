@@ -226,10 +226,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                 item_data['pedido'] = pedido
                 item_data['valor_unitario'] = valor_unitario
                 ItemPedido.objects.create(**item_data)
-            #verifica se eh o usuario teste
-            if check_user_eh_teste(self.context['request'].user):
-                fazer_proposta_faker(pedido)
-
+            
             return pedido
 
 

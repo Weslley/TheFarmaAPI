@@ -67,12 +67,7 @@ def init_proposta(id_pedido):
         # Atualizando pedido
         pedido = Pedido.objects.get(id=id_pedido)
         #verifica se eh do usuario de teste
-        if check_user_eh_teste(pedido.cliente.user):
-            #caso seja usuario teste sempre a farmacia
-            farmacias_proximas = [Farmacia.objects.get(pk=8)] # Lista com a farmacia teste    
-        else:
-            # selecionando as farmacias proximas
-            farmacias_proximas = Farmacia.objects.proximas(pedido)
+        farmacias_proximas = Farmacia.objects.proximas(pedido)
         farmacias_sem_proposta = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias_enviadas)
         if farmacias_proximas:
             if farmacias_sem_proposta:
