@@ -4,6 +4,7 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 
 from api.models.configuracao import Configuracao
 from api.models.produto import Produto
+from api.utils.formats import formata_numero_apresentaca
 from api.models.unidade import Unidade
 
 import locale
@@ -252,25 +253,25 @@ class Apresentacao(models.Model):
             #verifica se tem dosagem
             if self.dosagem:
                 virgula = True
-                dosagem = locale.currency(self.dosagem, symbol=False)
-                nome += '{} {}'.format(dosagem,self.sufixo_dosagem.nome)
+                dosagem = formata_numero_apresentaca(self.dosagem)
+                nome += '{}{}'.format(dosagem,self.sufixo_dosagem.nome)
             if self.segunda_dosagem:
-                dosagem = locale.currency(self.segunda_dosagem, symbol=False)
-                nome += ' + {} {}'.format(dosagem,self.sufixo_segunda_dosagem)
+                dosagem = formata_numero_apresentaca(self.segunda_dosagem)
+                nome += ' + {}{}'.format(dosagem,self.sufixo_segunda_dosagem)
             if self.terceira_dosagem:
-                dosagem = locale.currency(self.terceira_dosagem, symbol=False)
-                nome += ' + {} {}'.format(dosagem,self.sufixo_terceira_dosagem.nome)
+                dosagem = formata_numero_apresentaca(self.terceira_dosagem)
+                nome += ' + {}{}'.format(dosagem,self.sufixo_terceira_dosagem.nome)
             if self.quarta_dosagem:
-                dosagem = locale.currency(self.quarta_dosagem, symbol=False)
-                nome += ' + {} {}'.format(dosagem,self.sufixo_quarta_dosagem.nome)
+                dosagem = formata_numero_apresentaca(self.quarta_dosagem)
+                nome += ' + {}{}'.format(dosagem,self.sufixo_quarta_dosagem.nome)
             #se  tiver dosagem precisa da virgula
             if virgula:
                 nome += ','
             #verifica se a forma farmaceutica eh uma excecao
             if self.forma_farmaceutica.nome in EXECOES:
-                nome += ' {} {}'.format(self.quantidade,self.forma_farmaceutica.nome)
+                nome += ' {} {}'.format(formata_numero_apresentaca(self.quantidade),self.forma_farmaceutica.nome)
             else:
-                nome += '{} com {}'.format(self.forma_farmaceutica.nome,self.quantidade)
+                nome += '{} com {}'.format(self.forma_farmaceutica.nome,formata_numero_apresentaca(self.quantidade))
             if self.sufixo_quantidade:
                 nome += ' {}'.format(self.sufixo_quantidade.nome)
             return nome
