@@ -4,7 +4,7 @@ from api.views.pedido import PedidoCreate, PropostaList, \
     PropostaRetrieveUpdate, PedidoRetrieve, PedidoCheckout, \
     PedidoCancelamentoCliente, UltimoPedido, \
     PropostaCancelamentoFarmacia, ConfirmarEnvio, \
-    ConfirmarRetiradaEntrega, PropostaAddView, UltimosPedidos, CancelaPagamento
+    ConfirmarRetiradaEntrega, PropostaAddView, UltimosPedidos, CancelaPagamento, ProblemasEntregaView
 
 
 urlpatterns = [
@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^(?P<id>[0-9]+)/cancelamento_proposta/$', PropostaCancelamentoFarmacia.as_view()),
     url(r'^(?P<id>[0-9]+)/confirmar_envio/$', ConfirmarEnvio.as_view()),
     url(r'^(?P<id>[0-9]+)/confirmar_entrega/$', ConfirmarRetiradaEntrega.as_view()),
+    url(r'^(?P<id>[0-9]+)/problemas_entrega/$', ProblemasEntregaView.as_view()),
 ]

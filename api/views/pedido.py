@@ -29,6 +29,7 @@ from rest_framework import permissions, status as stts
 from rest_framework.serializers import ValidationError
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento import tipo_servicos
+from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -350,7 +351,7 @@ class UltimosPedidos(GenericAPIView):
         elif status == 9 :
             return 'TIMEOUT'
     
-class CancelaPagamento(GenericAPIView, IsClienteAuthenticatedMixin):
+class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
     def get_queryset(self):
         return Pedido.objects.get(pk=self.kwargs.get('id',None))
@@ -370,5 +371,19 @@ class CancelaPagamento(GenericAPIView, IsClienteAuthenticatedMixin):
             data_cancelamento.update({'valor':pedido.get_total_farmacia(pedido.farmacia)})
         print(data_cancelamento)
         rs = Pagamento.cancelar(tipo_servicos.CIELO,data_cancelamento)
-        print(rs)
-        return Response(status=stts.HTTP_200_OK)
+        if rs['cancelamento']['Status'] == StatusPagamentoCartao.CANCELADO:
+            return Response(status=stts.HTTP_200_OK)
+        else:
+            return Response({'detail':'Cancelamento nao realizado, entre em contato com o suporte!'},status=stts.HTTP_400_BAD_REQUEST)
+
+class ProblemasEntregaView(GenericAPIView, IsRepresentanteAuthenticatedMixin):
+
+    def get_object(self):
+        return Pedido.objects.get(id=self.kwargs.get('id'))
+
+    def get(self,request,*args, **kwargs):
+        tipo = request.GET.get('tipo',None)
+        print(tipo)
+        pedido = self.get_object()
+        enviar_notif(pedido.cliente.fcm_token,tipo,pedido.cliente_id,pedido=pedido)
+        return Response('')

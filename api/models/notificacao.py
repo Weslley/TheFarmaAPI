@@ -14,6 +14,9 @@ class TipoNotificacaoTemplate():
     MEDICAMENTO_FORAM_ENTREGUE_S = 9
     MEDICAMENTO_FORAM_ENTREGUE_P = 7
     FARMACIA_CANCELOU = 10
+    PEDIDO_SEM_ESTOQUE = 11
+    ENDERECO_NAO_LOCALIZADO = 12
+    DINHEIRO_ESTORNADO = 13
 
 
 class Notificacao(models.Model):

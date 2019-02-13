@@ -2,12 +2,14 @@ import requests
 from decouple import config
 from api.models.notificacao import NotificacoesTemplate, Notificacao, TipoNotificacaoTemplate
 
-def enviar_notif(fcm_token,tipo,cliente_id,extra_data=None):
+def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
     """
     Envia uma notificação para um fcm_token  
     fcm_token: String  
-    title: String 
-    body: String  
+    tipo: Int
+    pedido: Pedido
+    extra_data: Dict 
+    return: Dict
     """
 
     #template da notificacao
@@ -20,20 +22,8 @@ def enviar_notif(fcm_token,tipo,cliente_id,extra_data=None):
         'Content-Type':'application/json'
     }
     #corpo
-    body = {
-        'to':fcm_token,
-        'collapse_key':'type_a',
-        'notification':{
-            'title':template_notif.titulo,
-            'body':template_notif.menssagem
-        },
-        'data':{
-            'body':template_notif.titulo,
-            'title':template_notif.menssagem,
-            'screen':template_notif.tela,
-        }
-    }
-
+    body = get_body_requisicao(fcm_token,template_notif,pedido=pedido)
+    
     try:
         #envia para o firebase
         r = requests.post('https://fcm.googleapis.com/fcm/send',headers=headers,json=body)
@@ -54,3 +44,31 @@ def enviar_notif(fcm_token,tipo,cliente_id,extra_data=None):
     except Exception as e:
         print(str(e))
         return {'status':False,'error':str(e)}
+
+def get_body_requisicao(fcm_token,template_notif,pedido=None,extra=None):
+    """
+    monta o corpo para a requisicao pro push notification
+    fcm_token: String
+    template_notif: TemplateNotificacao
+    pedido: Pedido
+    extra: Dict
+    return: Dict
+    """
+    body = {
+        'to':fcm_token,
+        'collapse_key':'type_a',
+        'notification':{
+            'title':template_notif.titulo,
+            'body':template_notif.menssagem
+        },
+        'data':{
+            'body':template_notif.titulo,
+            'title':template_notif.menssagem,
+            'screen':template_notif.tela,
+        }
+    }
+    #caso tenha pedido formata para sair o id do pedido
+    if pedido:
+        body['notification']['body'] = body['notification']['body'].format(pedido.id)
+        body['data']['body'] = body['data']['body'].format(pedido.id)
+    return body
