@@ -20,7 +20,8 @@ EXECOES = [
     'Comprimido mastigável',
     'Comprimido liberação prolongada',
     'Cápsula gel mole',
-    'Comprimido sublingual'
+    'Comprimido sublingual',
+    'Drágeas'
 ]
 
 
@@ -175,74 +176,6 @@ class Apresentacao(models.Model):
 
     @property
     def nome_apresentacao(self):
-        """ try:
-            locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-            
-            def clean_decimal(decimal_value):
-                dc_tuple = decimal_value.as_tuple()
-                exp_tuple = dc_tuple.digits[dc_tuple.exponent:]
-                if max(exp_tuple) == 0:
-                    return int(
-                        ''.join(
-                            [str(_) for _ in dc_tuple.digits[:dc_tuple.exponent]]
-                        )
-                    )
-                return locale.currency(decimal_value, grouping=True, symbol=None)
-
-            if not self.identificado:
-                return self.nome
-
-            default_decimal_fields = ['dosagem', 'quantidade']
-            extra_decimal_fields = ['segunda_dosagem', 'terceira_dosagem']
-            fmt_values = {
-                df_field:clean_decimal(getattr(self, df_field))
-                for df_field in default_decimal_fields
-            }
-
-            extra = []
-            for extra_field in extra_decimal_fields:
-                result = getattr(self, extra_field)
-                if result:
-                    fmt_values[extra_field] = clean_decimal(result)
-                    extra.append(extra_field)
-
-            dosagem = fmt_values.get('dosagem')
-            quantidade = fmt_values.get('quantidade')
-            if extra:
-                segunda_dosagem = fmt_values.get('segunda_dosagem', None)
-                terceira_dosagem = fmt_values.get('terceira_dosagem', None)
-                prefixo_apresentacao = '{}{}'.format(dosagem, self.sufixo_dosagem)
-
-                if segunda_dosagem:
-                    prefixo_apresentacao += '+{}{}'.format(
-                        segunda_dosagem, self.sufixo_segunda_dosagem
-                    )
-                if terceira_dosagem:
-                    prefixo_apresentacao += '+{}{}'.format(
-                        terceira_dosagem, self.sufixo_terceira_dosagem
-                    )
-
-            else:
-                prefixo_apresentacao = '{}{}'.format(dosagem, self.sufixo_dosagem)
-
-            if self.sufixo_quantidade:
-                final_apresentacao = ", {} com {}{}".format(
-                    self.forma_farmaceutica.nome, quantidade,
-                    self.sufixo_quantidade
-                )
-            elif self.forma_farmaceutica.nome in ['Comprimidos','Cápsula','Pílula','Pastilha','Comprimido efervescente','Comprimido revestido','Cápsulas moles','Comprimido mastigável','Comprimido liberação prolongada','Cápsula gel mole','Comprimido sublingual'] :
-                final_apresentacao = ", {} {}".format(
-                    quantidade, self.forma_farmaceutica.nome.lower()
-                )
-            else:
-                final_apresentacao = ", {} {}".format(
-                    quantidade, self.forma_farmaceutica.nome.lower()
-                )
-
-            return prefixo_apresentacao + final_apresentacao
-        except Exception as err:
-            print(str(err))
-            return self.nome """
         try:
             #formata o nome
             nome = ''
@@ -266,15 +199,15 @@ class Apresentacao(models.Model):
                 nome += ' + {}{}'.format(dosagem,self.sufixo_quarta_dosagem.nome)
             #se  tiver dosagem precisa da virgula
             if virgula:
-                nome += ','
+                nome += ', '
             #verifica se a forma farmaceutica eh uma excecao
             if self.forma_farmaceutica.nome in EXECOES:
-                nome += ' {} {}'.format(formata_numero_apresentaca(self.quantidade),self.forma_farmaceutica.nome)
+                nome += '{} {}'.format(formata_numero_apresentaca(self.quantidade),self.forma_farmaceutica.nome)
             else:
                 nome += '{} com {}'.format(self.forma_farmaceutica.nome,formata_numero_apresentaca(self.quantidade))
             if self.sufixo_quantidade:
                 nome += ' {}'.format(self.sufixo_quantidade.nome)
-            return nome
+            return nome.capitalize()
         except Exception as err:
             print(str(err))
             return self.nome
