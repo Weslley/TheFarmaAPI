@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from time import sleep
 from decimal import Decimal
 
-from api.utils.usuario_teste import check_user_eh_teste
+from api.utils.usuario_teste import check_user_eh_teste, fazer_proposta_faker
 
 @app.task(queue='propostas')
 def init_proposta(id_pedido):
@@ -28,7 +28,16 @@ def init_proposta(id_pedido):
     busca = True
     farmacias_enviadas = []
     rs_visualizadas = ''
-
+    #verifica se eh o usuario teste
+    pedido = Pedido.objects.get(id=id_pedido)
+    print(pedido.cliente.usuario)
+    if check_user_eh_teste(pedido.cliente.usuario):
+        print('sim')
+        pedido.gerar_proposta([Farmacia.objects.get(pk=8)])
+        fazer_proposta_faker(pedido)
+        return None
+    else:
+        print('nao')
     # # alteração para globo
     # queryset = Farmacia.objects.order_by('-data_criacao')[:2]
     # farmacias = [f for f in queryset]

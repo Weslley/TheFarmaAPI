@@ -19,11 +19,39 @@ from itertools import groupby
 import decimal
 from api.utils.geo import get_pedidos_in_radius, get_mais_visualizados
 from api.models.farmacia import Farmacia
+from api.models.enums.status_pedido_faturamento import StatusPedidoFaturamento
+from api.models.enums.forma_pagamento import FormaPagamento
+from api.models.enums.status_conta import StatusConta
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
-
+def get_ultima_conta(representante):
+    """
+    Recupera o valor total dos que naoa  foram faturados
+    representante: Representante
+    return: Dict
+    """
+    #prepara o retorno
+    valor_total = 0
+    rs = {'valor_total':0,'tipo':StatusConta.RECEBER}
+    #todos os pedidos nao faturados e status de entregue
+    pedidos = Pedido.objects.filter(
+        farmacia__representantes=representante,
+        status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
+        status=StatusPedido.ENTREGUE
+    )
+    #calcula o valor da conta
+    for pedido in pedidos:
+        if pedido.forma_pagamento == FormaPagamento.CARTAO:
+            valor_total += pedido.valor_liquido
+        elif pedido.forma_pagamento == FormaPagamento.DINHEIRO:
+            valor_total -= pedido.valor_comissao_thefarma
+        if valor_total > 0:
+            rs.update({'valor_total':valor_total,'tipo':StatusConta.PAGAR})
+        else:
+            rs.update({'valor_total':valor_total,'tipo':StatusConta.RECEBER})
+    return rs
 def paginar_resultado(query,page):
     quantidade = 15
     return query[quantidade*page:quantidade*(page+1)]
@@ -132,9 +160,18 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
 
             valor = float(query['total']) if query['total'] else 0
             values.append(valor)
-
+        
+        #monta a reposta 
+        ult_conta = get_ultima_conta(representante)
+        print(ult_conta)
         data = {
-            'conta_atual': ContaMinimalSerializer(contas.first(), many=False).data,
+            'conta_atual': {
+                'tipo':ult_conta['tipo'],
+                'valor_total':ult_conta['valor_total'],
+                'data_vencimento':contas.first().data_vencimento,
+                'id':contas.first().id,
+                'status':contas.first().status,
+            },
             'contas': ContaMinimalSerializer(contas[:6], many=True).data,
             'vendas_hoje': PedidoTotaisSerializer(pedidos_de_hoje, many=False).data,
             'rendimentos': {
