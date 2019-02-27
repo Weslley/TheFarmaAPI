@@ -15,7 +15,7 @@ from api.models.enums import StatusPedido,\
 	StatusPedidoFaturamento, StatusPagamento, \
 	FormaPagamento, StatusPagamentoConta, StatusConta
 
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
 
 
 def get_faturamento(data_pedido, farmacia):
@@ -125,3 +125,66 @@ def alterar_status_contas():
 		if conta_aberta.data_vencimento < today:
 			conta_aberta.status = StatusPagamentoConta.ATRASADA
 			conta_aberta.save()
+
+def get_faturamento_pedido(pedido):
+	"""
+	Recupera o faturamento de um pedido
+	pedido: Pedido
+	return: Conta
+	"""
+	#init vars
+	DIA_FATURA = 20
+	DIA_PAGAMENTO = 1
+	data_pedido = datetime.now()
+	#cria a data da fatrua
+	data_faturamento = datetime(data_pedido.year,data_pedido.month,DIA_FATURA)
+	#passa o vencimento para o proximo mes dia 1
+	if data_pedido.month == 12:
+		#passa para o proximo ano
+		data_vencimento = datetime(data_pedido.year+1,1,DIA_PAGAMENTO)
+	else:
+		data_vencimento = datetime(data_pedido.year,data_pedido.month+1,DIA_PAGAMENTO)
+	#cria ou recupera o faturamento aberto
+	conta, created = Conta.objects.get_or_create(
+		status=StatusPagamentoConta.ABERTA,
+		farmacia=pedido.farmacia,
+		data_vencimento=data_vencimento,
+		data_faturamento=data_faturamento
+	)
+	return conta
+
+def processa_pedido(pedido):
+	"""
+	Metodo responsavel por fazer o faturamento do pedido
+	pedido: Pedido
+	return:
+	"""
+	conta = get_faturamento_pedido(pedido)
+	# Se o pedido for no credito
+	if pedido.forma_pagamento == FormaPagamento.CARTAO:
+		conta.valor_total += pedido.valor_liquido
+	else:
+		conta.valor_total -= pedido.valor_comissao_thefarma
+
+	if conta.valor_total < 0:
+		conta.tipo = StatusConta.PAGAR
+	else:
+		conta.tipo = StatusConta.RECEBER
+
+	conta.save()
+	pedido.status_faturamento = StatusPedidoFaturamento.FATURADO
+	pedido.faturamento = faturamento
+	pedido.save()
+
+@shared_task
+def faturar_pedidos():
+	#todos os pedidos que nao foram faturados
+	pedidos_nao_faturados = Pedido.objects.filter(
+		status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
+		status_pagamento=StatusPagamento.PAGO,
+		status=StatusPedido.ENTREGUE
+	)
+
+	#processa todos os pedidos nao faturados
+	for item in pedidos_nao_faturados:
+		processa_pedido(item)
