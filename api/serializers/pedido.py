@@ -1,5 +1,4 @@
 import locale
-
 from api.consumers.farmacia import FarmaciaConsumer
 from api.models.administradora import Administradora
 from api.models.configuracao import Configuracao
@@ -767,35 +766,40 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
         validated_data['valor_bruto'] = valor_total
 
-        if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
-            cartao = validated_data['cartao']
-            try:
-                venda = {
-                    'pedido_id': instance.id,
-                    'valor': valor_total,
-                    'cvv': cartao.cvv,
-                    'bandeira': cartao.bandeira,
-                    'token': cartao.token
-                }
+        #verifica se eh o usuario teste
+        if not check_user_eh_teste(self.context['request'].user):
+            if validated_data['forma_pagamento'] == FormaPagamento.CARTAO:
+                cartao = validated_data['cartao']
+                try:
+                    venda = {
+                        'pedido_id': instance.id,
+                        'valor': valor_total,
+                        'cvv': cartao.cvv,
+                        'bandeira': cartao.bandeira,
+                        'token': cartao.token
+                    }
 
-                data = Pagamento.pagar(tipo_servicos.CIELO, venda)
+                    data = Pagamento.pagar(tipo_servicos.CIELO, venda)
 
-                json_venda, json_captura = data['venda'], data['captura']
-                instance.json_venda = json_venda
-                instance.json_captura = json_captura
-                instance.pagamento_status = int(json_venda['Payment']['Status'])
-                pagamento_id = json_venda['Payment']['PaymentId']
+                    json_venda, json_captura = data['venda'], data['captura']
+                    instance.json_venda = json_venda
+                    instance.json_captura = json_captura
+                    instance.pagamento_status = int(json_venda['Payment']['Status'])
+                    pagamento_id = json_venda['Payment']['PaymentId']
 
-                if json_captura:
-                    instance.captura_status = int(json_captura['Status'])
-                    instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
-                instance.save()
-            except ResponseCieloException as err:
-                print(err)
-            except Exception as e:
-                print(e)
-                print(type(e))
-                print_exception()
+                    if json_captura:
+                        instance.captura_status = int(json_captura['Status'])
+                        instance.status_cartao = ServicoCielo.status_pagamento(pagamento_id)
+                    instance.save()
+                except ResponseCieloException as err:
+                    print(err)
+                except Exception as e:
+                    print(e)
+                    print(type(e))
+                    print_exception()
+            else:
+                #confirma o pagamento automaticamente
+                instance.status_cartao = StatusPagamentoCartao.PAGAMENTO_CONFIRMADO
 
             if instance.status_cartao != StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
                 raise serializers.ValidationError({'non_field_errors': 'Pagamento não confirmado'})

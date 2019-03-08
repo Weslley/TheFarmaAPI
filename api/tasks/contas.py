@@ -126,24 +126,24 @@ def alterar_status_contas():
 			conta_aberta.status = StatusPagamentoConta.ATRASADA
 			conta_aberta.save()
 
-def get_faturamento_pedido(pedido):
+def get_faturamento_pedido(pedido,hoje):
 	"""
 	Recupera o faturamento de um pedido
 	pedido: Pedido
+	hoje: Datetime
 	return: Conta
 	"""
 	#init vars
 	DIA_FATURA = 20
 	DIA_PAGAMENTO = 1
-	data_pedido = datetime.now()
 	#cria a data da fatrua
-	data_faturamento = datetime(data_pedido.year,data_pedido.month,DIA_FATURA)
+	data_faturamento = datetime(hoje.year,hoje.month,DIA_FATURA)
 	#passa o vencimento para o proximo mes dia 1
-	if data_pedido.month == 12:
+	if hoje.month == 12:
 		#passa para o proximo ano
-		data_vencimento = datetime(data_pedido.year+1,1,DIA_PAGAMENTO)
+		data_vencimento = datetime(hoje.year+1,1,DIA_PAGAMENTO)
 	else:
-		data_vencimento = datetime(data_pedido.year,data_pedido.month+1,DIA_PAGAMENTO)
+		data_vencimento = datetime(hoje.year,hoje.month+1,DIA_PAGAMENTO)
 	#cria ou recupera o faturamento aberto
 	conta, created = Conta.objects.get_or_create(
 		status=StatusPagamentoConta.ABERTA,
@@ -153,13 +153,15 @@ def get_faturamento_pedido(pedido):
 	)
 	return conta
 
-def processa_pedido(pedido):
+def processa_pedido(pedido,hoje):
 	"""
 	Metodo responsavel por fazer o faturamento do pedido
 	pedido: Pedido
+	hoje: Datetime
 	return:
 	"""
-	conta = get_faturamento_pedido(pedido)
+	conta = get_faturamento_pedido(pedido,hoje)
+	print(conta)
 	# Se o pedido for no credito
 	if pedido.forma_pagamento == FormaPagamento.CARTAO:
 		conta.valor_total += pedido.valor_liquido
@@ -173,18 +175,32 @@ def processa_pedido(pedido):
 
 	conta.save()
 	pedido.status_faturamento = StatusPedidoFaturamento.FATURADO
-	pedido.faturamento = faturamento
+	pedido.faturamento = conta
 	pedido.save()
 
 @shared_task
-def faturar_pedidos():
-	#todos os pedidos que nao foram faturados
+def faturar_pedidos(hoje=None):
+	"""
+	fatura todos os pedidos 
+	hoje: Datetime
+	"""
+	if not hoje:
+		hoje = datetime.now()
+	print(hoje)
+	#todos os pedidos que nao foram faturados e tem a data menor que hoje
 	pedidos_nao_faturados = Pedido.objects.filter(
 		status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
 		status_pagamento=StatusPagamento.PAGO,
-		status=StatusPedido.ENTREGUE
+		status=StatusPedido.ENTREGUE,
+		data_criacao__lte=hoje
 	)
+	print(str(pedidos_nao_faturados.query))
+	print(pedidos_nao_faturados)
 
 	#processa todos os pedidos nao faturados
 	for item in pedidos_nao_faturados:
-		processa_pedido(item)
+		try:
+			print('id do pedido {}'.format(item.id))
+			processa_pedido(item,hoje)
+		except Exception as e:
+			print(str(e))
