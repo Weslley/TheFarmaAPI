@@ -7,7 +7,7 @@ import datetime
 import random
 import dateutil
 import time
-from api.tasks.contas import faturar_pedido
+from api.tasks.contas import faturar_pedidos
 
 #fake_do_fake = {'id': 1352, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 12298, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}, {'apresentacao': 8332, 'quantidade': 4, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
 #fake_do_fake = {'id': 1319, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 1358, 'data_criacao': 1548364345128, 'data_atualizacao': 1548364345129, 'remote_ip': '201.131.164.166', 'browser': 'python-requests/2.18.3'}, 'forma_pagamento': 0, 'latitude': -5.0635121, 'longitude': -42.796581, 'delivery':  False, 'troco': '0.00', 'itens': [{'apresentacao': 126, 'quantidade': 1, 'valor_unitario': '0.00', 'status': 0}], 'uf': None}
@@ -15,7 +15,7 @@ fake_do_fake = {'id': 1362, 'valor_frete': '0.00', 'status': 0, 'log': {'id': 13
 
 class Command(BaseCommand):
     registrar = False
-    token = "" #token da farmacia
+    token = "aa" #token da farmacia
     token_final = "" #token do usuario final
     mes1 = None #datetime
     mes2 = None #datetime
@@ -23,30 +23,19 @@ class Command(BaseCommand):
     quantidade = random.randint(1,5)
     latitude = '-5.0635121'
     longitude = '-42.796581'
-    farmacia = {}
+    farmacia = {'token':'c1598c72f78d65f50827fe962a012b032446b148','farmacia_id':23}
     cliente = {}
     meses = 3
     header_cliente = {} #header das requisicoes para o cliente
     header_farmacia = {} #header para as requisicoes da farmacia
-    url_base = 'https://api.thefarma.com.br/' #url base do sistema
-    #url_base = 'http://localhost:8000/' #url base do sistema
+    #url_base = 'https://api.thefarma.com.br/' #url base do sistema
+    url_base = 'http://localhost:8000/' #url base do sistema
     url_pedido = 'pedidos/' #fazer pedido
     url_login = 'auth/farmacia/login/' #farmacia
     url_login_cliente_final = 'auth/login/' #cliente(app)
 
     def handle(self, *args, **options):
         self.formata_urls()
-        if self.registrar:
-            email,senha = self.criar_farmacia()
-            rs_login = self.logar(email,senha)
-        else:
-            rs_login = self.logar('f@f.com','admg2')
-            #rs_login = self.logar('x@x.com','teste@1234')
-        #recupera token
-        if rs_login:
-            self.token = rs_login['token']
-        else:
-            return None
         #logar usuario final
         rs_login_usuario_final = self.login_cliente_final('lucasresone@gmail.com','poupou123')
         if rs_login_usuario_final:
@@ -60,7 +49,8 @@ class Command(BaseCommand):
         #cartao = self.get_cartoes_cliente(self.cliente)
         #cria vendas em todos os dias
         while(self.meses):
-            for i in range(1,31):
+            #faz venda em todos os dias
+            for i in range(1,2):
                 try:
                     for j in range(1,random.randint(2,3)):
                         medicamentos_ids = self.get_random_apresentacao_ids() #recupera os ids das apresentacoes
@@ -82,11 +72,12 @@ class Command(BaseCommand):
                             pedido = self.altera_data_pedido(pedido,i,self.meses)
                         else:
                             print('Erro ao entregrar')
-                        faturar_pedido(pedido)
                 except Exception as err:
                     print('ERROR\n\n')
                     print(str(err))
+            self.faturamento(self.meses)
             self.meses -= 1
+            #faz o faturamento
             print('\n\n\MESES:{}\n\n'.format(self.meses))
     def login_cliente_final(self,username,password,type=0):
         """
@@ -120,10 +111,11 @@ class Command(BaseCommand):
         """
         Faz o login da farmacia no the farma 
         """
-        r = requests.post(self.url_base + self.url_login,data={
+        r = requests.post(self.url_base,data={
             'email':email,
             'password':password
         })
+        print(r.json())
         if r.status_code == 200:
             self.farmacia = r.json()
             print('Login OK')
@@ -181,7 +173,7 @@ class Command(BaseCommand):
         try:
             print('retorno da criacao:')
             print(r.json())
-            time.sleep(1)
+            time.sleep(3)
             return r.json()
         except Exception as err:
             print(err)
@@ -243,7 +235,7 @@ class Command(BaseCommand):
         try:
             print('resultado da proposta')
             print(r.json())
-            time.sleep(1)
+            time.sleep(3)
             return r.json()
         except Exception as err:
             print(err)
@@ -260,7 +252,7 @@ class Command(BaseCommand):
         try:
             print('resultado dos itens pedido')
             print(r.json())
-            time.sleep(1)
+            time.sleep(3)
             return r.json()
         except Exception as err:
             print(str(err))
@@ -308,7 +300,7 @@ class Command(BaseCommand):
         r = requests.put(url,headers=self.header_cliente,json=data)
         try:
             print(r.json())
-            time.sleep(1)
+            time.sleep(3)
             return r.json()
         except:
             return None
@@ -343,7 +335,7 @@ class Command(BaseCommand):
         try:
             print('entrega o pedido:')
             print(r.json())
-            time.sleep(1)
+            time.sleep(3)
             return r.json()
         except Exception as err:
             print(str(err))
@@ -394,3 +386,21 @@ class Command(BaseCommand):
         except Exception as err:
             print(str(err))
             return None
+
+
+    def faturamento(self,mes):
+        """
+        Faz o faturmento dos pedidos
+        mes: Int
+        """
+        DIA_HOJE = 20
+        #altera o hoje
+        if mes == 3:
+            hoje = datetime.datetime(self.mes1.year,self.mes1.month,DIA_HOJE)
+        if mes == 2: 
+            hoje = datetime.datetime(self.mes2.year,self.mes2.month,DIA_HOJE)
+        if mes == 1: 
+            hoje = datetime.datetime(self.mes3.year,self.mes3.month,DIA_HOJE)
+        #chama o metodo de faturar pedidos
+        faturar_pedidos(hoje)
+        

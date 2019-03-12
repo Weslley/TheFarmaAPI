@@ -161,7 +161,7 @@ def processa_pedido(pedido,hoje):
 	return:
 	"""
 	conta = get_faturamento_pedido(pedido,hoje)
-	print(conta)
+	print(conta.id)
 	# Se o pedido for no credito
 	if pedido.forma_pagamento == FormaPagamento.CARTAO:
 		conta.valor_total += pedido.valor_liquido
@@ -192,10 +192,11 @@ def faturar_pedidos(hoje=None):
 		status_faturamento=StatusPedidoFaturamento.NAO_FATURADO,
 		status_pagamento=StatusPagamento.PAGO,
 		status=StatusPedido.ENTREGUE,
-		data_criacao__lte=hoje
-	)
+		data_criacao__lt=hoje,
+	).exclude(farmacia_id=None)
+	print('----------------------------------')
 	print(str(pedidos_nao_faturados.query))
-	print(pedidos_nao_faturados)
+	print('----------------------------------')
 
 	#processa todos os pedidos nao faturados
 	for item in pedidos_nao_faturados:
