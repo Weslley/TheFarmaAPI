@@ -22,7 +22,7 @@ def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
         'Content-Type':'application/json'
     }
     #corpo
-    body = get_body_requisicao(fcm_token,template_notif,pedido=pedido)
+    body = get_body_requisicao(fcm_token,template_notif,pedido=pedido,extra=extra_data)
     
     try:
         #envia para o firebase
@@ -65,6 +65,7 @@ def get_body_requisicao(fcm_token,template_notif,pedido=None,extra=None):
             'body':template_notif.titulo,
             'title':template_notif.menssagem,
             'screen':template_notif.tela,
+            'data':extra
         }
     }
     #caso tenha pedido formata para sair o id do pedido

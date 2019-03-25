@@ -45,6 +45,7 @@ def get_ultima_conta(representante):
     for pedido in pedidos:
         if pedido.forma_pagamento == FormaPagamento.CARTAO:
             valor_total += pedido.valor_liquido
+            valor_total -= pedido.valor_comissao_thefarma
         elif pedido.forma_pagamento == FormaPagamento.DINHEIRO:
             valor_total -= pedido.valor_comissao_thefarma
         if valor_total > 0:
@@ -52,6 +53,7 @@ def get_ultima_conta(representante):
         else:
             rs.update({'valor_total':valor_total,'tipo':StatusConta.RECEBER})
     return rs
+    
 def paginar_resultado(query,page):
     quantidade = 15
     return query[quantidade*page:quantidade*(page+1)]

@@ -76,7 +76,7 @@ class PropostaAddView(APIView):
         pedido.views = actual_views + 1
         pedido.save()
         #notificacao fcm
-        enviar_notif(pedido.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id)
+        enviar_notif(pedido.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id,extra_data={'pedido_id':pedido.id})
         return Response({})
 
 
@@ -248,9 +248,9 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             #evento fcm
             quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
             if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id)
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id,extra_data={'pedido_id':instance})
             else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P,instance.cliente.id)
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P,instance.cliente.id,extra_data={'pedido_id':instance})
         else:
             # confirmando envio
             instance.status = StatusPedido.ENVIADO
@@ -259,9 +259,9 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             #evento fcm
             quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
             if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id)
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id,extra_data={'pedido_id':instance})
             else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_P,instance.cliente.id) 
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_P,instance.cliente.id,extra_data={'pedido_id':instance}) 
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -385,5 +385,5 @@ class ProblemasEntregaView(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         tipo = request.GET.get('tipo',None)
         print(tipo)
         pedido = self.get_object()
-        enviar_notif(pedido.cliente.fcm_token,tipo,pedido.cliente_id,pedido=pedido)
+        enviar_notif(pedido.cliente.fcm_token,tipo,pedido.cliente_id,pedido=pedido,extra_data={'pedido_id':pedido})
         return Response('')
