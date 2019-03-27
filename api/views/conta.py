@@ -73,7 +73,7 @@ class ContaRetrieve(generics.GenericAPIView, IsAuthenticatedRepresentanteMixin):
         detalhes_faturamento = pedidos_faturados.filter(
             forma_pagamento=FormaPagamento.DINHEIRO
         ).aggregate(
-            dinheiro=Coalesce(Sum('valor_liquido'), V(0))
+            dinheiro=Coalesce(Sum('valor_bruto'), V(0))
         )
 
         detalhes_faturamento.update(
