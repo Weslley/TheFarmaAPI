@@ -14,6 +14,7 @@ class StatusPagamentoCartao(IntEnum):
     PENDENTE = 12
     ABORTADA = 13
     AGENDADA = 20
+    PAGAMENTO_CANCELADO = 11
 
 # CHOICES = (
 #     (IDENTIFICACAO, 'IDENTIFICAÇÃO'),

@@ -24,7 +24,7 @@ from api.models.notificacao import TipoNotificacaoTemplate
 from api.utils.firebase_utils import enviar_notif
 from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
-    PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer
+    PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer, ComandaPeidoSerializer
 from rest_framework import permissions, status as stts
 from rest_framework.serializers import ValidationError
 from api.servico_pagamento.pagamento import Pagamento
@@ -371,9 +371,13 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             data_cancelamento.update({'valor':pedido.get_total_farmacia(pedido.farmacia)})
         print(data_cancelamento)
         rs = Pagamento.cancelar(tipo_servicos.CIELO,data_cancelamento)
-        if rs['cancelamento']['Status'] == StatusPagamentoCartao.CANCELADO:
+        if rs['cancelamento']['Status'] == StatusPagamentoCartao.PAGAMENTO_CANCELADO:
+            #atualiza o pedido
+            pedido.status = StatusPagamentoCartao.PAGAMENTO_CANCELADO
+            pedido.save()
             return Response(status=stts.HTTP_200_OK)
         else:
+            print(rs)
             return Response({'detail':'Cancelamento nao realizado, entre em contato com o suporte!'},status=stts.HTTP_400_BAD_REQUEST)
 
 class ProblemasEntregaView(GenericAPIView, IsRepresentanteAuthenticatedMixin):
@@ -387,3 +391,13 @@ class ProblemasEntregaView(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         pedido = self.get_object()
         enviar_notif(pedido.cliente.fcm_token,tipo,pedido.cliente_id,pedido=pedido,extra_data={'pedido_id':pedido})
         return Response('')
+
+class ComandaView(GenericAPIView,IsRepresentanteAuthenticatedMixin):
+
+    def get_object(self):
+        return Pedido.objects.get(pk=self.kwargs.get('id'))
+
+    def get(self,request,*args,**kwargs):
+        pedido = self.get_object()
+        serializer = ComandaPeidoSerializer(pedido)
+        return Response(serializer.data)
