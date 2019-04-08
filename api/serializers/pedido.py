@@ -866,3 +866,28 @@ class VendaPedido(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['total_liquido'] = locale.currency(ret['total_liquido'])
         return ret
+
+
+class ComandaPeidoSerializer(serializers.ModelSerializer):
+
+    cliente_nome = serializers.SerializerMethodField()
+    telefone = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Pedido
+        fields = (
+            'id',
+            'cliente_nome',
+            'telefone',
+            'cep',
+            'bairro',
+            'numero',
+            'logradouro',
+            'complemento',
+        )
+    
+    def get_cliente_nome(self,obj):
+        return '{} {}'.format(obj.cliente.usuario.first_name,obj.cliente.usuario.last_name) 
+    
+    def get_telefone(self,obj):
+        return obj.cliente.celular
