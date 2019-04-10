@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from .enums.tipo_notificacao import TipoNotificacao
+from api.models.pedido import Pedido
 
 
 class TipoNotificacaoTemplate():
@@ -32,6 +33,7 @@ class Notificacao(models.Model):
         related_name='notificacoes',
         on_delete=models.CASCADE
     )
+    pedido = models.ForeignKey(Pedido,models.CASCADE,default=None,null=True,blank=True)
 
     def __str__(self):
         return self.titulo

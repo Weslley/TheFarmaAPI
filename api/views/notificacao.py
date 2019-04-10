@@ -35,7 +35,7 @@ class NotificacaoUpdate(generics.RetrieveUpdateAPIView, IsClienteAuthenticatedMi
         Filtrando pelo cliente da requisição
         :return: Queryset
         """
-        queryset = Notificacao.objects.filter(cliente=self.request.user.cliente).order_by('-data_criacao')
+        queryset = Notificacao.objects.filter(cliente=self.request.user.cliente).exclude(visualizada=True).order_by('-data_criacao')
         return queryset
 
 

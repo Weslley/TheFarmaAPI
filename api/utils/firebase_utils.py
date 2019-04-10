@@ -25,19 +25,23 @@ def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
     body = get_body_requisicao(fcm_token,template_notif,pedido=pedido,extra=extra_data)
     
     try:
-        #envia para o firebase
-        r = requests.post('https://fcm.googleapis.com/fcm/send',headers=headers,json=body)
-        response_json = r.json()
         #cria uma notificacao para o usuario
         data_notificacao = {
             'tipo':0,
             'titulo': template_notif.titulo if template_notif.titulo else None,
             'mensagem': template_notif.menssagem,
             'visualizada':False,
-            'cliente_id':cliente_id
+            'cliente_id':cliente_id,
+            'pedido':pedido,
         }
         #salva
-        Notificacao.objects.create(**data_notificacao)
+        notif = Notificacao.objects.create(**data_notificacao)
+        #add o id da notificacao no extra_data
+        body['data']['data'].update({'notifcacao_id':notif.id})
+        print(body)
+        #envia para o firebase
+        r = requests.post('https://fcm.googleapis.com/fcm/send',headers=headers,json=body)
+        response_json = r.json()
 
         if response_json['sucess'] == 1:
             return {'status':True,'messagem':'success','extra_data':response_json}
