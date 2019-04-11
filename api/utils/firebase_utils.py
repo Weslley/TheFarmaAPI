@@ -37,7 +37,7 @@ def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
         #salva
         notif = Notificacao.objects.create(**data_notificacao)
         #add o id da notificacao no extra_data
-        body['data']['data'].update({'notifcacao_id':notif.id})
+        body['data']['data'].update({'notificacao_id':notif.id})
         print(body)
         #envia para o firebase
         r = requests.post('https://fcm.googleapis.com/fcm/send',headers=headers,json=body)
