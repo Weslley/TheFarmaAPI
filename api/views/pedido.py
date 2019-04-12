@@ -76,7 +76,7 @@ class PropostaAddView(APIView):
         pedido.views = actual_views + 1
         pedido.save()
         #notificacao fcm
-        enviar_notif(pedido.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id,extra_data={'pedido_id':pedido.id})
+        enviar_notif(pedido.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id,pedido,extra_data={'pedido_id':pedido.id})
         return Response({})
 
 
