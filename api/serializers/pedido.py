@@ -538,7 +538,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
                     _item.possui = False
                     _item.save()
         #pusher notification
-        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,extra_data={'pedido_id':instance.id})
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
 
     def atualiza_preco_farmacia(self,item):
