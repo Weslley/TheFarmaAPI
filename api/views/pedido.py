@@ -26,10 +26,10 @@ from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
     PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer, ComandaPeidoSerializer
 from rest_framework import permissions, status as stts
-from rest_framework.serializers import ValidationError
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento import tipo_servicos
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
+from api.models.enums.status_pedido import StatusPedido
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -93,7 +93,7 @@ class UltimoPedido(RetrieveAPIView, IsClienteAuthenticatedMixin):
 
     def get_object(self):
         cliente = self.request.user.cliente
-        instance = self.get_queryset().filter(cliente=cliente).last()
+        instance = self.get_queryset().filter(cliente=cliente).order_by('id').last()
         if not instance:
             raise Http404('Nenhum pedido encontrado.')
 
