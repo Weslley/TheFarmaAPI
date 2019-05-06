@@ -28,8 +28,8 @@ class Command(BaseCommand):
     meses = 3
     header_cliente = {} #header das requisicoes para o cliente
     header_farmacia = {} #header para as requisicoes da farmacia
-    #url_base = 'https://api.thefarma.com.br/' #url base do sistema
-    url_base = 'http://localhost:8000/' #url base do sistema
+    url_base = 'https://api.thefarma.com.br/' #url base do sistema
+    #url_base = 'http://localhost:8000/' #url base do sistema
     url_pedido = 'pedidos/' #fazer pedido
     url_login = 'auth/farmacia/login/' #farmacia
     url_login_cliente_final = 'auth/login/' #cliente(app)
@@ -109,7 +109,7 @@ class Command(BaseCommand):
 
     def logar(self,email,password):
         """
-        Faz o login da farmacia no the farma 
+        Faz o login da farmacia no the farma
         """
         r = requests.post(self.url_base,data={
             'email':email,
@@ -123,7 +123,7 @@ class Command(BaseCommand):
             return None
         return r.json()
 
-    
+
     def gera_mes(self):
         """
         Gera os meses das propostas
@@ -132,7 +132,7 @@ class Command(BaseCommand):
         self.mes1 = datetime.datetime(hoje.year,hoje.month,1)
         self.mes2 = self.mes1 - dateutil.relativedelta.relativedelta(months=1)
         self.mes3 = self.mes2 - dateutil.relativedelta.relativedelta(months=1)
-    
+
     def get_random_apresentacao_ids(self):
         """
         Recupera os id de apresentacoes aleatorias
@@ -144,11 +144,11 @@ class Command(BaseCommand):
             rs.append(ap[random.randint(1,500)])
             print('Medicamento:' + str(rs[-1].id))
         return rs
-    
+
     def fazer_pedido(self,medicamentos):
         """
-        Metodo para criar um pedido  
-        medicamento: List<Medicamento>  
+        Metodo para criar um pedido
+        medicamento: List<Medicamento>
         return:Dict
         """
         itens = []
@@ -185,7 +185,7 @@ class Command(BaseCommand):
         Return: Int
         """
         return Endereco.objects.values('id').last()['id']
-    
+
     def formata_urls(self):
         """
         Adiciona a url base as urls
@@ -193,7 +193,7 @@ class Command(BaseCommand):
         self.url_login = '{}{}'.format(self.url_base,self.url_login)
         self.url_login_cliente_final = '{}{}'.format(self.url_base,self.url_login_cliente_final)
         self.url_pedido = '{}{}'.format(self.url_base,self.url_pedido)
-    
+
     def monta_headers(self):
         """
         Monta os headers das requisicoes
@@ -210,12 +210,12 @@ class Command(BaseCommand):
 
     def fazer_proposta(self,pedido):
         """
-        Faz a farmacia realizar uma propostas para o pedido  
-        pedido_id: Int  
+        Faz a farmacia realizar uma propostas para o pedido
+        pedido_id: Int
         return: Dict
         """
         url = self.get_url_pedido_proposta(pedido)
-        itens_proposta = [] 
+        itens_proposta = []
         data_proposta = {
             'id':pedido['id']
         }
@@ -240,12 +240,12 @@ class Command(BaseCommand):
         except Exception as err:
             print(err)
             return None
-        
+
     def get_itens_pedido(self,pedido,header):
         """
-        Recupera os itens pedidos de um pedido  
-        pedido: Dict  
-        return: Dict  
+        Recupera os itens pedidos de um pedido
+        pedido: Dict
+        return: Dict
         """
         url = self.get_url_pedido_proposta(pedido)
         r = requests.get(url,headers=header)
@@ -258,28 +258,28 @@ class Command(BaseCommand):
             print(str(err))
             return None
 
-    
+
     def get_url_pedido_proposta(self,pedido):
         """
-        Recupera a url da proposta de um pedido  
-        pedido: Dict  
-        return: String  
+        Recupera a url da proposta de um pedido
+        pedido: Dict
+        return: String
         """
         return '{}pedidos/{}/propostas/'.format(self.url_base,pedido['id']) #formata url
-    
+
     def get_url_pedido_checkout(self,pedido):
         """
-        Recupera a url da proposta de um pedido  
-        pedido: Dict  
-        return: String  
+        Recupera a url da proposta de um pedido
+        pedido: Dict
+        return: String
         """
         return '{}pedidos/{}/checkout/'.format(self.url_base,pedido['id']) #formata url
 
     def aceita_proposta(self,pedido,cartao=None):
         """
-        Faz o cliente aceitar uma proposta  
-        pedido: Dict  
-        return: Dict 
+        Faz o cliente aceitar uma proposta
+        pedido: Dict
+        return: Dict
         """
         url = self.get_url_pedido_checkout(pedido)
         troco = self.calcula_troco(pedido)
@@ -292,7 +292,7 @@ class Command(BaseCommand):
         if cartao:
             data.update({
                 'forma_pagamento':0,
-                'cartao':cartao[0]['id'] 
+                'cartao':cartao[0]['id']
             })
         print(data)
         print('checkout:')
@@ -305,12 +305,12 @@ class Command(BaseCommand):
         except:
             return None
 
-    
+
     def calcula_troco(self,pedido):
         """
-        Calcula o total da proposta e gera um valor de troco  
-        pedido: Dict  
-        return: Float  
+        Calcula o total da proposta e gera um valor de troco
+        pedido: Dict
+        return: Float
         """
         url = self.get_url_pedido_proposta(pedido)
         total = 0
@@ -323,12 +323,12 @@ class Command(BaseCommand):
         total += random.randint(0,20)
         print(total)
         return total
-    
+
     def entrega_pedido(self,pedido):
         """
-        Farmacia informa que o pedido foi entregue  
-        pedido: Dict  
-        return: Dict  
+        Farmacia informa que o pedido foi entregue
+        pedido: Dict
+        return: Dict
         """
         url = ' {}pedidos/{}/confirmar_entrega/'.format(self.url_base,pedido['id'])
         r = requests.post(url,headers=self.header_farmacia,json={})
@@ -340,11 +340,11 @@ class Command(BaseCommand):
         except Exception as err:
             print(str(err))
             return None
-    
+
     def altera_data_pedido(self,pedido,dias,mes):
         """
-        Altera a data e o log da criacao  
-        pedido: Dict  
+        Altera a data e o log da criacao
+        pedido: Dict
         """
         pedido = Pedido.objects.get(pk=pedido['id'])
         if mes == 3:
@@ -371,7 +371,7 @@ class Command(BaseCommand):
             print('Erro:\n\n')
             print(str(err))
             return pedido
-    
+
     def get_cartoes_cliente(self,cliente):
         """
         Recupera o cartao do cliente
@@ -397,10 +397,9 @@ class Command(BaseCommand):
         #altera o hoje
         if mes == 3:
             hoje = datetime.datetime(self.mes1.year,self.mes1.month,DIA_HOJE)
-        if mes == 2: 
+        if mes == 2:
             hoje = datetime.datetime(self.mes2.year,self.mes2.month,DIA_HOJE)
-        if mes == 1: 
+        if mes == 1:
             hoje = datetime.datetime(self.mes3.year,self.mes3.month,DIA_HOJE)
         #chama o metodo de faturar pedidos
         faturar_pedidos(hoje)
-        

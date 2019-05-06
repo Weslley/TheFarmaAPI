@@ -5,8 +5,6 @@ services:
     container_name: thefarma_api_nginx
     ports:
       - "8000:8000"
-      # - "80:80"
-      # - "443:443"
     volumes:
       - ./config/dev/nginx:/etc/nginx/conf.d
       - ./config/dev/ssl:/etc/certificates
@@ -15,45 +13,95 @@ services:
       - media-data:/mediafiles
     depends_on:
       - web
+    restart: always
 
   web:
     build: .
     container_name: thefarma_api
-    command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000 --workers 3 --log-level=debug"
-    # command: bash -c "gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000 --workers 3 --log-level=debug"
-    # command: bash -c "python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000  --workers 3 --log-level=debug"
     volumes:
-      - .:/thefarmaapi
+      - static-data:/thefarmaapi/staticfiles
+      - media-data:/thefarmaapi/media
     expose:
       - "8000"
+    restart: always
     env_file:
       - dev.env
-    stdin_open: true
-    tty: true
-  
+    depends_on:
+      - redis_channels
+      - redis_celery
+
   worker_default:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "celery -A thefarmaapi worker -l debug --autoscale=10,3 --queues=default,update_cliente,propostas --hostname=worker_default"
+    command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,periodicos --hostname=worker_default"
     volumes:
       - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
+    restart: always
     env_file:
       - dev.env
+    depends_on:
+      - redis_channels
+      - redis_celery
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "celery -A thefarmaapi beat -l debug"
+    volumes:
+      - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
+    env_file:
+      - dev.env
+    depends_on:
+      - redis_channels
+      - redis_celery
+
+  worker_channels:
+    build: .
+    container_name: worker_channels
+    command: bash -c "python manage.py runworker"
+    volumes:
+      - static-data:/thefarmaapi/staticfiles
+      - media-data:/thefarmaapi/media
+    expose:
+      - "8000"
+    restart: always
+    env_file:
+      - dev.env
+    depends_on:
+      - redis_channels
+      - redis_celery
 
   channels:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "daphne -e ssl:443:privateKey=/etc/certificates/thefarmaapi.pem:certKey=/etc/certificates/thefarmaapi.crt -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
+    command: bash -c "daphne -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
     volumes:
       - media-data:/thefarmaapi/media
-      - ./config/dev/ssl:/etc/certificates
+      - ./config/prod/ssl:/etc/certificates
     expose:
       - "8000"
-      - "443"
+      #- "443"
+    restart: always
     env_file:
       - dev.env
+    depends_on:
+      - redis_channels
+      - redis_celery
+
+  redis_channels:
+    image: redis:alpine
+    command: redis-server
+    container_name: redis_channels
+
+  redis_celery:
+    image: redis:alpine
+    container_name: redis_celery
 
 volumes:
   static-data:
