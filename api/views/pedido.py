@@ -386,11 +386,14 @@ class ProblemasEntregaView(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         return Pedido.objects.get(id=self.kwargs.get('id'))
 
     def get(self,request,*args, **kwargs):
+        #tipo equivale ao motivo de nao ter sido entregue
         tipo = request.GET.get('tipo',None)
-        print(tipo)
+        #recupera o pedido
         pedido = self.get_object()
+        pedido.status = StatusPedido.NAO_ENTREGUE
+        pedido.save()
         enviar_notif(pedido.cliente.fcm_token,tipo,pedido.cliente_id,pedido=pedido,extra_data={'pedido_id':pedido})
-        return Response('')
+        return Response({})
 
 class ComandaView(GenericAPIView,IsRepresentanteAuthenticatedMixin):
 
