@@ -1,6 +1,8 @@
 from api.management.commands.faker import Command as FakeCommand
 import random
+from decimal import Decimal
 from api.models.pedido import ItemPropostaPedido
+from api.models.enums.status_item_proposta import StatusItemProposta
 
 def check_user_eh_teste(user):
     """
@@ -18,33 +20,16 @@ def fazer_proposta_faker(pedido):
     Farmacia teste faz uma propostas falsa  
     pedido: Pedido  
     """
-    #importa aqui pq treta 
-    # esse modulo chama o modulo das serializer e o serializer chama ele
-    from api.serializers.pedido import PropostaUpdateSerializer
-    #data para salvar
-    data = {
-        'id':pedido.id
-    }
-    itens_proposta = []
     #recupera os itens pedidos
     itens = ItemPropostaPedido.objects.filter(pedido=pedido)
     for item in itens:
         #faz uma proposta aleatoria
-        itens_proposta.append({
-            'valor_unitario':random.randint(1,50),
-            'quantidade':random.randint(1,item.quantidade),
-            'possui':True,
-            'id':item.id
-        })
-    #adiciona a lista de propostas
-    data.update({
-        'itens_proposta':itens_proposta    
-    })
-    #instancia o serializer e salva
-    serializer = PropostaUpdateSerializer(pedido,data,partial=True)
-    serializer.is_valid()
-    serializer.save()
-
+        item.valor_unitario = Decimal(random.randint(1,50))
+        item.quantidade = random.randint(1,item.quantidade)
+        item.status = 1
+        item.possui = True
+        item.save()
+    print('proposta fake feita')
 
 def criar_proposta_faramcia_teste(pedido):
     """
