@@ -872,6 +872,8 @@ class ComandaPeidoSerializer(serializers.ModelSerializer):
 
     cliente_nome = serializers.SerializerMethodField()
     telefone = serializers.SerializerMethodField()
+    valor_pago = serializers.SerializerMethodField()
+    valor_troco = serializers.SerializerMethodField()
     
     class Meta:
         model = Pedido
@@ -884,10 +886,21 @@ class ComandaPeidoSerializer(serializers.ModelSerializer):
             'numero',
             'logradouro',
             'complemento',
+            'valor_pago',
+            'valor_troco',
+            'cidade'
         )
     
     def get_cliente_nome(self,obj):
         return '{} {}'.format(obj.cliente.usuario.first_name,obj.cliente.usuario.last_name) 
     
     def get_telefone(self,obj):
-        return obj.cliente.celular
+        return '({}) {}-{}'.format(obj.cliente.celular[0:2],obj.cliente.celular[2:7],obj.cliente.celular[7:])
+    
+    def get_valor_troco(self,obj):
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        return locale.currency(obj.troco,grouping=True)
+    
+    def get_valor_pago(self,obj):
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        return locale.currency(obj.valor_bruto,grouping=True)
