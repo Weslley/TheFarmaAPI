@@ -25,7 +25,7 @@ from api.models.farmacia import Farmacia
 from api.models.log import Log
 from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, LogData
 from api.serializers.apresentacao import ApresentacaoListSerializer
-from api.serializers.farmacia import FarmaciaListSerializer, FarmaciaEnderecoSerializer
+from api.serializers.farmacia import FarmaciaListSerializer, FarmaciaEnderecoSerializer, FarmaciaComandaDado
 from api.servico_pagamento import tipo_servicos
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento.servicos.cielo import ServicoCielo, ResponseCieloException
@@ -34,6 +34,7 @@ from api.utils import get_user_lookup, get_tempo_proposta
 from datetime import datetime, timedelta
 from .log import LogSerializer
 import locale
+from api.utils.formats import formatar_telefone
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -874,6 +875,10 @@ class ComandaPeidoSerializer(serializers.ModelSerializer):
     telefone = serializers.SerializerMethodField()
     valor_pago = serializers.SerializerMethodField()
     valor_troco = serializers.SerializerMethodField()
+    farmacia = serializers.SerializerMethodField()
+    itens_pedido = serializers.SerializerMethodField()
+    forma_pagamento = serializers.SerializerMethodField()
+    data_criacao = serializers.SerializerMethodField()
     
     class Meta:
         model = Pedido
@@ -888,14 +893,19 @@ class ComandaPeidoSerializer(serializers.ModelSerializer):
             'complemento',
             'valor_pago',
             'valor_troco',
-            'cidade'
+            'cidade',
+            'farmacia',
+            'itens_pedido',
+            'forma_pagamento',
+            'id',
+            'data_criacao'
         )
     
     def get_cliente_nome(self,obj):
         return '{} {}'.format(obj.cliente.usuario.first_name,obj.cliente.usuario.last_name) 
     
     def get_telefone(self,obj):
-        return '({}) {}-{}'.format(obj.cliente.celular[0:2],obj.cliente.celular[2:7],obj.cliente.celular[7:])
+        return formatar_telefone(obj.cliente.celular)
     
     def get_valor_troco(self,obj):
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -904,3 +914,29 @@ class ComandaPeidoSerializer(serializers.ModelSerializer):
     def get_valor_pago(self,obj):
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
         return locale.currency(obj.valor_bruto,grouping=True)
+    
+    def get_farmacia(self,obj):
+        try:
+            serializer = FarmaciaComandaDado(instance=obj.farmacia)
+            return serializer.data
+        except Exception as e:
+            print(str(e))
+            return {}
+    
+    def get_itens_pedido(self,obj):
+        rs = []
+        for item in obj.itens.all():
+            rs.append({
+                'linha':item.apresentacao.produto.nome,
+                'quantidade':item.quantidade_atendida
+            })
+        return rs
+    
+    def get_forma_pagamento(self,obj):
+        if obj.forma_pagamento == FormaPagamento.CARTAO:
+            return 'Cartao'
+        elif obj.forma_pagamento == FormaPagamento.DINHEIRO:
+            return 'Dinheiro'
+    
+    def get_data_criacao(self,obj):
+        return obj.data_criacao.strftime('%d/%m/%Y')

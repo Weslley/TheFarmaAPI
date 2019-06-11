@@ -8,7 +8,8 @@ from datetime import datetime
 
 from api.serializers.endereco import EnderecoClienteCreateSerializer, EnderecoSerializer
 from api.utils.generics import calcula_distancia
-
+from api.utils.formats import formatar_telefone
+from api.models.bairro import Bairro
 
 class FarmaciaListSerializer(serializers.ModelSerializer):
     horario_funcionamento = serializers.SerializerMethodField()
@@ -177,3 +178,56 @@ class FarmaciaRepresentanteSerializer(serializers.ModelSerializer):
 
 class FarmaciaEnderecoSerializer(FarmaciaListSerializer):
     endereco = EnderecoSerializer()
+
+
+class FarmaciaComandaDado(serializers.ModelSerializer):
+
+    logradouto = serializers.SerializerMethodField()
+    bairro = serializers.SerializerMethodField()
+    cidade = serializers.SerializerMethodField()
+    telefone = serializers.SerializerMethodField()
+    numero = serializers.SerializerMethodField()
+    complemento = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Farmacia
+        fields = (
+            'razao_social',
+            'telefone',
+            'logradouto',
+            'bairro',
+            'cidade',
+            'numero',
+            'complemento',
+        )
+    
+    def get_logradouto(self,obj):
+        try:
+            return obj.endereco.logradouro
+        except Exception as e:
+            print(str(e))
+            return ''
+    
+    def get_bairro(self,obj):
+        # try:
+        return obj.endereco.bairro
+
+        # except Exception as e:
+        #     print(str(e))
+        #     return ''
+        
+    def get_cidade(self,obj):
+        try:
+            return '{} - {}'.format(obj.endereco.cidade.nome,obj.endereco.cidade.uf)
+        except Exception as e:
+            print(str(e))
+            return ''
+
+    def get_telefone(self,obj):
+        return formatar_telefone(obj.telefone)
+    
+    def get_numero(self,obj):
+        return obj.endereco.numero
+    
+    def get_complemento(self,obj):
+        return obj.endereco.complemento

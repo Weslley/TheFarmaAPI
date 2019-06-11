@@ -79,6 +79,7 @@ class Command(BaseCommand):
             self.meses -= 1
             #faz o faturamento
             print('\n\n\MESES:{}\n\n'.format(self.meses))
+
     def login_cliente_final(self,username,password,type=0):
         """
         faz o login do usuario
