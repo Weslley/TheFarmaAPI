@@ -3,12 +3,12 @@ from rest_framework import serializers
 
 from api.models.farmacia import Farmacia
 from api.models.feriado import Feriado
+from api.models.bairro import Bairro
 from api.serializers.conta_bancaria import ContaBancariaSerializer
 from datetime import datetime
 
-from api.serializers.endereco import EnderecoClienteCreateSerializer, EnderecoSerializer
+from api.serializers.endereco import EnderecoClienteCreateSerializer, EnderecoSerializer, EnderecoFarmaciaSerializer
 from api.utils.generics import calcula_distancia
-
 
 class FarmaciaListSerializer(serializers.ModelSerializer):
     horario_funcionamento = serializers.SerializerMethodField()
@@ -69,8 +69,8 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
                     obj.horario_funcionamento_feriado_inicial,
                     obj.horario_funcionamento_feriado_final
                 )
-            }
-        )
+            
+}        )
         return horarios
 
     def get_tempo_entrega(self, obj):
@@ -130,9 +130,36 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
 class FarmaciaSerializer(serializers.ModelSerializer):
     data_atualizacao = serializers.DateTimeField(format='%s')
 
+
     class Meta:
         model = Farmacia
         fields = '__all__'
+
+class FarmaciaUpdateSerializer(serializers.ModelSerializer):
+
+    endereco = EnderecoFarmaciaSerializer()
+    conta_bancaria = ContaBancariaSerializer()
+
+    class Meta:
+        model = Farmacia
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            endereco = instance.endereco
+            endereco_data = validated_data.pop('endereco')
+            bairro = Bairro.objects.get(id=endereco_data['bairro'])
+            conta = instance.conta_bancaria
+            conta_data = validated_data.pop('conta_bancaria')
+            for key, value in endereco_data.items():
+                setattr(endereco,key,value)
+            endereco.bairro = bairro.nome
+            endereco.save()
+            for key, value in conta_data.items():
+                setattr(conta,key,value)
+            conta.save()
+            return super().update(instance, validated_data)
+        
 
 
 class FarmaciaSimplificadoSerializer(serializers.ModelSerializer):

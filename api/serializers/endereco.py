@@ -13,6 +13,12 @@ from api.serializers.bairro import BairroCreateUpdateSerializer
 from api.serializers.cidade import CidadeCreateUpdateSerializer
 
 
+class EnderecoFarmaciaSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Endereco
+        fields = '__all__'
+
 class EnderecoClienteCreateSerializer(serializers.ModelSerializer):
     data_atualizacao = serializers.SerializerMethodField()
 

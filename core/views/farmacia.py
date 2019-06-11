@@ -2,7 +2,7 @@ import re
 
 from awesome_mixins.mixins.list import ListMixin
 from django.core.urlresolvers import reverse_lazy
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 
 from api.models.farmacia import Farmacia
 from api.models.representante_legal import RepresentanteLegal
@@ -35,11 +35,11 @@ class FarmaciaCreate(CreateView, AdminBaseMixin):
     form_class = FarmaciaForm
     success_url = reverse_lazy('farmacia-admin-list')
 
-
 class FarmaciaDetail(DetailView, AdminBaseMixin):
+    form_class = FarmaciaForm
     model = Farmacia
     pk_url_kwarg = 'id'
-
+    template_name = 'api/farmacia_detail.html'
 
 class RepresentanteCreate(CreateView, AdminBaseMixin):
     model = RepresentanteLegal
@@ -66,3 +66,7 @@ class RepresentanteCreate(CreateView, AdminBaseMixin):
         self.success_url = force_text(self.success_url)
         url = self.success_url.format(**self.object.__dict__)
         return url
+
+class RepresentanteDelete(DeleteView, AdminBaseMixin):
+    model = RepresentanteLegal
+    success_url = reverse_lazy('farmacia-admin-list')
