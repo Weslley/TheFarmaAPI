@@ -1,3 +1,33 @@
+function alertJs(nome, success, erro=null){
+    if(success){
+        $('.alerts-js').html(
+        `
+        <div class="alert alert-success alert-dismissible alert-js" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-check"></i> Operação concluída!</h4>
+            <strong>A atualização do Representante <span id="name-detail">${nome}</span> foi realizada com sucesso!</strong>
+        </div>
+        `);
+    }
+    else{
+        if(!erro){
+            erro = "Verifique o preenchimento dos campos obrigatórios!";
+        }
+        $('.alerts-js').html(
+        `
+        <div class="alert alert-danger alert-dismissible alert-js" style="display: none;">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> Erro!</h4>
+            <strong>Houve um erro ao atualizar o Representante <span id="name-detail">${nome}</span>. ${erro}</strong>
+        </div>
+            `
+        );
+    }
+    $('.alert-js').show();
+    setTimeout(() =>{ 
+        $('.alert-js').fadeOut(1000);
+    }, 7000);
+}
 /* 
 * Retorna um JSON com os campos do formulário
 */
@@ -162,8 +192,6 @@ function get_representante(id){
     })
         .done(function(data) {
 
-            console.log(data);
-
             $('#rep-nome').val(data.usuario.nome);
             $('#rep-sobrenome').val(data.usuario.sobrenome);
             if(data.cargo != null){
@@ -256,14 +284,11 @@ function update_representante(id, data, success_url){
         .done(function(data) {
             //location.href = success_url;
             $('#representanteEdit').modal('hide');
-            $('.alert-js').show();
-            $('#name-detail').text($('#rep-nome').val());
-            setTimeout(() =>{ 
-                $('.alert-js').fadeOut(1000);
-            }, 5000);            
-
+            alertJs($('#rep-nome').val(), true);
         })
         .fail( function(xhr, textStatus, errorThrown) {
+            $('#representanteEdit').modal('hide');
+            alertJs($('#rep-nome').val(), false);
             console.log(xhr);
             console.log(textStatus);
             console.log(errorThrown);
@@ -354,7 +379,6 @@ $( document ).ready(function() {
     $('.edit-rep').on('click', function(){
         pos = $(this).attr('data-pos');
         limpaCamposRep();
-        console.log(pos);
         get_representante(pos);
     })
     $('#rep-save-edit').on('click', function(){
@@ -391,3 +415,4 @@ $( document ).ready(function() {
         update_representante(pos, representante, success_url);
     });
 });
+

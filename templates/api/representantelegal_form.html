@@ -3,199 +3,199 @@
 {% load helper %}
 
 {% block content-header %}
-    <section class="content-header">
-      <h1>
-        Representante Legal
-        <small>Cadastro</small>
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li>Farmácias</li>
-        <li class="active">Representante Legal</li>
-      </ol>
-    </section>
+<section class="content-header">
+  <h1>
+    Representante Legal
+    <small>Cadastro</small>
+</h1>
+<ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li>Farmácias</li>
+    <li class="active">Representante Legal</li>
+</ol>
+</section>
 {% endblock content-header %}
 
 {% block content %}
 
 <style type="text/css">
     .tab-pane {
-         height: 330px;
-         max-height: 330px;
-         overflow-y: auto;
-         overflow-x: hidden;
-    }
+       height: 330px;
+       max-height: 330px;
+       overflow-y: auto;
+       overflow-x: hidden;
+   }
 
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        /* display: none; <- Crashes Chrome on hover */
-        -webkit-appearance: none;
-        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-    }
+   input::-webkit-outer-spin-button,
+   input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
 
 </style>
 
-    <div class="row">
-        <div class="col-md-12">
-{% if form.errors %}
-<div class="alert alert-danger alert-dismissible">
-<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-<h4><i class="icon fa fa-ban"></i> Erro!</h4>
-    {% for field in form %}
-        {% for error in field.errors %}
-                <strong>{{field.label}}</strong>: {{ error|escape }}<br>
-        {% endfor %}
-    {% endfor %}
-</div>
-    {% for error in form.non_field_errors %}
+<div class="row">
+    <div class="col-md-12">
+        {% if form.errors %}
         <div class="alert alert-danger alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h4><i class="icon fa fa-ban"></i> Erro!</h4>
-                    <strong>{{field.label}}</strong>: {{ error|escape }}<br>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> Erro!</h4>
+            {% for field in form %}
+            {% for error in field.errors %}
+            <strong>{{field.label}}</strong>: {{ error|escape }}<br>
+            {% endfor %}
+            {% endfor %}
         </div>
-    {% endfor %}
-{% endif %}
-          <!-- Custom Tabs -->
-            <form id="farma_form" method="post" enctype="multipart/form-data">{% csrf_token %}
-                <div class="nav-tabs-custom">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab_1" data-toggle="tab">Dados Básicos</a></li>
-                        <li><a href="#tab_2" data-toggle="tab">Endereço</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="tab_1">
+        {% for error in form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4><i class="icon fa fa-ban"></i> Erro!</h4>
+            <strong>{{field.label}}</strong>: {{ error|escape }}<br>
+        </div>
+        {% endfor %}
+        {% endif %}
+        <!-- Custom Tabs -->
+        <form id="farma_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab_1" data-toggle="tab">Dados Básicos</a></li>
+                    <li><a href="#tab_2" data-toggle="tab">Endereço</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1">
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.nome.label }}</label>
-                                        {{ form.nome|addclass:"form-control" }}
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.sobrenome.label }}</label>
-                                        {{ form.sobrenome|addclass:"form-control" }}
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.nome.label }}</label>
+                                    {{ form.nome|addclass:"form-control" }}
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.cargo.label }}</label>
-                                        {{ form.cargo|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.rg.label }}</label>
-                                        {{ form.rg|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.cpf.label }}</label>
-                                        {{ form.cpf|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.telefone.label }}</label>
-                                        {{ form.telefone|addclass:"form-control" }}
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.sobrenome.label }}</label>
+                                    {{ form.sobrenome|addclass:"form-control" }}
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.email.label }}</label>
-                                        {{ form.email|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.senha.label }}</label>
-                                        {{ form.senha|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.confirmacao_senha.label }}</label>
-                                        {{ form.confirmacao_senha|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
-                        <!-- /.tab-pane -->
-                        <div class="tab-pane" id="tab_2">
 
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.cep.label }}</label>
-                                        {{ form.cep|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.logradouro.label }}</label>
-                                        {{ form.logradouro|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.numero.label }}</label>
-                                        {{ form.numero|addclass:"form-control" }}
-                                    </div>
-                                </div>
-                                </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group ">
-                                        <label class="control-label">{{ form.complemento.label }}</label>
-                                        {{ form.complemento|addclass:"form-control" }}
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.cargo.label }}</label>
+                                    {{ form.cargo|addclass:"form-control" }}
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group ">
-                                        <label>{{ form.cidade.label }}</label>
-                                        {{ form.cidade|addclass:"form-control select2" }}
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group ">
-                                        <label>{{ form.bairro.label }}</label>
-                                        <select id="id_bairro" name="bairro" required class="form-control select2"></select>
-                                    </div>
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.rg.label }}</label>
+                                    {{ form.rg|addclass:"form-control" }}
                                 </div>
                             </div>
-                            {{ form.farmacia|addclass:"form-control hidden" }}
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.cpf.label }}</label>
+                                    {{ form.cpf|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.telefone.label }}</label>
+                                    {{ form.telefone|addclass:"form-control" }}
+                                </div>
+                            </div>
                         </div>
-                        <!-- /.tab-pane -->
-                </div>
-                    <!-- /.tab-content -->
-                    <div class="tab-footer box-footer">
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.email.label }}</label>
+                                    {{ form.email|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.senha.label }}</label>
+                                    {{ form.senha|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.confirmacao_senha.label }}</label>
+                                    {{ form.confirmacao_senha|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="tab_2">
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.cep.label }}</label>
+                                    {{ form.cep|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.logradouro.label }}</label>
+                                    {{ form.logradouro|addclass:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.numero.label }}</label>
+                                    {{ form.numero|addclass:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-12">
-                                <a href="{% url 'farmacia-admin-view' farmacia.id %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
-                                <button type="submit" onclick="limpar_campos();" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>
-                                <div class="clearfix"></div>
+                                <div class="form-group ">
+                                    <label class="control-label">{{ form.complemento.label }}</label>
+                                    {{ form.complemento|addclass:"form-control" }}
+                                </div>
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label>{{ form.cidade.label }}</label>
+                                    {{ form.cidade|addclass:"form-control select2" }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group ">
+                                    <label>{{ form.bairro.label }}</label>
+                                    <select id="id_bairro" name="bairro" required class="form-control select2"></select>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form.farmacia|addclass:"form-control hidden" }}
+                    </div>
+                    <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+                <div class="tab-footer box-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a href="{% url 'farmacia-admin-view' farmacia.id %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
+                            <button type="submit" onclick="limpar_campos();" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>
+                            <div class="clearfix"></div>
                         </div>
                     </div>
                 </div>
-            </form>
-          <!-- nav-tabs-custom -->
-        </div>
+            </div>
+        </form>
+        <!-- nav-tabs-custom -->
     </div>
+</div>
 
 
 {% endblock %}
@@ -272,9 +272,9 @@
                     q: params.term, // search term
                     page: params.page,
                     id_cidade: get_cidade_id()
-                  };
-                },
-                processResults: function (data, params) {
+                };
+            },
+            processResults: function (data, params) {
                   // parse the results into the format expected by Select2
                   // since we are using custom formatting functions we do not need to
                   // alter the remote JSON data, except to indicate that infinite
@@ -283,10 +283,10 @@
 
                   return {
                     results: data.content.items,
-                  };
-                },
-                cache: false
+                };
             },
+            cache: false
+        },
             escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
             minimumInputLength: 3
         });
@@ -296,20 +296,20 @@
 {% endblock js %}
 
 {% block css %}
-  <!-- daterange picker -->
-  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-daterangepicker/daterangepicker.css' %}">
-  <!-- bootstrap datepicker -->
-  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">
-  <!-- iCheck for checkboxes and radio inputs -->
-  <link rel="stylesheet" href="{% static 'admlte/plugins/iCheck/all.css' %}">
-  <!-- Bootstrap Color Picker -->
-  <link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css' %}">
-  <!-- Bootstrap time Picker -->
-  <link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">
-  <!-- Select2 -->
-  <link rel="stylesheet" href="{% static 'admlte/bower_components/select2/dist/css/select2.min.css' %}">
+<!-- daterange picker -->
+<link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-daterangepicker/daterangepicker.css' %}">
+<!-- bootstrap datepicker -->
+<link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">
+<!-- iCheck for checkboxes and radio inputs -->
+<link rel="stylesheet" href="{% static 'admlte/plugins/iCheck/all.css' %}">
+<!-- Bootstrap Color Picker -->
+<link rel="stylesheet" href="{% static 'admlte/bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css' %}">
+<!-- Bootstrap time Picker -->
+<link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static 'admlte/bower_components/select2/dist/css/select2.min.css' %}">
 
-    <link rel="stylesheet" href="{% static 'admlte/dist/css/AdminLTE.min.css' %}">
+<link rel="stylesheet" href="{% static 'admlte/dist/css/AdminLTE.min.css' %}">
 
 {#      <!-- Bootstrap time Picker -->#}
 {#  <link rel="stylesheet" href="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.css' %}">#}
