@@ -236,9 +236,9 @@ CHANNEL_LAYERS = {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
              #DOCKER CFG
-             'hosts': [('redis://redis_channels:6379/1')],
+             #'hosts': [('redis://redis_channels:6379/1')],
              #SEM DOCKER
-             #'hosts': [('redis://localhost:6379/1')],
+             'hosts': [('redis://localhost:6379/1')],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }

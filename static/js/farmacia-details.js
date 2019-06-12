@@ -7,6 +7,27 @@ function desabilitaMascaras(){
     $('#id_cep').unmask();
 }
 
+function limpaCamposRep(){
+    $('#rep-nome').val('');
+    $('#rep-sobrenome').val('');
+    $('#rep-cargo').val('');
+    $('#rep-rg').val('');
+    $('#rep-cpf').val('');
+    $('#rep-telefone').val('');
+    $('#rep-email').val('');
+    $('#rep-end-cep').val('');
+    $('#rep-end-logradouro').val('');
+    $('#rep-end-numero').val('');
+    $('#rep-end-complemento').val('');
+    $('#rep-end-cidade').html('');
+    $('#rep-end-bairro').html('');
+    $('#rep-cargo').val('');
+    $('#rep-telefone').mask('(00) 0000-0000');
+    $('#rep-telefone').mask('(00) 00000-0000');
+    $('#rep-end-cep').mask('00000-000', {reverse: true});
+    $('#rep-cpf').mask('000.000.000-00', {reverse: true});
+}
+
 function getCampos(){
 
     desabilitaMascaras();
@@ -330,8 +351,10 @@ $( document ).ready(function() {
         }, 400);
 	  	habilitaCampos();
   	});
-    $('#edit-rep').on('click', function(){
+    $('.edit-rep').on('click', function(){
         pos = $(this).attr('data-pos');
+        limpaCamposRep();
+        console.log(pos);
         get_representante(pos);
     })
     $('#rep-save-edit').on('click', function(){

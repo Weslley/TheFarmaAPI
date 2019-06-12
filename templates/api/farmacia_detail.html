@@ -369,7 +369,7 @@
                             <td>{{ representante.telefone|default_if_none:'' }}</td>
                             <td>{{ representante.cargo|default_if_none:'' }}</td>
                             <td>
-                                <button id="edit-rep" class="btn btn-flat btn-warning" data-toggle="modal" data-target="#representanteEdit" data-pos="{{representante.id}}"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-flat btn-warning edit-rep" data-toggle="modal" data-target="#representanteEdit" data-pos="{{representante.id}}"><i class="fa fa-edit"></i></button>
                                 <button  data-toggle="modal" data-target="#representanteRemove-{{representante.id}}" class="btn btn-flat btn-danger"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
