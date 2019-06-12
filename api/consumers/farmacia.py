@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from api.mixins.consumers import BaseConsumer
 from api.models.farmacia import Farmacia
 from api.models.pedido import Pedido, ItemPropostaPedido

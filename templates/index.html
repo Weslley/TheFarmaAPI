@@ -56,13 +56,12 @@
 
             function getPedidos(){
               $.ajax({
-                url: 'https://api.thefarma.com.br/pedidos/ultimos_pedido/',
+                url: '/pedidos/ultimos_pedido/',
                 type: "GET",
                 headers:{
                   Authorization: `Token ${token}`,
                 },
                 success: function(data, textStatus, algo) {
-                  console.log(data);
                   $('#result').html('')
                   data.forEach(el => {
                     let farmacias = '';
