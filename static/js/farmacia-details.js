@@ -52,8 +52,6 @@ function getCampos(){
     farmacia.tempo_entrega = $('#tempo_entrega').val();
     farmacia.latitude = $('#latitude').val().replace(',', '.');
     farmacia.longitude = $('#longitude').val().replace(',', '.');
-
-    console.log(farmacia);
   
     return farmacia;
 }
@@ -101,7 +99,7 @@ function habilitaCampos(){
 
 }
 
-function list_cidade(){
+function list_cidade(nome_campo){
 
     $.ajax({
         type: "GET",
@@ -112,8 +110,71 @@ function list_cidade(){
             $('#id_cidade').html('');
             $('#id_bairro').html('');
             data.results.forEach((cidade) => {
-                $('#id_cidade').append(new Option(cidade.nome, cidade.ibge));
+                $(nome_campo).append(new Option(cidade.nome, cidade.ibge));
             });
+        })
+        .fail( function(xhr, textStatus, errorThrown) {
+            console.log(xhr);
+            console.log(textStatus);
+            console.log(errorThrown);
+        });
+}
+
+/*
+cargo: null
+celular: null
+cpf: "00000000000"
+data_atualizacao: "2018-09-26T09:49:15.373119"
+data_nascimento: null
+endereco: {id: 14, cidade: {…}, data_atualizacao: 1510702970580, cep: "64078270", logradouro: "Rua jose ebaid", …}
+farmacia: 10
+id: 12
+rg: "00000000000"
+telefone: "00000000000"
+*/
+function get_representante(id){
+
+    $.ajax({
+        type: "GET",
+        dataType: 'json',
+        url: `/representante_legal/${id}`,
+    })
+        .done(function(data) {
+
+            console.log(data);
+
+            $('#rep-nome').val(data.usuario.nome);
+            $('#rep-sobrenome').val(data.usuario.sobrenome);
+            if(data.cargo != null){
+                $('#rep-cargo').val(data.cargo);
+            }
+            $('#rep-rg').val(data.rg);
+            $('#rep-cpf').val(data.cpf);
+            $('#rep-telefone').val(data.telefone);
+            $('#rep-email').val(data.usuario.email);
+
+            $('#rep-end-cep').val(data.endereco.cep);
+            $('#rep-end-logradouro').val(data.endereco.logradouro);
+            $('#rep-end-numero').val(data.endereco.numero);
+            $('#rep-end-complemento').val(data.endereco.complemento);
+
+            list_cidade('#rep-end-cidade');
+
+            if(data.cargo != null){
+                $('#rep-cargo').val(data.cargo);
+            }
+            if($('#rep-telefone').val().length <= 10){
+                $('#rep-telefone').mask('(00) 0000-0000');
+            }else{
+                $('#rep-telefone').mask('(00) 00000-0000');
+            }
+            $('#rep-end-cep').mask('00000-000', {reverse: true});
+            $('#rep-cpf').mask('000.000.000-00', {reverse: true});
+
+            setTimeout(() =>{ 
+                $('#rep-end-cidade').val(data.endereco.cidade).trigger('change');
+            }, 400);
+
         })
         .fail( function(xhr, textStatus, errorThrown) {
             console.log(xhr);
@@ -160,8 +221,36 @@ function update_farmacia(data, url, headers, success_url){
         });
 }
 
-function get_cidade_id() {
-    return ($("#id_cidade").val() != '' && $("#id_cidade").val() != undefined) ? $("#id_cidade").val() : null;
+function update_representante(id, data, success_url){
+    let crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
+    let headers = {"X-CSRFToken": crf_token};
+    $.ajax({
+        type: "PATCH",
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        headers: headers,
+        url:`/representante_legal/${id}/`,
+    })
+        .done(function(data) {
+            //location.href = success_url;
+            $('#representanteEdit').modal('hide');
+            $('.alert-js').show();
+            $('#name-detail').text($('#rep-nome').val());
+            setTimeout(() =>{ 
+                $('.alert-js').fadeOut(1000);
+            }, 5000);            
+
+        })
+        .fail( function(xhr, textStatus, errorThrown) {
+            console.log(xhr);
+            console.log(textStatus);
+            console.log(errorThrown);
+        });
+}
+
+function get_cidade_id(nome_campo) {
+    return ($(nome_campo).val() != '' && $(nome_campo).val() != undefined) ? $(nome_campo).val() : null;
 }
 
 $("#id_bairro").select2({
@@ -175,7 +264,38 @@ $("#id_bairro").select2({
           return {
             q: params.term, // search term
             page: params.page,
-            id_cidade: get_cidade_id()
+            id_cidade: get_cidade_id("#id_cidade")
+          };
+        },
+        processResults: function (data, params) {
+          // parse the results into the format expected by Select2
+          // since we are using custom formatting functions we do not need to
+          // alter the remote JSON data, except to indicate that infinite
+          // scrolling can be used
+          params.page = params.page || 1;
+
+          return {
+            results: data.content.items,
+          };
+        },
+        cache: false
+    },
+    escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+    minimumInputLength: 3
+});
+
+$("#rep-end-bairro").select2({
+    language: "pt-BR",
+    width: '100%',
+    ajax: {
+        url: "/admin/bairros/busca/",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term, // search term
+            page: params.page,
+            id_cidade: get_cidade_id("#rep-end-cidade")
           };
         },
         processResults: function (data, params) {
@@ -196,8 +316,9 @@ $("#id_bairro").select2({
 });
 
 $( document ).ready(function() {
+    var pos;
   	$('#edit-farmacia').on('click', function(){
-        list_cidade();
+        list_cidade('#id_cidade');
         list_banco();
 	  	$('#salvar-edit').show();
 	  	$('#add-rep').hide();
@@ -209,4 +330,41 @@ $( document ).ready(function() {
         }, 400);
 	  	habilitaCampos();
   	});
+    $('#edit-rep').on('click', function(){
+        pos = $(this).attr('data-pos');
+        get_representante(pos);
+    })
+    $('#rep-save-edit').on('click', function(){
+
+        $('#rep-telefone').unmask();
+        $('#rep-end-cep').unmask();
+        $('#rep-cpf').unmask();
+
+        let representante = {};
+        representante.usuario = {};
+        representante.endereco = {};
+        representante.usuario.nome = $('#rep-nome').val();
+        representante.usuario.sobrenome = $('#rep-sobrenome').val();
+        representante.usuario.email = $('#rep-email').val();
+        if($('#rep-cargo').val() != null){
+            representante.cargo = $('#rep-cargo').val();
+        }
+        representante.rg = $('#rep-rg').val();
+        representante.cpf = $('#rep-cpf').val();
+        representante.telefone = $('#rep-telefone').val();
+
+        representante.endereco.cep = $('#rep-end-cep').val();
+        representante.endereco.logradouro = $('#rep-end-logradouro').val();
+        representante.endereco.numero = $('#rep-end-numero').val();
+        representante.endereco.complemento = $('#rep-end-complemento').val();
+        if($('#rep-end-cidade').val()){
+            representante.endereco.cidade = $('#rep-end-cidade').val();
+        }
+        if($('#rep-end-bairro').val()){
+            representante.endereco.bairro = $('#rep-end-bairro').val();
+        }
+
+        let success_url = "/admin/farmacias/";
+        update_representante(pos, representante, success_url);
+    });
 });

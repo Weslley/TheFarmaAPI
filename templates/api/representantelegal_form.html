@@ -37,6 +37,24 @@
 
     <div class="row">
         <div class="col-md-12">
+{% if form.errors %}
+<div class="alert alert-danger alert-dismissible">
+<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+<h4><i class="icon fa fa-ban"></i> Erro!</h4>
+    {% for field in form %}
+        {% for error in field.errors %}
+                <strong>{{field.label}}</strong>: {{ error|escape }}<br>
+        {% endfor %}
+    {% endfor %}
+</div>
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h4><i class="icon fa fa-ban"></i> Erro!</h4>
+                    <strong>{{field.label}}</strong>: {{ error|escape }}<br>
+        </div>
+    {% endfor %}
+{% endif %}
           <!-- Custom Tabs -->
             <form id="farma_form" method="post" enctype="multipart/form-data">{% csrf_token %}
                 <div class="nav-tabs-custom">
@@ -168,7 +186,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <a href="{% url 'farmacia-admin-view' farmacia.id %}" class="btn btn-lg btn-flat btn-default pull-left">Voltar</a>
-                                <button onclick="limpar_campos();" type="submit" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>
+                                <button type="submit" onclick="limpar_campos();" class="btn btn-lg btn-flat btn-success pull-right">Salvar</button>
                                 <div class="clearfix"></div>
                             </div>
                         </div>
@@ -203,6 +221,7 @@
 {#<script src="{% static 'admlte/plugins/timepicker/bootstrap-timepicker.min.js' %}"></script>#}
 {#<script src="{% static 'admlte/bower_components/select2/dist/js/select2.full.min.js' %}"></script>#}
 <script type="text/javascript">
+
     function get_cidade_id() {
         return ($("#id_cidade").val() != '' && $("#id_cidade").val() != undefined) ? $("#id_cidade").val() : null;
     }
@@ -212,7 +231,6 @@
         $('#id_telefone').val($('#id_telefone').cleanVal());
         $('#id_cep').val($('#id_cep').cleanVal());
     }
-
 
     (function () {
         $('#id_cpf').attr('maxlength', 14);

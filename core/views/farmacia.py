@@ -52,6 +52,13 @@ class RepresentanteCreate(CreateView, AdminBaseMixin):
             self.farmacia = Farmacia.objects.get(id=farmacia_id)
         return super(RepresentanteCreate, self).dispatch(request, *args, **kwargs)
 
+    def form_invalid(self, form):
+        return self.render_to_response(
+            self.get_context_data(
+                form=form,
+            )
+        )
+
     def get_context_data(self, **kwargs):
         context = super(RepresentanteCreate, self).get_context_data(**kwargs)
         context['farmacia'] = self.farmacia
