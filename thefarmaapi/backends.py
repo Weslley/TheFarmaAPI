@@ -221,9 +221,6 @@ class FarmaciaBackend(object):
             user = representante.usuario
             if user.check_password(password):
                 token, create = Token.objects.get_or_create(user=user)
-                if not create:
-                    token.delete()
-                    Token.objects.create(user=user)
                 return user
         except RepresentanteLegal.DoesNotExist:
             return None

@@ -81,11 +81,11 @@ class LogoutMixin(CustomJSONAPIView):
     serializer_class = None
 
     def post(self, request, format=None):
-        try:
-            token = request._auth
-            token.delete()
-        except Token.DoesNotExist:
-            return Response({'detail': 'Token inválido.'}, status=status.HTTP_404_NOT_FOUND)
+        # try:
+        #     token = request._auth
+        #     token.delete()
+        # except Token.DoesNotExist:
+        #     return Response({'detail': 'Token inválido.'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'detail': 'Logout realizado com sucesso.'}, status=status.HTTP_200_OK)
 

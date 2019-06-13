@@ -22,7 +22,7 @@ from api.models.farmacia import Farmacia
 from api.models.enums.status_pedido_faturamento import StatusPedidoFaturamento
 from api.models.enums.forma_pagamento import FormaPagamento
 from api.models.enums.status_conta import StatusConta
-
+from dateutil import relativedelta
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -45,13 +45,17 @@ def get_ultima_conta(representante):
     for pedido in pedidos:
         if pedido.forma_pagamento == FormaPagamento.CARTAO:
             valor_total += pedido.valor_liquido
-            valor_total -= pedido.valor_comissao_thefarma
         elif pedido.forma_pagamento == FormaPagamento.DINHEIRO:
             valor_total -= pedido.valor_comissao_thefarma
-        if valor_total > 0:
-            rs.update({'valor_total':valor_total,'tipo':StatusConta.PAGAR})
-        else:
-            rs.update({'valor_total':valor_total,'tipo':StatusConta.RECEBER})
+    #atualizar o status
+    if valor_total > 0:
+        rs.update({'valor_total':valor_total,'tipo':StatusConta.PAGAR})
+    else:
+        rs.update({'valor_total':valor_total,'tipo':StatusConta.RECEBER})
+    
+    vencimento = datetime.now() + relativedelta.relativedelta(months=1)
+    #atualemnte o vencimento eh no primeiro dia do proximo mes
+    rs['vencimento'] = vencimento.replace(day=1).strftime('%Y-%m-%d')
     return rs
     
 def paginar_resultado(query,page):
@@ -148,37 +152,35 @@ class ResumoFinanceiro(generics.GenericAPIView, IsAuthenticatedRepresentanteMixi
                 liquido=Sum('valor_liquido')
             )
 
-        # Valores calculados de rendimento de cada mês
-        values = []
-        for mes in range(1, 13):
-            query = Pedido.objects\
-                .filter(
-                    status=StatusPedido.ENTREGUE,
-                    data_criacao__month=mes,
-                    data_criacao__year=date.today().year,
-                    farmacia__representantes=representante,
-                )\
-                .aggregate(total=Sum('valor_bruto'))
-
-            valor = float(query['total']) if query['total'] else 0
-            values.append(valor)
+        # Valores dos faturamentos no intervalo do ano
+        values_grafico = []
+        for mes in range(1,13):
+            #recupera o faturamento do mes
+            faturamento_mes = Pedido.objects.filter(
+                status=StatusPedido.ENTREGUE,
+                data_criacao__month=mes,
+                data_criacao__year=hoje.year,
+                farmacia__representantes=representante,
+            ).aggregate(Sum('valor_bruto'))
+            #add na lista de referencia
+            values_grafico.append(faturamento_mes['valor_bruto__sum'] if faturamento_mes['valor_bruto__sum'] else 0)
         
-        #monta a reposta 
+        #calcula os valores da ultima venda
         ult_conta = get_ultima_conta(representante)
-        print(ult_conta)
+
         data = {
             'conta_atual': {
                 'tipo':ult_conta['tipo'],
                 'valor_total':ult_conta['valor_total'],
-                'data_vencimento':contas.first().data_vencimento,
-                'id':contas.first().id,
-                'status':contas.first().status,
+                'data_vencimento':ult_conta['vencimento'],
+                #'id':contas.first().id,
+                #'status':contas.first().status,
             },
             'contas': ContaMinimalSerializer(contas[:6], many=True).data,
             'vendas_hoje': PedidoTotaisSerializer(pedidos_de_hoje, many=False).data,
             'rendimentos': {
                 'labels': [n.upper() for n in calendar.month_name if n],
-                'values': values
+                'values': values_grafico
             }
         }
 
@@ -202,23 +204,27 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
         page = int(self.request.GET.get('page',0))
         ano = self.request.GET.get('ano',None)
         #filtros para as datas das querys
-        filtros_pedido = {
-            'data_criacao__year':ano,
-            'data_criacao__month':mes,
-        }
-        filtros_itens_pedido = {
-            'pedido__data_criacao__year':ano,
-            'pedido__data_criacao__month':mes,
-        }
+        filtros_pedido = {}
+        filtros_itens_pedido = {}
         #se nao for passado nada, seta como o dia o filtro das datas
         if not (mes and ano):
             hoje = datetime.now()
             mes = hoje.month
             ano = hoje.year
             dia = hoje.day
-            filtros_pedido.update({'pedido__data_criacao__day':dia})
+            filtros_pedido.update({'data_criacao__day':dia})
             filtros_itens_pedido.update({'pedido__data_criacao__day':dia})
-            
+        
+        #define o mes e ano
+        filtros_pedido.update({
+            'data_criacao__year':ano,
+            'data_criacao__month':mes,
+        })
+        filtros_itens_pedido.update({
+            'pedido__data_criacao__year':ano,
+            'pedido__data_criacao__month':mes,
+        })
+
         representante = self.get_object()
         medicamentos = []
         quantidade = 0
@@ -255,7 +261,7 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
         #calcula o total bruto e liquido
         valores = itens_pedido.aggregate(bruto=Sum('valor_bruto'),liquido=Sum('valor_liquido'))
 
-        itens_pedido = paginar_resultado(itens_pedido,page)
+        # itens_pedido = paginar_resultado(itens_pedido,page)
 
         #agrupa
         for key, group in groupby(list(itens_pedido), key=lambda x:x['apresentacao__produto__id']):
@@ -265,8 +271,8 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
                 valor_bruto += item['valor_bruto']
             #acabou o produto add no medicamentos
             medicamentos.append({
-                'valor_liquido':valor_liquido,
-                'valor_bruto':valor_bruto,
+                'valor_liquido':locale.currency(valor_liquido,grouping=True),
+                'valor_bruto':locale.currency(valor_bruto,grouping=True),
                 'quantidade':quantidade,
                 'id':item['apresentacao__produto__id'],
                 'nome_produto':item['apresentacao__produto__nome'],
@@ -280,8 +286,8 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
 
         return Response({
             'total_numero_vendas':len(pedidos),
-            'total_liquido':'{}'.format(locale.currency(valores['liquido'])),
-            'total_bruto':'R$ {}'.format(locale.currency(valores['bruto'])),
+            'total_liquido':locale.currency(valores['liquido'],grouping=True) if valores['liquido'] else 'R$ 0,00',
+            'total_bruto':locale.currency(valores['bruto'],grouping=True) if valores['bruto'] else 'R$ 0,00',
             'medicamentos':medicamentos
         })
     
