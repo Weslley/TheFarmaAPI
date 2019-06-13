@@ -47,17 +47,17 @@ class Pedido(models.Model):
         max_digits=15, decimal_places=2, default=0
     )
     valor_bruto_sem_frete = models.DecimalField(
-        max_digits=15, decimal_places=2, default=1,
+        max_digits=15, decimal_places=2, default=0,
         null=True, blank=True,
-        validators=[MinValueValidator(1), ]
+        validators=[MinValueValidator(0), ]
     )
     valor_bruto = models.DecimalField(
-        max_digits=15, decimal_places=2, default=1,
-        validators=[MinValueValidator(1), ]
+        max_digits=15, decimal_places=2, default=0,
+        validators=[MinValueValidator(0), ]
     )
     valor_liquido = models.DecimalField(
-        max_digits=15, decimal_places=2, default=1, 
-        validators=[MinValueValidator(1), ]
+        max_digits=15, decimal_places=2, default=0, 
+        validators=[MinValueValidator(0), ]
     )
     valor_comissao_administradora = models.DecimalField(
         max_digits=15, decimal_places=2, default=0, 
