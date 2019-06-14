@@ -35,6 +35,7 @@ from datetime import datetime, timedelta
 from .log import LogSerializer
 import locale
 from api.utils.formats import formatar_telefone
+from api.models.representante_legal import RepresentanteLegal
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -540,6 +541,9 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
                     _item.save()
         #pusher notification
         enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+        #manda mensagem no WS
+        farmacia = RepresentanteLegal.objects.get(usuario=self.context['request'].user).farmacia
+        FarmaciaConsumer.send('{data:"3"}',id=farmacia.id)
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
 
     def atualiza_preco_farmacia(self,item):
