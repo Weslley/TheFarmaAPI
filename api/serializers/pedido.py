@@ -541,7 +541,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         #pusher notification
         instance.status = StatusPedido.ACEITO
         instance.save()
-        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.ACEITO,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.PEDIDO_ACEITO,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         return super(PropostaUpdateSerializer, self).update(instance, validated_data)
 
     def atualiza_preco_farmacia(self,item):
