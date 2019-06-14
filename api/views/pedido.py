@@ -236,10 +236,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
     def post(self, request, *args, **kwargs):
 
-        
         instance = self.get_object()
-
-        print("STATUS DO PEDIDO:>>>>>>",instance.status)
 
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
@@ -249,7 +246,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
 
-        if instance.status == StatusPedido.ACEITO:
+        elif instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
             delivery = instance.delivery
 
             # Verifica se existe medicamento de venda com receita, observando cada item...
@@ -285,12 +282,12 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
             enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
             if(delivery):
-                instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
-            else:
-                instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+                instance.status = StatusPedido.ENVIADO
+            #else:
+                #instance.status = StatusPedido.ENTREGUE
             instance.save()
 
-        if instance.status == StatusPedido.ENVIADO:
+        elif instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
             instance.save()
