@@ -238,11 +238,6 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
         instance = self.get_object()
 
-        print(">>>>>>>>>>>>",instance)
-        print(">>>>>>>>>>>>",instance.status)
-
-        import pdb; pdb.set_trace()
-
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
@@ -286,12 +281,12 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                         tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
 
             enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
+            print(">>>>>>>>>>>>>>>>",tipo)
             if(delivery):
                 instance.status = StatusPedido.ENVIADO
             #else:
                 #instance.status = StatusPedido.ENTREGUE
             instance.save()
-
         elif instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
