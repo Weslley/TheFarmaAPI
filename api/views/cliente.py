@@ -119,7 +119,7 @@ class EnderecoUpdateDelete(RetrieveUpdateDestroyAPIView, IsClienteAuthenticatedM
             instance = serializer.save()
 
             if instance.principal:
-                cliente.enderecos.update(endereco__principal=False)
+                cliente.enderecos.update(principal=False)
                 instance.principal = True
                 instance.save()
 
