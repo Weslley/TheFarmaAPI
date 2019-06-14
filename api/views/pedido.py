@@ -235,8 +235,10 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
     serializer_class = PedidoSerializer
 
     def post(self, request, *args, **kwargs):
-        print("STATUS DO PEDIDO:>>>>>>"instance.status)
         instance = self.get_object()
+
+        print("STATUS DO PEDIDO:>>>>>>",instance.status)
+        
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
