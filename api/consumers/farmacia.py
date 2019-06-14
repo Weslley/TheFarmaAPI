@@ -194,3 +194,13 @@ class FarmaciaConsumer(BaseConsumer):
         :return:
         """
         cls(skip_group=True).notifica_cancelamento(pedido, farmacias)
+
+    @classmethod
+    def fechar_cards_proposta(cls,pedido,farmacia):
+        """
+        Fecha os cards do gruopo da proposta
+        pedido: Pedido
+        farmacia: Farmacia
+        """
+        serializer = PropostaSerializer(instance=pedido)
+        cls.send({'pedido':serializer.data,'tipo':2},id=farmacia.id)
