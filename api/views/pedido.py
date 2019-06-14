@@ -241,6 +241,8 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         print(">>>>>>>>>>>>",instance)
         print(">>>>>>>>>>>>",instance.status)
 
+        import pdb; pdb.set_trace()
+
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
