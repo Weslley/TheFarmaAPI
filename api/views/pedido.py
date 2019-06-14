@@ -238,11 +238,14 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
         instance = self.get_object()
 
+        print(">>>>>>>>>>>>",instance)
+        print(">>>>>>>>>>>>",instance.status)
+
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
 
-        if instance.status == StatusPedido.ENTREGUE:
+        elif instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
 
