@@ -243,6 +243,44 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
+        if instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
+            delivery = instance.delivery
+
+            # Verifica se existe medicamento de venda com receita, observando cada item...
+            medicamento_receita = False
+            for item in instance.itens.all():
+                if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
+                    medicamento_receita = True
+                    break
+            # Verifica a forma de pagamento do pedido
+            if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
+                if(medicamento_receita):
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                else:
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_NORM
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
+
+            elif(instance.forma_pagamento == FormaPagamento.EM_CARTAO):
+                if(medicamento_receita):
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_COM_RECEITA
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
+                else:
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_NORM
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
+
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
+            #instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+            instance.save()
+
         if instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
@@ -283,63 +321,12 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
+        delivery = instance.delivery
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
-
-        if instance.status == StatusPedido.ABERTO:
-            tipo = TipoNotificacaoTemplate.ACEITO
-            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
-            instance.status = StatusPedido.ACEITO
-            instance.save()
-
-        if instance.status == StatusPedido.ACEITO:
-            """
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                tipo = TipoNotificacaoTemplate.MEDICAMENTO_AGUARDANDO_RETIRADA_S
-            else:
-                tipo = TipoNotificacaoTemplate.MEDICAMENTO_AGUARDANDO_RETIRADA_P
-            """
-
-            # Verifica se existe medicamento de venda com receita, observando cada item...
-            medicamento_receita = False
-            for item in instance.itens.all():
-                if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
-                    medicamento_receita = True
-                    break
-            # Verifica a forma de pagamento do pedido
-            if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
-                if(medicamento_receita):
-                    if(delivery):
-                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
-                    else:
-                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
-                else:
-                    if(delivery):
-                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_NORM
-                    else:
-                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
-
-            elif(instance.forma_pagamento == FormaPagamento.EM_CARTAO):
-                if(medicamento_receita):
-                    if(delivery):
-                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_COM_RECEITA
-                    else:
-                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
-                else:
-                    if(delivery):
-                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_NORM
-                    else:
-                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
-
-            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
-            instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
-            instance.save()
-
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
-
             
         else:
             # confirmando envio
