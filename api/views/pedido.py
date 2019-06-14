@@ -243,7 +243,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
-        if instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
+        if instance.status == StatusPedido.ACEITO:
             delivery = instance.delivery
 
             # Verifica se existe medicamento de venda com receita, observando cada item...
@@ -278,7 +278,10 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                         tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
 
             enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
-            #instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+            if(delivery):
+                instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
+            else:
+                instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
             instance.save()
 
         if instance.status == StatusPedido.ENVIADO:
