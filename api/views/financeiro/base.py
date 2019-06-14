@@ -259,7 +259,7 @@ class MedicamentosMaisVendidos(generics.GenericAPIView):
         ).order_by('apresentacao__produto__id')
 
         #calcula o total bruto e liquido
-        valores = itens_pedido.aggregate(bruto=Sum('valor_bruto'),liquido=Sum('valor_liquido'))
+        valores = pedidos.aggregate(bruto=Sum('valor_bruto'),liquido=Sum('valor_liquido'))
 
         # itens_pedido = paginar_resultado(itens_pedido,page)
 
