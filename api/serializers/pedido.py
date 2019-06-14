@@ -542,7 +542,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         #pusher notification
         # instance.status = StatusPedido.ACEITO
         # instance.save()
-        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.PEDIDO_ACEITO,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         #manda mensagem no WS
         farmacia = RepresentanteLegal.objects.get(usuario=self.context['request'].user).farmacia
         FarmaciaConsumer.fechar_cards_proposta(instance,farmacia)
