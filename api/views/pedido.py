@@ -30,6 +30,8 @@ from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento import tipo_servicos
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.models.enums.status_pedido import StatusPedido
+from api.models.enums.forma_pagamento import FormaPagamento
+from api.models.enums.tipo_venda import TipoVenda
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -241,6 +243,47 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
+        if instance.status == StatusPedido.ACEITO:
+            delivery = instance.delivery
+
+            # Verifica se existe medicamento de venda com receita, observando cada item...
+            medicamento_receita = False
+            for item in instance.itens.all():
+                if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
+                    medicamento_receita = True
+                    break
+            # Verifica a forma de pagamento do pedido
+            if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
+                if(medicamento_receita):
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                else:
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_NORM
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
+
+            elif(instance.forma_pagamento == FormaPagamento.EM_CARTAO):
+                if(medicamento_receita):
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_COM_RECEITA
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
+                else:
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_NORM
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
+
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
+            if(delivery):
+                instance.status = StatusPedido.AGUARDANDO_ENVIO_FARMACIA
+            else:
+                instance.status = StatusPedido.AGUARDANDO_RETIRADA_CLIENTE
+            instance.save()
+
         if instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
@@ -267,6 +310,8 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         return Response(serializer.data)
 
 
+
+
 class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin):
     """
     Confirmar entrega/retirada do pedido
@@ -279,16 +324,23 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
+        delivery = instance.delivery
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
-
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
-
-        # confirmando envio
-        instance.status = StatusPedido.ENTREGUE
-        instance.save()
+            
+        else:
+            # confirmando envio
+            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
+            if (len(quantidade)==1):
+                tipo = TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S
+            else:
+                tipo = TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P
+            instance.status = StatusPedido.ENTREGUE
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
+            instance.save()
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)

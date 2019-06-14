@@ -163,7 +163,8 @@ class FarmaciaConsumer(BaseConsumer):
         :param kwargs:
         :return:
         """
-        print('Chegou')
+        self.send(self.message, self.kwargs['id'])
+        
 
     @classmethod
     def send_propostas(cls, pedido, farmacias):
