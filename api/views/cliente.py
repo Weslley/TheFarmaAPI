@@ -119,9 +119,10 @@ class EnderecoUpdateDelete(RetrieveUpdateDestroyAPIView, IsClienteAuthenticatedM
             instance = serializer.save()
 
             if instance.principal:
-                cliente.enderecos.update(principal=False)
-                instance.principal = True
-                instance.save()
+                #desativa o principal antigo
+                endereco = cliente.enderecos.filter(principal=True).exclude(id=instance.id).first()
+                endereco.principal = False
+                endereco.save()
 
 
 class CartaoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
