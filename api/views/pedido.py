@@ -235,6 +235,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
     serializer_class = PedidoSerializer
 
     def post(self, request, *args, **kwargs):
+        print("STATUS DO PEDIDO:>>>>>>"instance.status)
         instance = self.get_object()
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
@@ -242,6 +243,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
+
 
         if instance.status == StatusPedido.ACEITO:
             delivery = instance.delivery
