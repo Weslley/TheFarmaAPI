@@ -224,7 +224,7 @@ class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedM
         return Response(serializer.data)
 
 
-class ConfirmarEnvio(GenericAPIView):
+class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
     """
     Confirmar envio do pedido
 
