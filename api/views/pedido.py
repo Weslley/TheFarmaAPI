@@ -224,7 +224,7 @@ class PropostaCancelamentoFarmacia(GenericAPIView, IsRepresentanteAuthenticatedM
         return Response(serializer.data)
 
 
-class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
+class ConfirmarEnvio(GenericAPIView):
     """
     Confirmar envio do pedido
 
@@ -268,7 +268,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                     else:
                         tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
 
-            elif(instance.forma_pagamento == FormaPagamento.EM_CARTAO):
+            elif(instance.forma_pagamento == FormaPagamento.CARTAO):
                 if(medicamento_receita):
                     if(delivery):
                         tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_COM_RECEITA
@@ -281,7 +281,6 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                         tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
 
             enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
-            print(">>>>>>>>>>>>>>>>",tipo)
             if(delivery):
                 instance.status = StatusPedido.ENVIADO
             #else:
