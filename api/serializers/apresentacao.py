@@ -253,7 +253,7 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-        pmc = locale.currency(pmc, grouping=True, symbol=None)
+        # locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        # pmc = locale.currency(pmc, grouping=True, symbol=None)
 
         return pmc
