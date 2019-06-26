@@ -542,7 +542,27 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         #pusher notification
         # instance.status = StatusPedido.ACEITO
         # instance.save()
+        
         enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+        tipo = None
+        medicamento_receita = False
+        for item in instance.itens.all():
+            if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
+                medicamento_receita = True
+                break
+        if(not instance.delivery):
+            if(medicamento_receita):
+                if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                else:
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
+            else:
+                if(instance.forma_pagamento == FormaPagamento.CARTAO):
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
+                else:
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
+                    
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         #manda mensagem no WS
         farmacia = RepresentanteLegal.objects.get(usuario=self.context['request'].user).farmacia
         FarmaciaConsumer.fechar_cards_proposta(instance,farmacia)
