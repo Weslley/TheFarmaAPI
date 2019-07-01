@@ -8,7 +8,7 @@ class NotificacaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notificacao
-        exclude = ('cliente', )
+        exclude = ('cliente','mensagem_extra')
     
     def get_mensagem(self,obj):
         msg = ''
@@ -16,7 +16,9 @@ class NotificacaoSerializer(serializers.ModelSerializer):
             msg = obj.mensagem_extra
             #verifica se precisa formatar a saida
             if '{}' in msg:
-                msg = msg.format(obj.id)
+                msg = msg.format(obj.pedido.id)
+        else:
+            msg = obj.mensagem
         return msg
 
 class NotificacaoUpdateSerializer(serializers.ModelSerializer):
