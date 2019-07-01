@@ -251,10 +251,8 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
             # Verifica se existe medicamento de venda com receita, observando cada item...
             medicamento_receita = False
-            for item in instance.itens.all():
-                if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
-                    medicamento_receita = True
-                    break
+            if instance.itens.filter(apresentacao__produto__principio_ativo__tipo_venda=TipoVenda.COM_RECEITA).count():
+                medicamento_receita = True
             # Verifica a forma de pagamento do pedido
             if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
                 if(medicamento_receita):
@@ -280,7 +278,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                     else:
                         tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
 
-            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
             if(delivery):
                 instance.status = StatusPedido.ENVIADO
             #else:
@@ -290,23 +288,10 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
             instance.save()
-            #evento fcm
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id,extra_data={'pedido_id':instance})
-            else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P,instance.cliente.id,extra_data={'pedido_id':instance})
         else:
             # confirmando envio
             instance.status = StatusPedido.ENVIADO
             instance.save()
-            #gera mensagem no fcm
-            #evento fcm
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id,extra_data={'pedido_id':instance})
-            else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_P,instance.cliente.id,extra_data={'pedido_id':instance}) 
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
