@@ -36,6 +36,7 @@ from .log import LogSerializer
 import locale
 from api.utils.formats import formatar_telefone
 from api.models.representante_legal import RepresentanteLegal
+from api.models.enums.tipo_venda import TipoVenda
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -544,25 +545,25 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         # instance.save()
         
         enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
-        tipo = None
-        medicamento_receita = False
-        for item in instance.itens.all():
-            if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
-                medicamento_receita = True
-                break
-        if(not instance.delivery):
-            if(medicamento_receita):
-                if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
-                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
-                else:
-                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
-            else:
-                if(instance.forma_pagamento == FormaPagamento.CARTAO):
-                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
-                else:
-                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
+        # tipo = None
+        # medicamento_receita = False
+        # for item in instance.itens.all():
+        #     if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
+        #         medicamento_receita = True
+        #         break
+        # if(not instance.delivery):
+        #     if(medicamento_receita):
+        #         if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
+        #             tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+        #         else:
+        #             tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
+        #     else:
+        #         if(instance.forma_pagamento == FormaPagamento.CARTAO):
+        #             tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
+        #         else:
+        #             tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
                     
-            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+        #     enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         #manda mensagem no WS
         farmacia = RepresentanteLegal.objects.get(usuario=self.context['request'].user).farmacia
         FarmaciaConsumer.fechar_cards_proposta(instance,farmacia)
@@ -715,10 +716,37 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def notifcar_cliente(self,pedido):
+        """
+        Metodo que faz a notificacao para um cliente
+        """
+        tipo = None
+        medicamento_receita = False
+        if pedido.itens.filter(apresentacao__produto__principio_ativo__tipo_venda=TipoVenda.COM_RECEITA).count():
+            medicamento_receita = True
+
+        if(not pedido.delivery):
+            if(medicamento_receita):
+                #medicamento com receita
+                if(pedido.forma_pagamento == FormaPagamento.DINHEIRO):
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                else:
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
+            else:
+                #medicamento sem receita
+                if(pedido.forma_pagamento == FormaPagamento.CARTAO):
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
+                else:
+                    tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
+                    
+            enviar_notif(pedido.cliente.fcm_token,tipo,pedido.cliente.id,pedido,extra_data={'pedido_id':pedido.id})
+
     def update(self, instance, validated_data):
         with transaction.atomic():
             instance = self.valida_pagamento(instance, validated_data)
             self.gerar_contas(instance)
+            #notifica o cliente
+            self.notifcar_cliente(instance)
         return instance
 
     def gerar_contas(self, pedido):

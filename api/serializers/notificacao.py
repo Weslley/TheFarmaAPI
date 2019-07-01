@@ -4,11 +4,20 @@ from api.models.notificacao import Notificacao
 
 
 class NotificacaoSerializer(serializers.ModelSerializer):
-    
+    mensagem = serializers.SerializerMethodField()
+
     class Meta:
         model = Notificacao
         exclude = ('cliente', )
-
+    
+    def get_mensagem(self,obj):
+        msg = ''
+        if obj.mensagem_extra:
+            msg = obj.mensagem_extra
+            #verifica se precisa formatar a saida
+            if '{}' in msg:
+                msg = msg.format(obj.id)
+        return msg
 
 class NotificacaoUpdateSerializer(serializers.ModelSerializer):
     
