@@ -15,7 +15,7 @@ class NotificacaoSerializer(serializers.ModelSerializer):
         if obj.mensagem_extra:
             msg = obj.mensagem_extra
             #verifica se precisa formatar a saida
-            if '{}' in msg:
+            if '{}' in msg and obj.pedido:
                 msg = msg.format(obj.pedido.id)
         else:
             msg = obj.mensagem
