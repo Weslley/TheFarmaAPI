@@ -213,8 +213,8 @@ LOGOUT_URL = '/admin/logout/'
 LOGIN_REDIRECT_URL = '/admin/'
 
 # Celery
-CELERY_BROKER_URL = 'redis://redis_celery:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis_celery:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -236,9 +236,9 @@ CHANNEL_LAYERS = {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
              #DOCKER CFG
-             'hosts': [('redis://redis_channels:6379/1')],
+             #'hosts': [('redis://redis_channels:6379/1')],
              #SEM DOCKER
-             #'hosts': [('redis://localhost:6379/1')],
+             'hosts': [('redis://localhost:6379/1')],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }

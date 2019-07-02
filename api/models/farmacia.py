@@ -22,18 +22,10 @@ class FarmaciaManager(models.Manager):
         if 'exclude_farmacias' in kwargs and kwargs['exclude_farmacias']:
             queryset = queryset.exclude(id__in=[farmacia.id for farmacia in kwargs['exclude_farmacias']])
 
-        try:
-            raio_proposta = Configuracao.objects.first().raio_proposta
-        except AttributeError:
-            raio_proposta = 1.0
-        except Exception as err:
-            print(err)
-            raio_proposta = 1.0
 
         queryset = queryset.distinct('id')
 
-        result_list = [f for f in queryset if calcula_distancia(pedido.localizacao, f.localizacao) <= raio_proposta]
-
+        result_list = [f for f in queryset if calcula_distancia(pedido.localizacao, f.localizacao) <= f.raio_acao]
         return result_list
 
 

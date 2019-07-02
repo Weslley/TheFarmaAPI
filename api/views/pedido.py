@@ -398,6 +398,8 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
     def get(self,request, *args, **kwargs):
         pedido = self.get_queryset()
+        if pedido.status == StatusPagamentoCartao.CANCELADO:
+            return Response({'detail':'Venda ja estornada'},status=stts.HTTP_400_BAD_REQUEST)
         json_venda = pedido.json_venda
         try:
             data_cancelamento = {

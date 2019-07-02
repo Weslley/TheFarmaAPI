@@ -322,11 +322,11 @@ class ItemPedido(models.Model):
 class ItemPropostaPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens_proposta')
     apresentacao = models.ForeignKey(Apresentacao, related_name='itens_propostos')
-    quantidade = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), ])
+    quantidade = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), ])
     valor_unitario = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     farmacia = models.ForeignKey(Farmacia, related_name='itens_proposta')
     status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
-    possui = models.BooleanField(default=True)
+    possui = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('pedido', 'apresentacao', 'farmacia')
