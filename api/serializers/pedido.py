@@ -509,6 +509,8 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         itens_proposta = [item for item in self.initial_data['itens_proposta']]
+        if not any(map(lambda x : x['quantidade'],itens_proposta)):
+            raise serializers.ValidationError('Ao menos um item deve ter quantidade valida!')
         for item in itens_proposta:
             try:
                 self.instance.itens_proposta.get(id=item['id'])
@@ -517,7 +519,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
 
         if get_tempo_proposta(self.instance) == 0:
             raise serializers.ValidationError('Tempo para submeter proposta excedido.')
-
+        
         return attrs
 
     def create(self, validated_data):
