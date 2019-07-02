@@ -193,15 +193,16 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             return None
 
     def save(self, commit=True):
+        #cria o representante
         with transaction.atomic():
             self.instance = super(RepresentanteFarmaciaForm, self).save(commit=False)
             self.instance.endereco = self.get_endereco(commit=commit)
             self.instance.usuario = self.get_usuario(commit=commit)
             self.instance.farmacia = self.initial['farmacia']
-            if commit:
-                self.instance.save()
-            return self.instance
-
+        #salva
+        if commit:
+            self.instance.save()
+        return self.instance
 
 class UsuarioParceiroForm(forms.ModelForm):
     nome = forms.CharField(max_length=30)

@@ -510,11 +510,11 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         itens_proposta = [item for item in self.initial_data['itens_proposta']]
         #verifica se ao menos um item tem quantidade
-        if not any(map(lambda x : x['quantidade'],itens_proposta)):
-            raise serializers.ValidationError('Ao menos um item deve ter quantidade valida!')
-        #verifica se possui ao menos um item
-        if not any(map(lambda x : x['possui'],itens_proposta)):
-            raise serializers.ValidationError('Voce deve possuir ao menos um item!')
+        # if not any(map(lambda x : x['quantidade'],itens_proposta)):
+        #     raise serializers.ValidationError('Ao menos um item deve ter quantidade valida!')
+        # #verifica se possui ao menos um item
+        # if not any(map(lambda x : x['possui'],itens_proposta)):
+        #     raise serializers.ValidationError('Voce deve possuir ao menos um item!')
         for item in itens_proposta:
             try:
                 self.instance.itens_proposta.get(id=item['id'])
@@ -531,9 +531,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data.pop('itens_proposta')
-
-        itens_proposta = [item for item in self.initial_data['itens_proposta']]
-
+        itens_proposta = [item for item in self.initial_data['itens_proposta'] if item['quantidade'] > 0 and item['possui']]
         for item in itens_proposta:
 
             item_proposta = instance.itens_proposta.get(id=item['id'])
