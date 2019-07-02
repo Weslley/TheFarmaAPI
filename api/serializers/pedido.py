@@ -544,13 +544,13 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         # instance.save()
         
         enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
-        tipo = None
-        medicamento_receita = False
-        for item in instance.itens.all():
-            if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
-                medicamento_receita = True
-                break
         if(not instance.delivery):
+            tipo = None
+            medicamento_receita = False
+            for item in instance.itens.all():
+                if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
+                    medicamento_receita = True
+                    break
             if(medicamento_receita):
                 if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
                     tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
