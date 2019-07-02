@@ -411,9 +411,10 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             data_cancelamento.update({'valor':pedido.get_total_farmacia(pedido.farmacia)})
         print(data_cancelamento)
         rs = Pagamento.cancelar(tipo_servicos.CIELO,data_cancelamento)
-        if rs['cancelamento']['Status'] == StatusPagamentoCartao.PAGAMENTO_CANCELADO:
-            #atualiza o pedido
-            pedido.status = StatusPagamentoCartao.PAGAMENTO_CANCELADO
+        #verica se o retorno da cielo foi de cancelado
+        if rs['cancelamento']['Status'] == StatusPagamentoCartao.CANCELADO:
+            #atualiza o status do pedido
+            pedido.status = StatusPedido.ESTORNADO
             pedido.save()
             return Response(status=stts.HTTP_200_OK)
         else:

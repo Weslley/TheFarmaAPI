@@ -16,3 +16,4 @@ class StatusPedido(IntEnum):
     SEM_PROPOSTA = 8                  # Caso na tenha sido encontrado uma proposta para o cliente
     TIMEOUT = 9                       # Timeout para aceitar a proposta
     NAO_ENTREGUE = 10                 # Farmacia nao conseguiu entregar um pedido
+    ESTORNADO = 11
