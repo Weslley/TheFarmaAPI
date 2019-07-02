@@ -287,6 +287,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         elif instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
+            enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.D_PEDIDO_ENTREGUE,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
             instance.save()
         else:
             # confirmando envio
