@@ -82,7 +82,6 @@ def get_tempo_proposta(pedido):
     :param pedido: Pedido
     :return: Tempo em segundos
     """
-    return 1000
     try:
         duracao_proposta = Configuracao.objects.first().duracao_proposta
     except Exception:
