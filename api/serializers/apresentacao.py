@@ -74,7 +74,7 @@ class ApresentacaoBusca(serializers.ModelSerializer):
         )
 
     def get_nome(self, obj):
-        obj.nome_apresentacao
+        return obj.nome_apresentacao
     
     def get_embalagem(self, obj):
         if obj.embalagem:
