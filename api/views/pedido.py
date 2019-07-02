@@ -251,10 +251,8 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
             # Verifica se existe medicamento de venda com receita, observando cada item...
             medicamento_receita = False
-            for item in instance.itens.all():
-                if(item.apresentacao.produto.principio_ativo.tipo_venda == TipoVenda.COM_RECEITA):
-                    medicamento_receita = True
-                    break
+            if instance.itens.filter(apresentacao__produto__principio_ativo__tipo_venda=TipoVenda.COM_RECEITA).count():
+                medicamento_receita = True
             # Verifica a forma de pagamento do pedido
             if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
                 if(medicamento_receita):
@@ -280,7 +278,7 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
                     else:
                         tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
 
-            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
             if(delivery):
                 instance.status = StatusPedido.ENVIADO
             #else:
@@ -289,24 +287,12 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
         elif instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
+            enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.D_PEDIDO_ENTREGUE,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
             instance.save()
-            #evento fcm
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id,extra_data={'pedido_id':instance})
-            else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P,instance.cliente.id,extra_data={'pedido_id':instance})
         else:
             # confirmando envio
             instance.status = StatusPedido.ENVIADO
             instance.save()
-            #gera mensagem no fcm
-            #evento fcm
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id,extra_data={'pedido_id':instance})
-            else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_P,instance.cliente.id,extra_data={'pedido_id':instance}) 
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -412,6 +398,8 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
     def get(self,request, *args, **kwargs):
         pedido = self.get_queryset()
+        if pedido.status == StatusPagamentoCartao.CANCELADO:
+            return Response({'detail':'Venda ja estornada'},status=stts.HTTP_400_BAD_REQUEST)
         json_venda = pedido.json_venda
         try:
             data_cancelamento = {
@@ -425,9 +413,10 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             data_cancelamento.update({'valor':pedido.get_total_farmacia(pedido.farmacia)})
         print(data_cancelamento)
         rs = Pagamento.cancelar(tipo_servicos.CIELO,data_cancelamento)
-        if rs['cancelamento']['Status'] == StatusPagamentoCartao.PAGAMENTO_CANCELADO:
-            #atualiza o pedido
-            pedido.status = StatusPagamentoCartao.PAGAMENTO_CANCELADO
+        #verica se o retorno da cielo foi de cancelado
+        if rs['cancelamento']['Status'] == StatusPagamentoCartao.CANCELADO:
+            #atualiza o status do pedido
+            pedido.status = StatusPedido.ESTORNADO
             pedido.save()
             return Response(status=stts.HTTP_200_OK)
         else:

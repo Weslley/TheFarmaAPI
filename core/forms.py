@@ -40,6 +40,7 @@ class FarmaciaForm(forms.ModelForm):
     numero_conta = forms.IntegerField(label='Número Conta*')
     digito_conta = forms.CharField(label='Dígito Conta*', max_length=1)
     operacao = forms.CharField(label='Operação', max_length=3, required=False)
+    raio_acao = forms.DecimalField(max_digits=10,decimal_places=2,label="Raio de Ação(KM)")
 
     class Meta:
         model = Farmacia

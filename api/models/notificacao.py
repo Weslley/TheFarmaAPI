@@ -28,6 +28,7 @@ class TipoNotificacaoTemplate():
     D_AGUARDANDO_EM_CARTAO_COM_RECEITA = 20
     D_AGUARDANDO_EM_DINHEIRO_NORM = 21
     D_AGUARDANDO_EM_DINHEIRO_COM_RECEITA = 22
+    D_PEDIDO_ENTREGUE = 23
 
 
 class Notificacao(models.Model):
