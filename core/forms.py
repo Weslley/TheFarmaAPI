@@ -11,6 +11,7 @@ from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
 from api.models.parceiro import UsuarioParceiro
 from api.models.representante_legal import RepresentanteLegal
+import re
 
 
 class AtualizacaoForm(forms.ModelForm):
@@ -131,6 +132,18 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             raise forms.ValidationError("Senhas incorretas")
         return password2
 
+    def clean_telefone(self):
+        telefone = self.cleaned_data['telefone']
+        return re.sub(r'\D','',telefone)
+
+    def clean_rg(self):
+        rg = self.cleaned_data['rg']
+        return re.sub(r'\D','',rg)
+
+    def clean_cpf(self):
+        cpf = self.cleaned_data['cpf']
+        return re.sub(r'\D','',cpf)
+
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).count() > 0:
@@ -174,9 +187,11 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             return None
 
     def get_endereco(self, commit=True):
+        unmask_cep = self.cleaned_data['cep']
+        unmask_cep = re.sub(r'\D','',unmask_cep)
         try:
             obj = Endereco(
-                cep=self.cleaned_data['cep'],
+                cep=unmask_cep,
                 logradouro=self.cleaned_data['logradouro'],
                 numero=self.cleaned_data['numero'],
                 complemento=self.cleaned_data['complemento'],
