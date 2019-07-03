@@ -531,19 +531,21 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data.pop('itens_proposta')
-        itens_proposta = [item for item in self.initial_data['itens_proposta'] if item['quantidade'] > 0 and item['possui']]
-        for item in itens_proposta:
+        itens_proposta = [item for item in self.initial_data['itens_proposta']]
+        #verifica se ao menos um item possui como verdadeiro e tem quantidade acima de 0
+        if any(map(lambda x : x['possui'],itens_proposta)) and any(map(lambda x : x['quantidade'],itens_proposta)):
+            for item in itens_proposta:
 
-            item_proposta = instance.itens_proposta.get(id=item['id'])
-            item_proposta.status = StatusItemProposta.ENVIADO
-            serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
-            if serializer.is_valid():
-                _item = serializer.save()
-                self.atualiza_preco_farmacia(_item)
-                # Caso a quantidade seja zero coloca como não possui
-                if not _item.quantidade:
-                    _item.possui = False
-                    _item.save()
+                item_proposta = instance.itens_proposta.get(id=item['id'])
+                item_proposta.status = StatusItemProposta.ENVIADO
+                serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
+                if serializer.is_valid():
+                    _item = serializer.save()
+                    self.atualiza_preco_farmacia(_item)
+                    # Caso a quantidade seja zero coloca como não possui
+                    if not _item.quantidade:
+                        _item.possui = False
+                        _item.save()
         #pusher notification
         # instance.status = StatusPedido.ACEITO
         # instance.save()
