@@ -532,8 +532,8 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data.pop('itens_proposta')
         itens_proposta = [item for item in self.initial_data['itens_proposta']]
-        #verifica se ao menos um item possui como verdadeiro e tem quantidade acima de 0
-        if any(map(lambda x : x['possui'],itens_proposta)) and any(map(lambda x : x['quantidade'],itens_proposta)):
+        #verifica se ao menos uma quantidade acima de 0
+        if any(map(lambda x : x['quantidade'],itens_proposta)):
             for item in itens_proposta:
 
                 item_proposta = instance.itens_proposta.get(id=item['id'])
