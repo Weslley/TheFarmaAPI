@@ -312,7 +312,6 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
-        delivery = instance.delivery
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
@@ -321,13 +320,7 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
             
         else:
             # confirmando envio
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                tipo = TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S
-            else:
-                tipo = TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P
             instance.status = StatusPedido.ENTREGUE
-            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,extra_data={'pedido_id':instance})
             instance.save()
 
         serializer = self.get_serializer(instance)
