@@ -115,6 +115,7 @@ class ItemPedidoCreateSerializer(serializers.ModelSerializer):
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
     apresentacao = ApresentacaoListSerializer(read_only=True)
+    quantidade = serializers.SerializerMethodField()
 
     class Meta:
         model = ItemPedido
@@ -130,7 +131,12 @@ class ItemPedidoSerializer(serializers.ModelSerializer):
             'valor_unitario': {'read_only': True},
             'status': {'read_only': True},
         }
-
+    
+    def get_quantidade(self,obj):
+        if obj.pedido.status == StatusPedido.ABERTO:
+            return obj.quantidade
+        else:
+            return obj.quantidade_atendida
 
 class PedidoCreateSerializer(serializers.ModelSerializer):
     log = LogSerializer(read_only=True)
