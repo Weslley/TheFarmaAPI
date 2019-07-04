@@ -485,6 +485,7 @@ class PropostaSerializer(serializers.ModelSerializer):
 
 
 class ItemPropostaUpdateSerializer(serializers.ModelSerializer):
+    possui = serializers.NullBooleanField(required=False)
     class Meta:
         model = ItemPropostaPedido
         fields = (
@@ -535,22 +536,23 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         #verifica se ao menos uma quantidade acima de 0
         if any(map(lambda x : x['quantidade'],itens_proposta)):
             for item in itens_proposta:
-
+                #ignora o possui que veio
+                item.pop('possui',None)
+                #verifica a quantidade e atribui o valor do possui
+                item['possui'] = True if item['quantidade'] > 0 else False
+                #recupera a instancia no banco e diz que foi enviado
                 item_proposta = instance.itens_proposta.get(id=item['id'])
                 item_proposta.status = StatusItemProposta.ENVIADO
                 serializer = ItemPropostaUpdateSerializer(instance=item_proposta, data=item)
                 if serializer.is_valid():
                     _item = serializer.save()
                     self.atualiza_preco_farmacia(_item)
-                    # Caso a quantidade seja zero coloca como não possui
-                    if not _item.quantidade:
-                        _item.possui = False
-                        _item.save()
+            #envia a notificacao pro app      
+            enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         #pusher notification
         # instance.status = StatusPedido.ACEITO
         # instance.save()
         
-        enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
         #manda mensagem no WS
         farmacia = RepresentanteLegal.objects.get(usuario=self.context['request'].user).farmacia
         FarmaciaConsumer.fechar_cards_proposta(instance,farmacia)
