@@ -220,7 +220,7 @@ class FarmaciaComandaDado(serializers.ModelSerializer):
     class Meta:
         model = Farmacia
         fields = (
-            'razao_social',
+            'nome_fantasia',
             'telefone',
             'logradouto',
             'bairro',
