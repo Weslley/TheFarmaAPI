@@ -328,8 +328,6 @@ class ItemPropostaPedido(models.Model):
     status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
     possui = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('pedido', 'apresentacao', 'farmacia')
 
     @property
     def quantidade_inferior(self):
