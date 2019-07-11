@@ -10,7 +10,17 @@ from api.models.log import Log
 from api.utils import get_user_lookup, get_tempo_proposta
 from api.models.farmacia import Farmacia
 import itertools
+from api.consumers.farmacia import FarmaciaConsumer
 
+
+class SerializerPropostaCliente(serializers.ModelSerializer):
+    """ Json que vai para o cliente """
+
+    class Meta:
+        model = Pedido
+        fields = (
+            ''
+        )
 
 
 class ItemPedidoCreateSerializer(serializers.Serializer):
@@ -91,7 +101,13 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         return List<ItemPedido>
         """
         rs = []
+        i = 0
         for item in itens:
+            #calcula o valor_unitario da primeira apresentacao e coloca no dict original
+            #futuramente usado no valor_unitario da proposta
+            valor_unitario = self.get_pcm(item['apresentacao'][0],pedido.cidade_obj)
+            itens[i].update({'valor_unitario':valor_unitario})
+            i+=1
             for apresentacao in item['apresentacao']:
                 #aumenta o hank de proposta
                 apresentacao.get_manager.update_ranking_proposta(apresentacao.id)
@@ -132,13 +148,13 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 
     def parse_itens_lista_permutacao(self,item):
         """
-        Faz o parse de uma lista para pode ser permutada
+        Faz um lista para cada apresentacao replicando as informacoe de qtd e valor_unitario
         item:dict
         return: List
         """
-        lista = []
         quantidade = item['quantidade']
-        return [{'quantidade':quantidade,'apresentacao':x} for x in item['apresentacao']]
+        valor_unitario = item['valor_unitario']
+        return [{'quantidade':quantidade,'apresentacao':x,'valor_unitario':valor_unitario} for x in item['apresentacao']]
     
     def gerar_proposta_permutada(self,itens,farmacias,pedido):
         """
@@ -152,16 +168,35 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         #fazendo antes o parse de dict para lista de dict
         lista_permutada = list(itertools.product(*map(self.parse_itens_lista_permutacao,itens)))
         for farmacia in farmacias:
-            print('Interacao farmacia')
+            #para cada farmacia cria propostas permutadas
+            print('Interacao farmacia:')
             for item_pedido in lista_permutada:
+                print('Nova Proposta:')
+                #pedidos da proposta
+                itens_proposta = []
                 for item in item_pedido:
                     print(farmacia,item)
-                    ItemPropostaPedido.objects.create(
+                    #cria o item pedidos
+                    itens_proposta.append(ItemPropostaPedido.objects.create(
                         pedido=pedido,
-                        valor_unitario=0,
+                        valor_unitario=item['valor_unitario'],
                         quantidade=item['quantidade'],
                         apresentacao=item['apresentacao'],
                         farmacia=farmacia
-                    )
-    
+                    ))
+                    data = self.serializer_data_item_pedido_proposta(itens_proposta,pedido)
+
+
+    def serializer_data_item_pedido_proposta(self,lista,pedido):
+        """
+        Serializa os dados para mandar pelo websocket para as farmacias
+        lista: List<ItemPropostaPedido>
+        pedido: Pedido
+        return: Dict
+        """
+        rs = {
+            "id":pedido.id,
+            "itens_proposta":[{"id":x.id,"pmc":x.valor_unitario,"codigo_barras":x.apresentacao.codigo_barras,\
+                                "quantidade":x.quantidade} for x in lista],\
+        }
         import pdb; pdb.set_trace()

@@ -10,6 +10,7 @@ from api.consumers import FarmaciaConsumer
 from datetime import datetime, timedelta
 from time import sleep
 from decimal import Decimal
+import json
 
 from api.utils.usuario_teste import check_user_eh_teste, fazer_proposta_faker
 
@@ -110,4 +111,29 @@ def init_proposta(id_pedido):
     elif not len(pedido.propostas):
         pedido.status = StatusPedido.SEM_PROPOSTA
 
+    pedido.save()
+
+@app.task(queue='propostas')
+def aplic_proposta_v2(data):
+    """
+    Metodo para fazer as propostas
+    """ 
+    #faz o parse da data
+    data = json.loads(data)
+    #recupera a duracao de uma proposta
+    try:
+        duracao_proposta = Configuracao.objects.first().duracao_proposta
+    except:
+        duracao_proposta = timedelta(minutes=5)
+    #espera acabar
+    sleep(60*duracao_proposta)
+    #recupera o estado atual do pedido
+    pedido = Pedido.objects.get(pk=data['id'])
+    #se tem proposta e continua com status aberto eh pq nao selecionou nenhuma
+    total_propostas = pedido.propostas.count()
+    if total_propostas and pedido.status == StatusPedido.ABERTO:
+        pedido.status = StatusPedido.TIMEOUT
+    elif not total_propostas:
+        #nao recebeu uma proposta :(
+        pedido.status = StatusPedido.SEM_PROPOSTA
     pedido.save()
