@@ -10,4 +10,4 @@ class ListPrimaryKeyRelatoionField(RelatedField):
         return self.queryset.filter(pk__in=value)
     
     def to_representation(self,data):
-        return [x.pk for x in data]
+        return data.pk

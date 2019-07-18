@@ -327,6 +327,7 @@ class ItemPropostaPedido(models.Model):
     farmacia = models.ForeignKey(Farmacia, related_name='itens_proposta')
     status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
     possui = models.BooleanField(default=False)
+    permutacao_id = models.IntegerField(default=0)
 
 
     @property

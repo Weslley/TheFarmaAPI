@@ -79,5 +79,13 @@ def curtida_delete_signal(sender, **kwargs):
 
 @receiver(post_save, sender=Pedido)
 def make_proposta(sender, **kwargs):
-    if kwargs['created']:
-        init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas', countdown=1)
+    #verifica se tem a controladora do signal
+    if hasattr(kwargs['instance'],'_ignore_signal'):
+        #verifica se eh pra ignorar
+        if kwargs['instance']._ignore_signal:
+            print('ignorou')
+            return
+    else:
+        if kwargs['created']:
+            print('caiu aqui')
+            init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas', countdown=1)

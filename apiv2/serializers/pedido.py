@@ -10,17 +10,22 @@ from api.models.log import Log
 from api.utils import get_user_lookup, get_tempo_proposta
 from api.models.farmacia import Farmacia
 import itertools
-from api.consumers.farmacia import FarmaciaConsumer
+from api.consumers.farmacia import FarmaciaConsumer, PropostaSerializer, ItemPropostaSerializer
 
 
-class SerializerPropostaCliente(serializers.ModelSerializer):
-    """ Json que vai para o cliente """
+class ItensPropostaPermutadosSerializer(PropostaSerializer):
 
-    class Meta:
-        model = Pedido
-        fields = (
-            ''
+    def get_itens_proposta(self,obj):
+        itens = self.context['lista']
+        context = {
+            'cidade': self.context['farmacia'].endereco.cidade,
+        }
+        itens_proposta = ItemPropostaSerializer(
+            many=True,
+            instance=itens,
+            context=context
         )
+        return itens_proposta.data
 
 
 class ItemPedidoCreateSerializer(serializers.Serializer):
@@ -66,9 +71,13 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             #cria o pedido
             validated_data['cliente'] = get_user_lookup(request,'cliente')
             validated_data['log'] = log
-            pedido = Pedido.objects.create(**validated_data)
-            
-            #cria o pedido dos itens
+            pedido = Pedido(**validated_data)
+            #cria um atributo para poder ignorar o signal
+            pedido._ignore_signal = True
+            #salva realemnte em banco
+            pedido.save()
+
+            #cria os itens do pedido
             rs = self.gerar_itens_pedido(itens,pedido)
             #gera as proposta
             farmacias_proximas = Farmacia.objects.proximas(pedido)
@@ -168,12 +177,15 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         #fazendo antes o parse de dict para lista de dict
         lista_permutada = list(itertools.product(*map(self.parse_itens_lista_permutacao,itens)))
         for farmacia in farmacias:
+            #controle de qual foi o id da permutacao
+            i = 0
             #para cada farmacia cria propostas permutadas
             print('Interacao farmacia:')
             for item_pedido in lista_permutada:
                 print('Nova Proposta:')
                 #pedidos da proposta
                 itens_proposta = []
+                i += 1
                 for item in item_pedido:
                     print(farmacia,item)
                     #cria o item pedidos
@@ -182,21 +194,22 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                         valor_unitario=item['valor_unitario'],
                         quantidade=item['quantidade'],
                         apresentacao=item['apresentacao'],
-                        farmacia=farmacia
+                        farmacia=farmacia,
+                        permutacao_id=i
                     ))
-                    data = self.serializer_data_item_pedido_proposta(itens_proposta,pedido)
+                #serializa a proposta atual
+                data = self.serializer_data_item_pedido_proposta(itens_proposta,pedido,farmacia)
+                #manda para o ws
+                #FarmaciaConsumer.send(data,**{'id':farmacia.id})
 
 
-    def serializer_data_item_pedido_proposta(self,lista,pedido):
+    def serializer_data_item_pedido_proposta(self,lista,pedido,farmacia):
         """
         Serializa os dados para mandar pelo websocket para as farmacias
         lista: List<ItemPropostaPedido>
         pedido: Pedido
+        farmacia: Farmacia
         return: Dict
         """
-        rs = {
-            "id":pedido.id,
-            "itens_proposta":[{"id":x.id,"pmc":x.valor_unitario,"codigo_barras":x.apresentacao.codigo_barras,\
-                                "quantidade":x.quantidade} for x in lista],\
-        }
-        import pdb; pdb.set_trace()
+        serializer = ItensPropostaPermutadosSerializer(pedido,context={'lista':lista,'farmacia':farmacia})
+        return serializer.data
