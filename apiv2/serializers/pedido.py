@@ -200,7 +200,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                 #serializa a proposta atual
                 data = self.serializer_data_item_pedido_proposta(itens_proposta,pedido,farmacia)
                 #manda para o ws
-                #FarmaciaConsumer.send(data,**{'id':farmacia.id})
+                FarmaciaConsumer.send(data,**{'id':farmacia.id})
 
 
     def serializer_data_item_pedido_proposta(self,lista,pedido,farmacia):
