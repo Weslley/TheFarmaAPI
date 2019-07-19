@@ -16,7 +16,7 @@ def analisa_pedido_notificacao(temp_notif, pedido):
         elif(pedido.forma_pagamento == FormaPagamento.CARTAO):
 '''
 
-def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
+def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None,farmacia=None):
     """
     Envia uma notificação para um fcm_token  
     fcm_token: String  
@@ -48,6 +48,8 @@ def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
             'visualizada':False,
             'cliente_id':cliente_id,
             'pedido':pedido,
+            'farmacia':farmacia,
+            'template':template_notif
         }
         #salva
         notif = Notificacao.objects.create(**data_notificacao)
