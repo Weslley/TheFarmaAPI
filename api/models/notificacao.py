@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 from .enums.tipo_notificacao import TipoNotificacao
 from api.models.pedido import Pedido
+from api.models.farmacia import Farmacia
 
 
 class TipoNotificacaoTemplate():
@@ -31,6 +32,13 @@ class TipoNotificacaoTemplate():
     D_PEDIDO_ENTREGUE = 23
 
 
+class NotificacoesTemplate(models.Model):
+    tela = models.IntegerField(null=True,blank=True)
+    titulo = models.CharField(max_length=50,null=True,blank=True)
+    menssagem = models.TextField(null=True, blank=True)
+    mensagem_extra = models.TextField(null=True, blank=True)
+    tipo = models.IntegerField(null=True,blank=True)
+
 class Notificacao(models.Model):
     tipo = models.IntegerField(choices=TipoNotificacao.choices())
     titulo = models.CharField(max_length=50)
@@ -46,13 +54,8 @@ class Notificacao(models.Model):
         on_delete=models.CASCADE
     )
     pedido = models.ForeignKey(Pedido,models.CASCADE,default=None,null=True,blank=True)
+    farmacia = models.ForeignKey(Farmacia,models.CASCADE,default=None,null=True,blank=True)
+    template = models.ForeignKey(NotificacoesTemplate,models.DO_NOTHING,default=None,null=True,blank=True)
 
     def __str__(self):
         return self.titulo
-
-class NotificacoesTemplate(models.Model):
-    tela = models.IntegerField(null=True,blank=True)
-    titulo = models.CharField(max_length=50,null=True,blank=True)
-    menssagem = models.TextField(null=True, blank=True)
-    mensagem_extra = models.TextField(null=True, blank=True)
-    tipo = models.IntegerField(null=True,blank=True)

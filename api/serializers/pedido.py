@@ -37,6 +37,7 @@ import locale
 from api.utils.formats import formatar_telefone
 from api.models.representante_legal import RepresentanteLegal
 from api.models.enums.tipo_venda import TipoVenda
+from api.models.notificacao import Notificacao
 
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -553,8 +554,16 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
                 if serializer.is_valid():
                     _item = serializer.save()
                     self.atualiza_preco_farmacia(_item)
-            #envia a notificacao pro app      
-            enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+            #envia a notificacao pro app
+            #verifica se ele ja foi notificado pela farmacia atual
+            farmacia = self.context['request'].user.representante_farmacia.farmacia
+            total_notifcacao = Notificacao.objects.filter(
+                pedido=instance,
+                template__tipo=TipoNotificacaoTemplate.NOVA_PROPOSTA,
+                farmacia=farmacia
+            )
+            if (not total_notifcacao.count()):
+                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id},farmacia=farmacia)
         #pusher notification
         # instance.status = StatusPedido.ACEITO
         # instance.save()
