@@ -34,7 +34,7 @@ class ItemPedidoCreateSerializer(serializers.Serializer):
     apresentacao = serializers.PrimaryKeyRelatedField(queryset=Apresentacao.objects.all(),required=False)
     quantidade = serializers.IntegerField()
     produto = serializers.CharField(required=False)
-    generico = serializers.BooleanField()
+    generico = serializers.BooleanField(write_only=True)
     dosagens = serializers.ListField(required=False)
     embalagem = serializers.CharField(required=False)
     quantidade_embalagem = serializers.DecimalField(required=False,max_digits=10,decimal_places=2)
@@ -94,14 +94,13 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             #cria um atributo para poder ignorar o signal
             pedido._ignore_signal = True
             #salva realemnte em banco
-            #pedido.save()
+            pedido.save()
 
             #cria os itens do pedido
             rs = self.gerar_itens_pedido(itens,pedido)
             #gera as proposta
             farmacias_proximas = Farmacia.objects.proximas(pedido)
             self.gerar_proposta_permutada(itens,farmacias_proximas,pedido)
-            import pdb; pdb.set_trace()
             return pedido
 
     def recupera_dados_endereco(self,endereco):
@@ -139,12 +138,15 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             if item['generico']:
                 item['apresentacao'] = self.get_aprentacoes_produto(item)
             i+=1
-            import pdb; pdb.set_trace()
+            #convert pra lista
+            if isinstance(item['apresentacao'],Apresentacao):
+                item['apresentacao'] = [item['apresentacao'],]
             for apresentacao in item['apresentacao']:
                 #aumenta o hank de proposta
                 apresentacao.get_manager.update_ranking_proposta(apresentacao.id)
                 #data do item pedido
                 data_item_pedido = {}
+                data_item_pedido['quantidade'] = item['quantidade']
                 data_item_pedido['pedido'] = pedido
                 data_item_pedido['valor_unitario'] = self.get_pcm(apresentacao,pedido.cidade_obj)
                 data_item_pedido['apresentacao'] = apresentacao
@@ -274,5 +276,5 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                     'quarta_dosagem':dosagem['dosagem'],
                     'sufixo_quarta_dosagem__nome__startswith':dosagem['sufixo_dosagem']
                 })
-        import pdb; pdb.set_trace()
+        print(Apresentacao.objects.filter(**filtro).count())                
         return Apresentacao.objects.filter(**filtro)
