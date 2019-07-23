@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from api.models.pedido import Pedido, ItemPedido, ItemPropostaPedido
+from api.models.produto import Produto
 from api.models.endereco import Endereco
 from api.serializers.log import LogSerializer
 from django.db import transaction
@@ -11,6 +12,7 @@ from api.utils import get_user_lookup, get_tempo_proposta
 from api.models.farmacia import Farmacia
 import itertools
 from api.consumers.farmacia import FarmaciaConsumer, PropostaSerializer, ItemPropostaSerializer
+from apiv2.utils.formartar import desformatar_nome_dosagem
 
 
 class ItensPropostaPermutadosSerializer(PropostaSerializer):
@@ -29,8 +31,25 @@ class ItensPropostaPermutadosSerializer(PropostaSerializer):
 
 
 class ItemPedidoCreateSerializer(serializers.Serializer):
-    apresentacao = ListPrimaryKeyRelatoionField(queryset=Apresentacao.objects.all())
+    apresentacao = serializers.PrimaryKeyRelatedField(queryset=Apresentacao.objects.all(),required=False)
     quantidade = serializers.IntegerField()
+    produto = serializers.CharField(required=False)
+    generico = serializers.BooleanField()
+    dosagens = serializers.ListField(required=False)
+    embalagem = serializers.CharField(required=False)
+    quantidade_embalagem = serializers.DecimalField(required=False,max_digits=10,decimal_places=2)
+    sufixo_quantidade = serializers.CharField(required=False,allow_blank=True,allow_null=True)
+
+    def validate(self,data):
+        if data['generico']:
+            if not 'produto' in data or not 'dosagens' in data or not 'embalagem' in data or not 'quantidade_embalagem' or not 'sufixo_quantidade' in data:
+                raise serializers.ValidationError({
+                    'detail':'Caso seja aceito generico informe todos os seguintes campos:Produto, Embalagem, Quantidade_embalagem, dosagem e Sufixo_dosagem'
+                })
+        else:
+            if not 'apresentacao' in data:
+                raise serializers.ValidationError({'detail':'Por favor informe uma apresentacao'})
+        return data
 
 class PedidoCreateSerializer(serializers.ModelSerializer):
 
@@ -75,13 +94,14 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             #cria um atributo para poder ignorar o signal
             pedido._ignore_signal = True
             #salva realemnte em banco
-            pedido.save()
+            #pedido.save()
 
             #cria os itens do pedido
             rs = self.gerar_itens_pedido(itens,pedido)
             #gera as proposta
             farmacias_proximas = Farmacia.objects.proximas(pedido)
             self.gerar_proposta_permutada(itens,farmacias_proximas,pedido)
+            import pdb; pdb.set_trace()
             return pedido
 
     def recupera_dados_endereco(self,endereco):
@@ -114,9 +134,12 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         for item in itens:
             #calcula o valor_unitario da primeira apresentacao e coloca no dict original
             #futuramente usado no valor_unitario da proposta
-            valor_unitario = self.get_pcm(item['apresentacao'][0],pedido.cidade_obj)
-            itens[i].update({'valor_unitario':valor_unitario})
+            itens[i].update({'valor_unitario':0})
+            #add as apresentacoes
+            if item['generico']:
+                item['apresentacao'] = self.get_aprentacoes_produto(item)
             i+=1
+            import pdb; pdb.set_trace()
             for apresentacao in item['apresentacao']:
                 #aumenta o hank de proposta
                 apresentacao.get_manager.update_ranking_proposta(apresentacao.id)
@@ -213,3 +236,43 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         """
         serializer = ItensPropostaPermutadosSerializer(pedido,context={'lista':lista,'farmacia':farmacia})
         return serializer.data
+    
+    def get_aprentacoes_produto(self,item):
+        """
+        Recupera as apresentacoes de um produto baseado nas suas especificacoes
+        item: Dict{produto,embalagem,quantidade_embalagem,sufixo_quantidade,dosagens}
+        return: List<Apresentacoes>
+        """
+        principio_ativo = Produto.objects.filter(nome__istartswith=item['produto']).first().principio_ativo
+        #filtros base
+        filtro = {
+            'produto__principio_ativo':principio_ativo,
+            'quantidade__gte':item['quantidade_embalagem'],
+            'forma_farmaceutica__nome__istartswith': item['embalagem'],
+        }
+        #add as dosagens ao filtro
+        for dosagem in item['dosagens']:
+            #o i indica qual eh a ordem da dosagem
+            #primeira,segunda...
+            if dosagem['i'] == 1:
+                filtro.update({
+                    'dosagem':dosagem['dosagem'],
+                    'sufixo_dosagem__nome__startswith':dosagem['sufixo_dosagem']
+                })
+            if dosagem['i'] == 2:
+                filtro.update({
+                    'segunda_dosagem':dosagem['dosagem'],
+                    'sufixo_segunda_dosagem__nome__startswith':dosagem['sufixo_dosagem']
+                })
+            if dosagem['i'] == 3:
+                filtro.update({
+                    'terceira_dosagem':dosagem['dosagem'],
+                    'sufixo_terceira_dosagem__nome__startswith':dosagem['sufixo_dosagem']
+                })
+            if dosagem['i'] == 4:
+                filtro.update({
+                    'quarta_dosagem':dosagem['dosagem'],
+                    'sufixo_quarta_dosagem__nome__startswith':dosagem['sufixo_dosagem']
+                })
+        import pdb; pdb.set_trace()
+        return Apresentacao.objects.filter(**filtro)

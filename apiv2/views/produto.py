@@ -19,20 +19,49 @@ class ListDosagensProdutoView(generics.GenericAPIView):
         return: Dict
         """
         sufixo_quantidade = apresentacao.sufixo_quantidade.nome if apresentacao.sufixo_quantidade else ''
-        if apresentacao.forma_farmaceutica.nome in EXECOES:
-            return {
-                'dosagem':gerar_nome_dosagem(apresentacao),
-                'embalagem':apresentacao.forma_farmaceutica.nome,
-                'quantidade_embalagem':apresentacao.quantidade,
-                'sufixo_quantidade':sufixo_quantidade
-            }
-        else:
-            return {
-                'dosagem':gerar_nome_dosagem(apresentacao),
-                'embalagem':apresentacao.forma_farmaceutica.nome,
-                'quantidade_embalagem':apresentacao.quantidade,
-                'sufixo_quantidade':sufixo_quantidade
-            }
+        embalagem = apresentacao.forma_farmaceutica.nome
+        #formata o nome da embalagem
+        embalagem_formatada = self.gerar_nome_embalagem(
+            embalagem,
+            apresentacao.quantidade,
+            sufixo_quantidade
+        )
+        #retorno base
+        rs = {
+            'dosagem_formatada':gerar_nome_dosagem(apresentacao),
+            'embalagem_formatada':embalagem_formatada,
+            'embalagem':embalagem,
+            'quantidade_embalagem':apresentacao.quantidade,
+            'sufixo_quantidade': sufixo_quantidade,
+            'dosagens':[]
+        }
+        #os campos a baixo sao opcionais
+        if apresentacao.dosagem:
+            rs['dosagens'].append({
+                'dosagem':apresentacao.dosagem,
+                'sufixo_dosagem':apresentacao.sufixo_dosagem.nome,
+                'i':1
+            })
+        if apresentacao.segunda_dosagem:
+            rs['dosagens'].append({
+                'dosagem':apresentacao.segunda_dosagem,
+                'sufixo_dosagem':apresentacao.sufixo_segunda_dosagem.nome,
+                'i':2
+            })
+        if apresentacao.terceira_dosagem:
+            rs['dosagens'].append({
+                'dosagem':apresentacao.terceira_dosagem,
+                'sufixo_dosagem':apresentacao.sufixo_terceira_dosagem.nome,
+                'i':3
+            })
+        if apresentacao.quarta_dosagem:
+            rs['dosagens'].append({
+                'dosagem':apresentacao.quarta_dosagem,
+                'sufixo_dosagem':apresentacao.sufixo_quarta_dosagem.nome,
+                'i':4
+            })
+        return rs
+        
 
     def gerar_nome_embalagem(self,embalagem,quantidade,sufixo_quantidade):
         """
@@ -81,10 +110,11 @@ class ListDosagensProdutoView(generics.GenericAPIView):
         for k,g in groupby(list(apresentacoes), key=lambda x:self.group_by_dict(x)):
             #prepara a lista de retorno
             #contendo a lista de apresentacoes
-            rs['results'].append({
+            item = {
                 'apresentacacoes':[x.id for x in g],
-                'dosagem':k['dosagem'],
-                'embalagem':self.gerar_nome_embalagem(k['embalagem'],k['quantidade_embalagem'],k['sufixo_quantidade']),
-            })
+            }
+            #atualiza com o resto das keys
+            item.update(**k)
+            rs['results'].append(item)
         return Response(rs)
         
