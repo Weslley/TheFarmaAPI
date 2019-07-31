@@ -13,6 +13,10 @@ from api.models.farmacia import Farmacia
 import itertools
 from api.consumers.farmacia import FarmaciaConsumer, PropostaSerializer, ItemPropostaSerializer
 from apiv2.utils.formartar import desformatar_nome_dosagem
+from api.serializers.pedido import PedidoDetalhadoSerializer
+from api.models.enums.status_item_proposta import StatusItemProposta
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Sum, Case, When, Q, IntegerField
+
 
 
 class ItensPropostaPermutadosSerializer(PropostaSerializer):
@@ -205,14 +209,14 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             #controle de qual foi o id da permutacao
             i = 0
             #para cada farmacia cria propostas permutadas
-            print('Interacao farmacia:')
+            # print('Interacao farmacia:')
             for item_pedido in lista_permutada:
-                print('Nova Proposta:')
+                # print('Nova Proposta:')
                 #pedidos da proposta
                 itens_proposta = []
                 i += 1
                 for item in item_pedido:
-                    print(farmacia,item)
+                    # print(farmacia,item)
                     #cria o item pedidos
                     itens_proposta.append(ItemPropostaPedido.objects.create(
                         pedido=pedido,
@@ -276,5 +280,22 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                     'quarta_dosagem':dosagem['dosagem'],
                     'sufixo_quarta_dosagem__nome__startswith':dosagem['sufixo_dosagem']
                 })
-        print(Apresentacao.objects.filter(**filtro).count())                
+        # print(Apresentacao.objects.filter(**filtro).count())                
         return Apresentacao.objects.filter(**filtro)
+
+
+class PedidoRetriveSerializer(PedidoDetalhadoSerializer):
+
+    def get_propostas(self,obj):
+        propostas = obj.itens_proposta.filter(status=StatusItemProposta.ENVIADO)\
+            .values('permutacao_id','farmacia_id')\
+            .annotate(
+                total_proposta=Sum(ExpressionWrapper(F('quantidade')*F('valor_unitario'),output_field=DecimalField())),
+                total_possui=Sum(Case(
+                    When(Q(possui=True),then=1),
+                    When(Q(possui=False),then=0),
+                    output_field=IntegerField()
+                ))
+            )
+        
+        import pdb; pdb.set_trace()

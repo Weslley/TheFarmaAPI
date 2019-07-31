@@ -84,15 +84,19 @@ class ListDosagensProdutoView(generics.GenericAPIView):
         produto: Str
         return: bool
         """
-        principio_ativo = Produto.objects.filter(nome__istartswith=produto)\
-            .first().principio_ativo
+        principio_ativo = Produto.objects.filter(nome__istartswith=produto)
+        if not principio_ativo.count():
+            raise ValidationError({'detail':'Produto nao encontrado'})
+        #recupera o principio ativo
+        principio_ativo = principio_ativo.first().principio_ativo
+        #ve se tem mais um
         quantidade = Produto.objects.filter(principio_ativo=principio_ativo)\
             .distinct('nome').count()
         return True if quantidade  > 1 else False
 
 
     def get_queryset(self):
-        qs = Produto.objects.filter(nome__iexact=self.kwargs.get('nome',None))
+        qs = Produto.objects.filter(nome__iexact=self.request.query_params.get('nome',None))
         if not qs.count():
             raise ValidationError({'detail':'Produto nao existe'})
         return qs
@@ -100,7 +104,7 @@ class ListDosagensProdutoView(generics.GenericAPIView):
     def get(self,request,*args,**kwargs):
         #variavel de retorno
         rs = {
-            'generico': self.possui_generico_similar(self.kwargs['nome']),
+            'generico': self.possui_generico_similar(request.query_params.get('nome',None)),
             'results':[]
         }
         #seleciona todas as apresentacoes do produto

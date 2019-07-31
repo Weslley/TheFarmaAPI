@@ -338,6 +338,9 @@ class ItemPropostaPedido(models.Model):
         """
         return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade
 
+    @ProcessLookupError
+    def valor_proposta(self):
+        return self.quantidade * self.valor_unitario
 
 class LogData(models.Model):
     mes = models.CharField(max_length=75)

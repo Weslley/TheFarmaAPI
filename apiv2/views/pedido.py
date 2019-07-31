@@ -3,6 +3,7 @@ from apiv2.serializers.pedido import PedidoCreateSerializer
 from rest_framework import permissions
 from api.models.pedido import Pedido
 from api.consumers.farmacia import FarmaciaConsumer, PropostaSerializer
+from apiv2.serializers.pedido import PedidoRetriveSerializer
 
 class PedidoCreateListView(generics.ListCreateAPIView):
     queryset = Pedido.objects.all()
@@ -14,8 +15,13 @@ class PedidoCreateListView(generics.ListCreateAPIView):
         else:
             return PedidoCreateSerializer
     
-    def get(self,request,*args,**kwargs):
-        p = Pedido.objects.last()
-        ps = PropostaSerializer(p)
-        FarmaciaConsumer.send(ps.data,id=8)
-        return response.Response()
+    # def get(self,request,*args,**kwargs):
+    #     p = Pedido.objects.last()
+    #     ps = PropostaSerializer(p)
+    #     FarmaciaConsumer.send(ps.data,id=8)
+    #     return response.Response()
+
+
+class PedidoRetriveView(generics.RetrieveAPIView):
+    queryset = Pedido.objects.all()
+    serializer_class = PedidoRetriveSerializer
