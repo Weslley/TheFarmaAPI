@@ -16,7 +16,7 @@ from apiv2.utils.formartar import desformatar_nome_dosagem
 from api.serializers.pedido import PedidoDetalhadoSerializer
 from api.models.enums.status_item_proposta import StatusItemProposta
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Sum, Case, When, Q, IntegerField
-
+from itertools import groupby
 
 
 class ItensPropostaPermutadosSerializer(PropostaSerializer):
@@ -287,6 +287,11 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 class PedidoRetriveSerializer(PedidoDetalhadoSerializer):
 
     def get_propostas(self,obj):
+        """
+        Recupera as melhores propostas que um pedido recebeu
+        obj: Pedido
+        return: List
+        """
         propostas = obj.itens_proposta.filter(status=StatusItemProposta.ENVIADO)\
             .values('permutacao_id','farmacia_id')\
             .annotate(
@@ -296,6 +301,14 @@ class PedidoRetriveSerializer(PedidoDetalhadoSerializer):
                     When(Q(possui=False),then=0),
                     output_field=IntegerField()
                 ))
-            )
+            )\
+            .order_by('farmacia_id','-total_possui','total_proposta')
         
+        
+        #agrupa por farmacia, como ja vem formata pega o melhor item
+        melhores_propostas = []
+        for key,group in groupby(list(propostas),key=lambda x:x['farmacia_id']):
+            l = list(group)
+            melhores_propostas.append(l[0])
+        #falta fazer o que antigamente fazia kkkkkkkk
         import pdb; pdb.set_trace()
