@@ -17,6 +17,8 @@ from api.serializers.pedido import PedidoDetalhadoSerializer
 from api.models.enums.status_item_proposta import StatusItemProposta
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField, Sum, Case, When, Q, IntegerField
 from itertools import groupby
+from api.serializers.farmacia import FarmaciaEnderecoSerializer
+from api.serializers.pedido import ItemPropostaSimplificadoSerializer
 
 
 class ItensPropostaPermutadosSerializer(PropostaSerializer):
@@ -284,6 +286,72 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         return Apresentacao.objects.filter(**filtro)
 
 
+class PropostasFarmaciaSerializer(serializers.ModelSerializer):
+    farmacia = serializers.SerializerMethodField()
+    possui_todos_itens = serializers.SerializerMethodField()
+    itens = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    valor_total = serializers.SerializerMethodField()
+    valor_frete = serializers.SerializerMethodField()
+    valor_total_com_frete = serializers.SerializerMethodField()
+    quantidade_maxima_parcelas = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Farmacia
+        fields = (
+            'farmacia',
+            'possui_todos_itens',
+            'itens',
+            'status',
+            'valor_total',
+            'valor_frete',
+            'valor_total_com_frete',
+            'quantidade_maxima_parcelas'
+        )
+    
+    def get_farmacia(self,obj):
+        serializer = FarmaciaEnderecoSerializer(obj,context=self.context)
+        return serializer.data
+    
+    def get_possui_todos_itens(self,obj):
+        return obj.possui_todos_itens_permutacao(
+            self.context['pedido'],
+            self.context['permutacao_id']
+        )
+
+    def get_itens(self,obj):
+        itens = obj.get_itens_proposta_permutacao(
+            self.context['pedido'],
+            self.context['permutacao_id']
+        )
+        serializer = ItemPropostaSimplificadoSerializer(itens,many=True)
+        return serializer.data
+    
+    def get_status(self,obj):
+        return obj.get_status_proposta_permutacao(
+            self.context['pedido'],
+            self.context['permutacao_id']
+        )
+    
+    def get_valor_total(self,obj):
+        return obj.get_valor_proposta_permutacao(
+            self.context['pedido'],
+            self.context['permutacao_id']
+        )
+
+    def get_valor_total_com_frete(self,obj):
+        return obj.get_valor_proposta_permutada_com_frete(
+            self.context['pedido'],
+            self.context['permutacao_id']
+        )
+    
+    def get_quantidade_maxima_parcelas(self,obj):
+        return obj.get_quantidade_maxima_parcelas(self.context['pedido'])
+    
+    def get_valor_frete(self,obj):
+        return obj.get_valor_frete(self.context['pedido'])
+
+
 class PedidoRetriveSerializer(PedidoDetalhadoSerializer):
 
     def get_propostas(self,obj):
@@ -305,10 +373,19 @@ class PedidoRetriveSerializer(PedidoDetalhadoSerializer):
             .order_by('farmacia_id','-total_possui','total_proposta')
         
         
-        #agrupa por farmacia, como ja vem formata pega o melhor item
+        #agrupa por farmacia_id
         melhores_propostas = []
         for key,group in groupby(list(propostas),key=lambda x:x['farmacia_id']):
+            #converte para lista e pega o primeiro
+            #como ja vem ordenado pelo banco
+            #o primeiro eh o que possui mais itens e tem o menor preco
             l = list(group)
-            melhores_propostas.append(l[0])
-        #falta fazer o que antigamente fazia kkkkkkkk
-        import pdb; pdb.set_trace()
+            #instancia o serializer da proposta da farmacia passando o pedido e permutacao
+            #ja chama o data tambem
+            melhores_propostas.append(
+                PropostasFarmaciaSerializer(Farmacia.objects.get(id=key), \
+                    context={'pedido':obj,'permutacao_id':l[0]['permutacao_id']}).data
+            )
+        
+        return melhores_propostas
+        
