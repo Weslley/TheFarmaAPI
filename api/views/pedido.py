@@ -30,6 +30,8 @@ from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento import tipo_servicos
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.models.enums.status_pedido import StatusPedido
+from api.models.enums.forma_pagamento import FormaPagamento
+from api.models.enums.tipo_venda import TipoVenda
 
 
 class PedidoCreate(ListCreateAPIView, IsClienteAuthenticatedMixin):
@@ -76,7 +78,7 @@ class PropostaAddView(APIView):
         pedido.views = actual_views + 1
         pedido.save()
         #notificacao fcm
-        enviar_notif(pedido.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id,pedido,extra_data={'pedido_id':pedido.id})
+        #enviar_notif(pedido.cliente.fcm_token,TipoNotificacaoTemplate.VISUALIZADO,pedido.cliente.id,pedido,extra_data={'pedido_id':pedido.id})
         return Response({})
 
 
@@ -233,38 +235,69 @@ class ConfirmarEnvio(GenericAPIView, IsRepresentanteAuthenticatedMixin):
     serializer_class = PedidoSerializer
 
     def post(self, request, *args, **kwargs):
+
         instance = self.get_object()
+
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
 
-        if instance.status == StatusPedido.ENTREGUE:
+        elif instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
 
-        if instance.status == StatusPedido.ENVIADO:
+
+        elif instance.status == StatusPedido.AGUARDANDO_ENVIO_FARMACIA or instance.status == StatusPedido.AGUARDANDO_RETIRADA_CLIENTE:
+            delivery = instance.delivery
+
+            # Verifica se existe medicamento de venda com receita, observando cada item...
+            medicamento_receita = False
+            if instance.itens.filter(apresentacao__produto__principio_ativo__tipo_venda=TipoVenda.COM_RECEITA).count():
+                medicamento_receita = True
+            # Verifica a forma de pagamento do pedido
+            if(instance.forma_pagamento == FormaPagamento.DINHEIRO):
+                if(medicamento_receita):
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_COM_RECEITA
+                else:
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_DINHEIRO_NORM
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_DINHEIRO_NORM
+
+            elif(instance.forma_pagamento == FormaPagamento.CARTAO):
+                if(medicamento_receita):
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_COM_RECEITA
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_COM_RECEITA
+                else:
+                    if(delivery):
+                        tipo = TipoNotificacaoTemplate.D_AGUARDANDO_EM_CARTAO_NORM
+                    else:
+                        tipo = TipoNotificacaoTemplate.B_AGUARDANDO_EM_CARTAO_NORM
+
+            enviar_notif(instance.cliente.fcm_token,tipo,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
+            if(delivery):
+                instance.status = StatusPedido.ENVIADO
+            #else:
+                #instance.status = StatusPedido.ENTREGUE
+            instance.save()
+        elif instance.status == StatusPedido.ENVIADO:
             # Confirmando também a entrega
             instance.status = StatusPedido.ENTREGUE
+            enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.D_PEDIDO_ENTREGUE,instance.cliente.id,instance,extra_data={'pedido_id':instance.id})
             instance.save()
-            #evento fcm
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_S,instance.cliente.id,extra_data={'pedido_id':instance})
-            else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_FORAM_ENTREGUE_P,instance.cliente.id,extra_data={'pedido_id':instance})
         else:
             # confirmando envio
             instance.status = StatusPedido.ENVIADO
             instance.save()
-            #gera mensagem no fcm
-            #evento fcm
-            quantidade = ItemPedido.objects.filter(pedido_id=instance.id)
-            if (len(quantidade)==1):
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_S,instance.cliente.id,extra_data={'pedido_id':instance})
-            else:
-                enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.MEDICAMENTO_SAIU_ENTREGA_P,instance.cliente.id,extra_data={'pedido_id':instance}) 
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
 
 
 class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin):
@@ -282,13 +315,13 @@ class ConfirmarRetiradaEntrega(GenericAPIView, IsRepresentanteAuthenticatedMixin
         if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
                 instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
             raise ValidationError({'detail': 'Proposta já foi cancelado.'})
-
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Proposta já foi entregue.'})
-
-        # confirmando envio
-        instance.status = StatusPedido.ENTREGUE
-        instance.save()
+            
+        else:
+            # confirmando envio
+            instance.status = StatusPedido.ENTREGUE
+            instance.save()
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -358,6 +391,8 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
 
     def get(self,request, *args, **kwargs):
         pedido = self.get_queryset()
+        if pedido.status == StatusPagamentoCartao.CANCELADO:
+            return Response({'detail':'Venda ja estornada'},status=stts.HTTP_400_BAD_REQUEST)
         json_venda = pedido.json_venda
         try:
             data_cancelamento = {
@@ -371,9 +406,10 @@ class CancelaPagamento(GenericAPIView, IsRepresentanteAuthenticatedMixin):
             data_cancelamento.update({'valor':pedido.get_total_farmacia(pedido.farmacia)})
         print(data_cancelamento)
         rs = Pagamento.cancelar(tipo_servicos.CIELO,data_cancelamento)
-        if rs['cancelamento']['Status'] == StatusPagamentoCartao.PAGAMENTO_CANCELADO:
-            #atualiza o pedido
-            pedido.status = StatusPagamentoCartao.PAGAMENTO_CANCELADO
+        #verica se o retorno da cielo foi de cancelado
+        if rs['cancelamento']['Status'] == StatusPagamentoCartao.CANCELADO:
+            #atualiza o status do pedido
+            pedido.status = StatusPedido.ESTORNADO
             pedido.save()
             return Response(status=stts.HTTP_200_OK)
         else:

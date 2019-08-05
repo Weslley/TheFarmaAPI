@@ -1,8 +1,22 @@
 import requests
 from decouple import config
 from api.models.notificacao import NotificacoesTemplate, Notificacao, TipoNotificacaoTemplate
+from api.models.enums import FormaPagamento
 
-def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
+'''
+def analisa_pedido_notificacao(temp_notif, pedido):
+    """
+    Analisa o tipo de pedido e customiza a mensagem
+    temp_notif: <NotificacaoTemplate object>
+    pedido: <Pedido object>
+    """
+    if(not pedido.delivery):
+        if(pedido.forma_pagamento == FormaPagamento.DINHEIRO):
+
+        elif(pedido.forma_pagamento == FormaPagamento.CARTAO):
+'''
+
+def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None,farmacia=None):
     """
     Envia uma notificação para um fcm_token  
     fcm_token: String  
@@ -23,16 +37,19 @@ def enviar_notif(fcm_token,tipo,cliente_id,pedido=None,extra_data=None):
     }
     #corpo
     body = get_body_requisicao(fcm_token,template_notif,pedido=pedido,extra=extra_data)
-    
+
     try:
         #cria uma notificacao para o usuario
         data_notificacao = {
             'tipo':0,
             'titulo': template_notif.titulo if template_notif.titulo else None,
             'mensagem': template_notif.menssagem,
+            'mensagem_extra': template_notif.mensagem_extra,
             'visualizada':False,
             'cliente_id':cliente_id,
             'pedido':pedido,
+            'farmacia':farmacia,
+            'template':template_notif
         }
         #salva
         notif = Notificacao.objects.create(**data_notificacao)
@@ -63,11 +80,13 @@ def get_body_requisicao(fcm_token,template_notif,pedido=None,extra=None):
         'collapse_key':'type_a',
         'notification':{
             'title':template_notif.titulo,
-            'body':template_notif.menssagem
+            'body':template_notif.menssagem,
+            'extra':template_notif.mensagem_extra
         },
         'data':{
             'body':template_notif.titulo,
             'title':template_notif.menssagem,
+            'extra':template_notif.mensagem_extra,
             'screen':template_notif.tela,
             'data':extra
         }

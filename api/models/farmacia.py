@@ -8,7 +8,7 @@ from api.models.conta_bancaria import ContaBancaria
 from api.models.endereco import Endereco
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.utils.generics import calcula_distancia
-
+from decimal import Decimal
 
 class FarmaciaManager(models.Manager):
 
@@ -22,18 +22,10 @@ class FarmaciaManager(models.Manager):
         if 'exclude_farmacias' in kwargs and kwargs['exclude_farmacias']:
             queryset = queryset.exclude(id__in=[farmacia.id for farmacia in kwargs['exclude_farmacias']])
 
-        try:
-            raio_proposta = Configuracao.objects.first().raio_proposta
-        except AttributeError:
-            raio_proposta = 1.0
-        except Exception as err:
-            print(err)
-            raio_proposta = 1.0
 
         queryset = queryset.distinct('id')
 
-        result_list = [f for f in queryset if calcula_distancia(pedido.localizacao, f.localizacao) <= raio_proposta]
-
+        result_list = [f for f in queryset if calcula_distancia(pedido.localizacao, f.localizacao) <= f.raio_acao]
         return result_list
 
 
@@ -130,6 +122,7 @@ class Farmacia(models.Model):
     latitude = models.FloatField(verbose_name='Latitude*')
     longitude = models.FloatField(verbose_name='Longitude*')
     objects = FarmaciaManager()
+    raio_acao = models.DecimalField(decimal_places=2,max_digits=10,default=Decimal(0))
 
     class Meta:
         verbose_name = 'Farmácia'
@@ -209,3 +202,69 @@ class Farmacia(models.Model):
         except Exception as e:
             print(e)
             return 1
+
+    def get_itens_proposta_permutacao(self,pedido,permutacao_id):
+        """
+        Recupera todos os itens proposta de uma proposta de permutacao
+        pedido: Pedido
+        permutacao_id: Int
+        return: List<ItensProposta>
+        """
+        return self.itens_proposta.filter(pedido=pedido,permutacao_id=permutacao_id)
+    
+    def get_status_proposta_permutacao(self,pedido,permutacao_id):
+        """
+        Recupera o status da proposta se todos foram enviado
+        pedido: Pedido
+        permutacao_id: Int
+        return: Int
+        """
+        #proposta
+        proposta = self.get_itens_proposta_permutacao(pedido,permutacao_id).values('status')
+        # Verifica se todos os itens estão como enviado
+        if all(item['status'] == StatusItemProposta.ENVIADO for item in proposta):
+            return StatusItemProposta.ENVIADO
+
+        # Verifica se todos os itens estão como cancelados
+        if all(item['status'] == StatusItemProposta.CANCELADO for item in proposta):
+            return StatusItemProposta.CANCELADO
+
+        # caso contrario a proposta esta como em aberto
+        return StatusItemProposta.ABERTO
+
+    def get_valor_proposta_permutacao(self,pedido,permutacao_id):
+        """
+        Recupera o valor da propostas baseado em um permutacao
+        pedido: Pedido
+        permutacao_id: Int
+        return: Decimal
+        """
+        resultado = self.get_itens_proposta_permutacao(pedido,permutacao_id).\
+            aggregate(valor_proposta=Sum(
+                F('quantidade') * F('valor_unitario'), output_field=models.DecimalField(max_digits=15, decimal_places=2)
+            ))
+        return resultado['valor_proposta']
+    
+    def get_valor_proposta_permutada_com_frete(self, pedido,permutacao_id):
+        """
+        Retorna o valor de uma proposta baseada na permutacacao  
+        adicionando o valor do frete ao total
+        pedido: Pedido
+        permutacao_id: Int
+        return: Decimal
+        """
+        resultado = self.get_valor_proposta_permutacao(pedido,permutacao_id)
+        frete = self.get_valor_frete(pedido)
+        return resultado + frete
+    
+    def possui_todos_itens_permutacao(self, pedido, permutacao_id):
+        """
+        Informa se a proposta possui todos os itens
+        :param pedido: Pedido proposto
+        :param permutacao_id: Int
+        :return: Retorna um boolean
+        """
+        itens = self.get_itens_proposta_permutacao(pedido,permutacao_id)
+        itens_disponiveis = itens.filter(possui=True)
+
+        return itens.count() == itens_disponiveis.count() and not any(item.quantidade_inferior for item in itens_disponiveis)

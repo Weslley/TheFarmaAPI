@@ -24,6 +24,7 @@ from rest_framework_docs import urls as rest_framework_docs_urls
 from api.urls import urls as api_urls
 from api.views.root import DRFDocsView
 from core import urls as core_urls
+from apiv2 import urls as apiv2_urls 
 
 urlpatterns = [
     url(r'^', include(api_urls)),
@@ -33,5 +34,6 @@ urlpatterns = [
     url(r'^lucas-admin/', admin.site.urls),
     url(r'^admin/', include(core_urls)),
     url(r'^api-auth/', include(drf_urls, namespace='rest_framework')),
+    url(r'^a/v2/',include(apiv2_urls)),
 ] 
 # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

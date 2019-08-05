@@ -4,12 +4,14 @@ from django.dispatch import receiver
 from pyrebase import pyrebase
 
 from api.models.pedido import Pedido, LogData
-from api.tasks.pedido import init_proposta
+from api.tasks.pedido import init_proposta, aplic_proposta_v2
 
 from api.models.curtida import Curtida
 from api.models.post import Post
 from api.serializers.post import PostExportSerializer
 
+from api.models.configuracao import Configuracao
+from datetime import timedelta
 import locale
 
 
@@ -79,5 +81,19 @@ def curtida_delete_signal(sender, **kwargs):
 
 @receiver(post_save, sender=Pedido)
 def make_proposta(sender, **kwargs):
-    if kwargs['created']:
-        init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas', countdown=1)
+    #verifica se tem a controladora do signal
+    if hasattr(kwargs['instance'],'_ignore_signal'):
+        #verifica se eh pra ignorar
+        if kwargs['instance']._ignore_signal:
+            #lanca a task que ira atualizar o status do pedido
+            #recupera a duracao de uma proposta
+            try:
+                duracao_proposta = Configuracao.objects.first().duracao_proposta
+            except:
+                duracao_proposta = timedelta(minutes=5)
+            print('ignorou')
+            aplic_proposta_v2.apply_async([kwargs['instance'].id,],queue='propostas',countdown=duracao_proposta.total_seconds())
+    else:
+        if kwargs['created']:
+            print('caiu aqui')
+            init_proposta.apply_async([kwargs['instance'].id, ], queue='propostas', countdown=1)

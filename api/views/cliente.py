@@ -117,9 +117,12 @@ class EnderecoUpdateDelete(RetrieveUpdateDestroyAPIView, IsClienteAuthenticatedM
         with transaction.atomic():
             cliente = self.request.user.cliente
             instance = serializer.save()
-
             if instance.principal:
-                cliente.enderecos.update(principal=False)
+                #desativa o principal antigo
+                for endereco in cliente.enderecos.all():
+                    endereco.endereco.principal = False
+                    endereco.save()
+                #reativa o passado como principal
                 instance.principal = True
                 instance.save()
 

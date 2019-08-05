@@ -45,6 +45,7 @@ DEFAULT_APPS = [
 LOCAL_APPS = [
     'api',
     'core',
+    'apiv2'
 ]
 
 THIRD_PARTY_APPS = [

@@ -11,6 +11,7 @@ from api.models.endereco import Endereco
 from api.models.farmacia import Farmacia
 from api.models.parceiro import UsuarioParceiro
 from api.models.representante_legal import RepresentanteLegal
+import re
 
 
 class AtualizacaoForm(forms.ModelForm):
@@ -39,6 +40,7 @@ class FarmaciaForm(forms.ModelForm):
     numero_conta = forms.IntegerField(label='Número Conta*')
     digito_conta = forms.CharField(label='Dígito Conta*', max_length=1)
     operacao = forms.CharField(label='Operação', max_length=3, required=False)
+    raio_acao = forms.DecimalField(max_digits=10,decimal_places=2,label="Raio de Ação(KM)")
 
     class Meta:
         model = Farmacia
@@ -130,6 +132,18 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             raise forms.ValidationError("Senhas incorretas")
         return password2
 
+    def clean_telefone(self):
+        telefone = self.cleaned_data['telefone']
+        return re.sub(r'\D','',telefone)
+
+    def clean_rg(self):
+        rg = self.cleaned_data['rg']
+        return re.sub(r'\D','',rg)
+
+    def clean_cpf(self):
+        cpf = self.cleaned_data['cpf']
+        return re.sub(r'\D','',cpf)
+
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).count() > 0:
@@ -173,9 +187,11 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             return None
 
     def get_endereco(self, commit=True):
+        unmask_cep = self.cleaned_data['cep']
+        unmask_cep = re.sub(r'\D','',unmask_cep)
         try:
             obj = Endereco(
-                cep=self.cleaned_data['cep'],
+                cep=unmask_cep,
                 logradouro=self.cleaned_data['logradouro'],
                 numero=self.cleaned_data['numero'],
                 complemento=self.cleaned_data['complemento'],
@@ -192,15 +208,16 @@ class RepresentanteFarmaciaForm(forms.ModelForm):
             return None
 
     def save(self, commit=True):
+        #cria o representante
         with transaction.atomic():
             self.instance = super(RepresentanteFarmaciaForm, self).save(commit=False)
             self.instance.endereco = self.get_endereco(commit=commit)
             self.instance.usuario = self.get_usuario(commit=commit)
             self.instance.farmacia = self.initial['farmacia']
-            if commit:
-                self.instance.save()
-            return self.instance
-
+        #salva
+        if commit:
+            self.instance.save()
+        return self.instance
 
 class UsuarioParceiroForm(forms.ModelForm):
     nome = forms.CharField(max_length=30)

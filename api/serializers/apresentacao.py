@@ -74,7 +74,7 @@ class ApresentacaoBusca(serializers.ModelSerializer):
         )
 
     def get_nome(self, obj):
-        obj.nome_apresentacao
+        return obj.nome_apresentacao
     
     def get_embalagem(self, obj):
         if obj.embalagem:
@@ -253,7 +253,7 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-        pmc = locale.currency(pmc, grouping=True, symbol=None)
+        # locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+        # pmc = locale.currency(pmc, grouping=True, symbol=None)
 
-        return pmc
+        return float(pmc)
