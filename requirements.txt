@@ -16,7 +16,7 @@ certifi==2017.7.27.1
 cffi==1.11.2
 channels==1.1.6
 chardet==3.0.4
--e git+https://github.com/DeveloperCielo/API-3.0-Python#egg=cieloApi3
+-e git+https://github.com/DeveloperCielo/API-3.0-Python@8d8d923009c4b30cf38a7d7f065c46fae688a847#egg=cieloApi3
 constantly==15.1.0
 coreapi==2.3.1
 coreschema==0.0.4
