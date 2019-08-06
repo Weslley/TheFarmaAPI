@@ -112,11 +112,21 @@ class ListDosagensProdutoView(generics.GenericAPIView):
             .exclude(forma_farmaceutica=None).order_by('quantidade','embalagem','quantidade')
         #agrupa por {dosagem,embalagem,quantidade e sufixo quantidade}
         for k,g in groupby(list(apresentacoes), key=lambda x:self.group_by_dict(x)):
+            l = []
+
+            for x in g:
+                try:
+                    imagem = x.imagem.url
+                except: 
+                    imagem = ''
+                
+                fabricante = x.produto.laboratorio.nome if x.produto.laboratorio else ''
+                l.append({ 'id': x.id, 'imagem': imagem, 'fabricante': fabricante })
+
             #prepara a lista de retorno
             #contendo a lista de apresentacoes
-            item = {
-                'apresentacacoes':[x.id for x in g],
-            }
+            item = { 'apresentacoes': l }
+            
             #atualiza com o resto das keys
             item.update(**k)
             rs['results'].append(item)
