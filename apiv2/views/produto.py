@@ -11,7 +11,7 @@ from api.utils.formats import formata_numero_apresentaca
 
 class ListDosagensProdutoView(generics.GenericAPIView):
 
-    def group_by_dict(self,apresentacao):
+    def group_by_dict(self, apresentacao):
         """
         Metodo que retorna o dicionario para fazer o group by dos  
         medicamento.
@@ -98,7 +98,7 @@ class ListDosagensProdutoView(generics.GenericAPIView):
     def get_queryset(self):
         qs = Produto.objects.filter(nome__iexact=self.request.query_params.get('nome',None))
         if not qs.count():
-            raise ValidationError({'detail':'Produto nao existe'})
+            raise ValidationError({'detail':'Produto não existe'})
         return qs
 
     def get(self,request,*args,**kwargs):
@@ -110,15 +110,32 @@ class ListDosagensProdutoView(generics.GenericAPIView):
         #seleciona todas as apresentacoes do produto
         apresentacoes = Apresentacao.objects.filter(produto__in=self.get_queryset())\
             .exclude(forma_farmaceutica=None).order_by('quantidade','embalagem','quantidade')
+
         #agrupa por {dosagem,embalagem,quantidade e sufixo quantidade}
         for k,g in groupby(list(apresentacoes), key=lambda x:self.group_by_dict(x)):
+
+            l = []
+
+            for x in g:
+
+                try:
+                    imagem = x.imagem.url
+                except: 
+                    imagem = ''
+                
+                fabricante = x.produto.laboratorio.nome if x.produto.laboratorio else ''
+                l.append({ 'id': x.id, 'imagem': imagem, 'fabricante': fabricante })
+
+            #import pdb; pdb.set_trace()
+
             #prepara a lista de retorno
             #contendo a lista de apresentacoes
             item = {
-                'apresentacacoes':[x.id for x in g],
+                'apresentacoes': l
             }
             #atualiza com o resto das keys
             item.update(**k)
             rs['results'].append(item)
+
         return Response(rs)
         

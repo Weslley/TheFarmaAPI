@@ -83,7 +83,7 @@ pyOpenSSL==17.3.0
 pyparsing==2.2.0
 Pyrebase==3.0.9
 python-cards==1.3
-python-decouple==3.0 -e git+https://github.com/juanjbrown/python-decouple-plus#egg=python_decouple_plus
+python-decouple==3.0
 pytz==2017.2
 PyZenvia==0.3
 redis==2.10.5
