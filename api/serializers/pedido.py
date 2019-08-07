@@ -3,6 +3,8 @@ from api.consumers.farmacia import FarmaciaConsumer
 from api.models.administradora import Administradora
 from api.models.configuracao import Configuracao
 from api.models.conta_pagar import ContaPagar
+import locale
+
 from api.models.conta_receber import ContaReceber
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
@@ -33,14 +35,10 @@ from api.utils import get_client_browser, get_client_ip  # , status_transacao_ca
 from api.utils import get_user_lookup, get_tempo_proposta
 from datetime import datetime, timedelta
 from .log import LogSerializer
-import locale
-from api.utils.formats import formatar_telefone
+
 from api.models.representante_legal import RepresentanteLegal
 from api.models.enums.tipo_venda import TipoVenda
 from api.models.notificacao import Notificacao
-
-
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 class PagamentoCartao(object):
     pass
@@ -922,6 +920,7 @@ class VendaPedido(serializers.ModelSerializer):
         """
         formata a saida
         """
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
         ret = super().to_representation(instance)
         ret['total_liquido'] = locale.currency(ret['total_liquido'])
         return ret
@@ -963,15 +962,15 @@ class ComandaPeidoSerializer(serializers.ModelSerializer):
         return '{} {}'.format(obj.cliente.usuario.first_name,obj.cliente.usuario.last_name) 
     
     def get_telefone(self,obj):
-        return formatar_telefone(obj.cliente.celular)
+        return obj.cliente.celular_formatado
     
     def get_valor_troco(self,obj):
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-        return locale.currency(obj.troco,grouping=True)
+        return locale.currency(obj.troco, grouping=True)
     
     def get_valor_pago(self,obj):
         locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-        return locale.currency(obj.valor_bruto,grouping=True)
+        return locale.currency(obj.valor_bruto, grouping=True)
     
     def get_farmacia(self,obj):
         try:

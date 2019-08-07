@@ -18,7 +18,6 @@ from dj_database_url import parse as parse_db_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -29,7 +28,6 @@ SECRET_KEY = '1fw$lp)2r2askby^#=-!$i36l_8frl46k(-%jmv%1cx-!4rlk='
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 DEFAULT_APPS = [
@@ -76,7 +74,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'api.middleware.PrintRequest'
 ]
 
 ROOT_URLCONF = 'thefarmaapi.urls'
@@ -100,26 +97,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'thefarmaapi.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#     }
-# }
 DATABASES = {
-    'default': config(
-        'DATABASE_URL',
-        cast=parse_db_url
-    ),
+    'default': config('DATABASE_URL', cast=parse_db_url),
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -153,18 +136,13 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Backends de atutenticação
 AUTHENTICATION_BACKENDS = (
@@ -214,8 +192,8 @@ LOGOUT_URL = '/admin/logout/'
 LOGIN_REDIRECT_URL = '/admin/'
 
 # Celery
-CELERY_BROKER_URL = 'redis://redis_celery:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis_celery:6379/0'
+CELERY_BROKER_URL = config('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = config('CELERY_BROKER_URL')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -229,23 +207,17 @@ CELERY_RESULT_SERIALIZER = 'json'
 #     },
 # }
 
-# CORS_ORIGIN_WHITELIST = config('CORS_ORIGIN_WHITELIST', cast=casting.to_tuple(','))
 CORS_ORIGIN_ALLOW_ALL = True
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'asgi_redis.RedisChannelLayer',
         'CONFIG': {
-             #DOCKER CFG
-             'hosts': [('redis://redis_channels:6379/1')],
-             #SEM DOCKER
-             #'hosts': [('redis://localhost:6379/1')],
+            'hosts': [(config('REDIS_CHANNELS_URL'))],
         },
         'ROUTING': 'thefarmaapi.routing.channels_routing',
     }
 }
 
-# HTTPS = config('HTTPS', default='https://')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 FAKER_DOMAIN_EMAIL = config('FAKER_DOMAIN_EMAIL', default='thefarma_domain')

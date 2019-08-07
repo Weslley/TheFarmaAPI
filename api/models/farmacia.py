@@ -1,3 +1,5 @@
+import re
+from decimal import Decimal
 from datetime import time, timedelta
 
 from django.db import models
@@ -8,7 +10,6 @@ from api.models.conta_bancaria import ContaBancaria
 from api.models.endereco import Endereco
 from api.models.enums.status_item_proposta import StatusItemProposta
 from api.utils.generics import calcula_distancia
-from decimal import Decimal
 
 class FarmaciaManager(models.Manager):
 
@@ -138,6 +139,16 @@ class Farmacia(models.Model):
         :return: tupla de latitude e longitude
         """
         return self.latitude, self.longitude
+
+    @property
+    def telefone_formatado(self):
+        if self.telefone:
+            if len(self.telefone)==11:
+                return '({}{}) {}{}{}{}{}-{}{}{}{}'.format(*re.sub("\D",'', self.telefone))
+            elif len(self.telefone)==1:
+                return '({}{}) {}{}{}{}-{}{}{}{}'.format(*re.sub("\D",'', self.telefone))
+
+        return re.sub('\D','', self.telefone)
 
     def get_itens_proposta(self, pedido):
         """

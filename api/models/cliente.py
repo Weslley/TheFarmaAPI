@@ -28,6 +28,16 @@ class Cliente(models.Model):
     def __str__(self):
         return self.usuario.get_full_name()
 
+    @property
+    def celular_formatado(self):
+        if self.celular:
+            if len(self.celular)==11:
+                return '({}{}) {}{}{}{}{}-{}{}{}{}'.format(*re.sub("\D",'', self.celular))
+            elif len(self.celular)==1:
+                return '({}{}) {}{}{}{}-{}{}{}{}'.format(*re.sub("\D",'', self.celular))
+
+        return re.sub('\D','', self.celular)
+
     def get_remote_image(self, image_url):
         """
         Metodo para fazer o download e da imagem da url e salvar no campo foto

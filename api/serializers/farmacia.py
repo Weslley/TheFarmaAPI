@@ -1,16 +1,17 @@
+from datetime import datetime
+
 from django.db import transaction
 from rest_framework import serializers
 
-from api.models.farmacia import Farmacia
+from api.models.bairro import Bairro
 from api.models.feriado import Feriado
-from api.models.bairro import Bairro
-from api.serializers.conta_bancaria import ContaBancariaSerializer
-from datetime import datetime
+from api.models.farmacia import Farmacia
 
-from api.serializers.endereco import EnderecoClienteCreateSerializer, EnderecoSerializer, EnderecoFarmaciaSerializer
 from api.utils.generics import calcula_distancia
-from api.utils.formats import formatar_telefone
-from api.models.bairro import Bairro
+
+from api.serializers.conta_bancaria import ContaBancariaSerializer
+from api.serializers.endereco import EnderecoClienteCreateSerializer, EnderecoSerializer, EnderecoFarmaciaSerializer
+
 
 class FarmaciaListSerializer(serializers.ModelSerializer):
     horario_funcionamento = serializers.SerializerMethodField()
@@ -92,8 +93,12 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
         return '{} hora{}{}'.format(horas, 's' if horas > 1 else '', str_minutos if minutos > 0 else '')
 
     def get_distancia(self, obj):
+        cliente = (None, None)
         farmacia = (obj.latitude, obj.longitude)
-        cliente = (self.context['pedido'].latitude, self.context['pedido'].longitude)
+        
+        if 'pedido' in self.context:
+            cliente = (self.context['pedido'].latitude, self.context['pedido'].longitude)
+
         if all(farmacia) and all(cliente):
             distancia = round(calcula_distancia(farmacia, cliente), 2)
         else:
@@ -101,6 +106,7 @@ class FarmaciaListSerializer(serializers.ModelSerializer):
 
         if distancia == 0:
             return '0m'
+
         if distancia >= 1:
             return '{distancia}km'.format(distancia=distancia)
         else:
@@ -252,7 +258,7 @@ class FarmaciaComandaDado(serializers.ModelSerializer):
             return ''
 
     def get_telefone(self,obj):
-        return formatar_telefone(obj.telefone)
+        return obj.telefone_formatado
     
     def get_numero(self,obj):
         return obj.endereco.numero

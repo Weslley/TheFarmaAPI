@@ -1,11 +1,10 @@
 from django.db import models, transaction
 
-from versatileimagefield.fields import VersatileImageField, PPOIField
-
-from api.models.configuracao import Configuracao
-from api.models.produto import Produto
-from api.utils.formats import formata_numero_apresentaca
 from api.models.unidade import Unidade
+from api.models.produto import Produto
+from api.models.configuracao import Configuracao
+
+from versatileimagefield.fields import VersatileImageField, PPOIField
 
 import locale
 
@@ -186,27 +185,29 @@ class Apresentacao(models.Model):
             #verifica se tem dosagem
             if self.dosagem:
                 virgula = True
-                dosagem = formata_numero_apresentaca(self.dosagem)
+                dosagem = "{}".format(int(self.dosagem))
                 nome += '{}{}'.format(dosagem,self.sufixo_dosagem.nome)
             if self.segunda_dosagem:
-                dosagem = formata_numero_apresentaca(self.segunda_dosagem)
+                dosagem = "{}".format(int(self.segunda_dosagem))
                 nome += ' + {}{}'.format(dosagem,self.sufixo_segunda_dosagem)
             if self.terceira_dosagem:
-                dosagem = formata_numero_apresentaca(self.terceira_dosagem)
+                dosagem = "{}".format(int(self.terceira_dosagem))
                 nome += ' + {}{}'.format(dosagem,self.sufixo_terceira_dosagem.nome)
             if self.quarta_dosagem:
-                dosagem = formata_numero_apresentaca(self.quarta_dosagem)
+                dosagem = "{}".format(int(self.quarta_dosagem))
                 nome += ' + {}{}'.format(dosagem,self.sufixo_quarta_dosagem.nome)
             #se  tiver dosagem precisa da virgula
             if virgula:
                 nome += ', '
             #verifica se a forma farmaceutica eh uma excecao
             if self.forma_farmaceutica.nome in EXECOES:
-                nome += '{} {}'.format(formata_numero_apresentaca(self.quantidade),self.forma_farmaceutica.nome)
+                nome += '{} {}'.format("{}".format(int(self.quantidade)), self.forma_farmaceutica.nome)
             else:
-                nome += '{} com {}'.format(self.forma_farmaceutica.nome,formata_numero_apresentaca(self.quantidade))
+                nome += '{} com {}'.format(self.forma_farmaceutica.nome, "{}".format(int(self.quantidade)))
+
             if self.sufixo_quantidade:
                 nome += ' {}'.format(self.sufixo_quantidade.nome)
+
             return nome.capitalize()
         except Exception as err:
             print(str(err))
@@ -220,8 +221,72 @@ class Apresentacao(models.Model):
                (self.ranking_compra * configuracao.peso_ranking_compra)
 
     @property
+    def fabricante(self):
+        try:
+            return self.produto.laboratorio.nome if self.produto.laboratorio else ''
+        except: 
+            return ''
+
+    @property
+    def imagem_url(self):
+        try:
+            url = self.imagem.url
+        except: 
+            url = ''
+
+        return url
+
+    @property
     def get_manager(self):
         return self.__class__.objects
+
+    @property
+    def dosagem_formatada(self):
+        """
+        Fortmata a apresentacao
+        apresentacao: Apresentacao
+        return: str
+        """
+        try:
+            nome = ''
+            if self.dosagem:
+                dosagem = "{}".format(int(self.dosagem))
+                nome += '{}{}'.format(dosagem, self.sufixo_dosagem.nome)
+            if self.segunda_dosagem:
+                dosagem = "{}".format(int(self.segunda_dosagem))
+                nome += ' + {}{}'.format(dosagem, self.sufixo_segunda_dosagem)
+            if self.terceira_dosagem:
+                dosagem = "{}".format(int(self.terceira_dosagem))
+                nome += ' + {}{}'.format(dosagem, self.sufixo_terceira_dosagem.nome)
+            if self.quarta_dosagem:
+                dosagem = "{}".format(int(self.quarta_dosagem))
+                nome += ' + {}{}'.format(dosagem, self.sufixo_quarta_dosagem.nome)
+            return nome
+        except Exception as e:
+            return self.nome
+
+    @property
+    def embalagem_formatada(self):
+        """
+        Gera o nome da embalagem
+        apresentacao: Apresentacao
+        return: str
+        """
+        quantidade = 0
+        if self.quantidade:
+            quantidade = int(self.quantidade)
+
+        #embalagem = self.embalagem.nome
+        forma_farmaceutica = self.forma_farmaceutica.nome
+        sufixo_quantidade = self.sufixo_quantidade.nome if self.sufixo_quantidade else ''
+
+        #verifica se esta nas execoes de formatacao
+        if forma_farmaceutica in EXECOES:
+            nome = '{} {}'.format(quantidade, forma_farmaceutica)
+        else:
+            nome = '{} com {}{}'.format(forma_farmaceutica, quantidade, sufixo_quantidade)
+
+        return nome
 
     def genericos(self, comercializado=None):
         #filtros base
@@ -260,12 +325,8 @@ class Apresentacao(models.Model):
                 'sufixo_quarta_dosagem': self.sufixo_quarta_dosagem
             })
         
-        return self.get_manager.filter(**filtro)
-
-    @property
-    def embalagem_formatada(self):
-        pass
-
+        return self.get_manager.filter(**filtro).exclude(id=self.id)
+    
 
 def generate_filename(self, filename):
     return 'apresentacoes/{0}/{1}'.format(self.apresentacao_id, filename)
