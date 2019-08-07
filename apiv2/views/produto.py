@@ -71,6 +71,7 @@ class ListDosagensProdutoView(generics.GenericAPIView):
                 l.append({ 
                     'id': x.id,
                     'embalagem': x.embalagem_formatada,
+                    'quantidade_embalagem': x.quantidade,
                     'fabricante': x.fabricante,
                     'imagem': x.imagem_url,
                 })
