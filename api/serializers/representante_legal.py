@@ -67,7 +67,6 @@ class RepresentanteFarmaciaSerializer(serializers.ModelSerializer):
             if 'endereco' in validated_data:
                 endereco_data = validated_data.pop('endereco')
                 cidade = endereco_data.pop('cidade')
-                #import pdb; pdb.set_trace()
                 endereco_data.update({'cidade': cidade.ibge})
                 serializer = EnderecoFarmaciaSerializer(
                     instance.endereco,

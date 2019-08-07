@@ -47,14 +47,9 @@ class ItemPedidoCreateSerializer(serializers.Serializer):
     sufixo_quantidade = serializers.CharField(required=False,allow_blank=True,allow_null=True)
 
     def validate(self,data):
-        if data['generico']:
-            if not 'produto' in data or not 'dosagens' in data or not 'embalagem' in data or not 'quantidade_embalagem' or not 'sufixo_quantidade' in data:
-                raise serializers.ValidationError({
-                    'detail':'Caso seja aceito generico informe todos os seguintes campos:Produto, Embalagem, Quantidade_embalagem, dosagem e Sufixo_dosagem'
-                })
-        else:
-            if not 'apresentacao' in data:
-                raise serializers.ValidationError({'detail':'Por favor informe uma apresentacao'})
+        if not 'apresentacao' in data:
+            raise serializers.ValidationError({'detail':'Por favor informe uma apresentacao'})
+        
         return data
 
 class PedidoCreateSerializer(serializers.ModelSerializer):
@@ -85,9 +80,11 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             #init vars
             itens = validated_data.pop('itens')
             request = self.context['request']
+
             #cria o log
             # gerando log do pedido com o agent e o ip da requisição
             log = self.criar_log(request)
+
             #atualiza as informacoes do endereco
             endereco = validated_data.pop('endereco',None)
             if validated_data['delivery'] and endereco:
@@ -97,19 +94,23 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             validated_data['cliente'] = get_user_lookup(request,'cliente')
             validated_data['log'] = log
             pedido = Pedido(**validated_data)
+
             #cria um atributo para poder ignorar o signal
             pedido._ignore_signal = True
+
             #salva realemnte em banco
             pedido.save()
 
             #cria os itens do pedido
-            rs = self.gerar_itens_pedido(itens,pedido)
+            rs = self.gerar_itens_pedido(itens, pedido)
+
             #gera as proposta
             farmacias_proximas = Farmacia.objects.proximas(pedido)
-            self.gerar_proposta_permutada(itens,farmacias_proximas,pedido)
+            self.gerar_proposta_permutada(itens, farmacias_proximas, pedido)
+
             return pedido
 
-    def recupera_dados_endereco(self,endereco):
+    def recupera_dados_endereco(self, endereco):
         """
         Retorna as informacacoes do endereco do cliente
         endereco: Endereco
@@ -145,8 +146,9 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                 item['apresentacao'] = self.get_aprentacoes_produto(item)
             i+=1
             #convert pra lista
-            if isinstance(item['apresentacao'],Apresentacao):
+            if isinstance(item['apresentacao'], Apresentacao):
                 item['apresentacao'] = [item['apresentacao'],]
+
             for apresentacao in item['apresentacao']:
                 #aumenta o hank de proposta
                 apresentacao.get_manager.update_ranking_proposta(apresentacao.id)
@@ -171,7 +173,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             remote_ip=get_client_ip(request)
         )
     
-    def get_pcm(self,apresentacao,cidade):
+    def get_pcm(self,apresentacao, cidade):
         """
         Buscando o pmc base para calcular o valor unitário
         apresentacao: Apresentacao
@@ -184,6 +186,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             valor_unitario = tabela.pmc
         except Exception as err:
             print(err)
+
         return valor_unitario
 
     def parse_itens_lista_permutacao(self,item):
@@ -194,9 +197,9 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         """
         quantidade = item['quantidade']
         valor_unitario = item['valor_unitario']
-        return [{'quantidade':quantidade,'apresentacao':x,'valor_unitario':valor_unitario} for x in item['apresentacao']]
+        return [{ 'quantidade': quantidade, 'apresentacao': x, 'valor_unitario': valor_unitario } for x in item['apresentacao']]
     
-    def gerar_proposta_permutada(self,itens,farmacias,pedido):
+    def gerar_proposta_permutada(self, itens, farmacias, pedido):
         """
         Gera proposta baseada na permutacao nas apresentacoes selecionadas
         itens: List<Dict>
@@ -206,14 +209,13 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         """
         #permuta a lista de itens
         #fazendo antes o parse de dict para lista de dict
-        lista_permutada = list(itertools.product(*map(self.parse_itens_lista_permutacao,itens)))
+        lista_permutada = list(itertools.product(*map(self.parse_itens_lista_permutacao, itens)))
         for farmacia in farmacias:
             #controle de qual foi o id da permutacao
             i = 0
             #para cada farmacia cria propostas permutadas
             # print('Interacao farmacia:')
             for item_pedido in lista_permutada:
-                # print('Nova Proposta:')
                 #pedidos da proposta
                 itens_proposta = []
                 i += 1
@@ -229,9 +231,10 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                         permutacao_id=i
                     ))
                 #serializa a proposta atual
-                data = self.serializer_data_item_pedido_proposta(itens_proposta,pedido,farmacia)
+                data = self.serializer_data_item_pedido_proposta(itens_proposta, pedido, farmacia)
+
                 #manda para o ws
-                FarmaciaConsumer.send(data,**{'id':farmacia.id})
+                FarmaciaConsumer.send(data ,**{'id': farmacia.id})
 
 
     def serializer_data_item_pedido_proposta(self,lista,pedido,farmacia):
@@ -245,45 +248,14 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         serializer = ItensPropostaPermutadosSerializer(pedido,context={'lista':lista,'farmacia':farmacia})
         return serializer.data
     
-    def get_aprentacoes_produto(self,item):
+    def get_aprentacoes_produto(self, item):
         """
         Recupera as apresentacoes de um produto baseado nas suas especificacoes
         item: Dict{produto,embalagem,quantidade_embalagem,sufixo_quantidade,dosagens}
         return: List<Apresentacoes>
         """
-        principio_ativo = Produto.objects.filter(nome__istartswith=item['produto']).first().principio_ativo
-        #filtros base
-        filtro = {
-            'produto__principio_ativo':principio_ativo,
-            'quantidade__gte':item['quantidade_embalagem'],
-            'forma_farmaceutica__nome__istartswith': item['embalagem'],
-        }
-        #add as dosagens ao filtro
-        for dosagem in item['dosagens']:
-            #o i indica qual eh a ordem da dosagem
-            #primeira,segunda...
-            if dosagem['i'] == 1:
-                filtro.update({
-                    'dosagem':dosagem['dosagem'],
-                    'sufixo_dosagem__nome__startswith':dosagem['sufixo_dosagem']
-                })
-            if dosagem['i'] == 2:
-                filtro.update({
-                    'segunda_dosagem':dosagem['dosagem'],
-                    'sufixo_segunda_dosagem__nome__startswith':dosagem['sufixo_dosagem']
-                })
-            if dosagem['i'] == 3:
-                filtro.update({
-                    'terceira_dosagem':dosagem['dosagem'],
-                    'sufixo_terceira_dosagem__nome__startswith':dosagem['sufixo_dosagem']
-                })
-            if dosagem['i'] == 4:
-                filtro.update({
-                    'quarta_dosagem':dosagem['dosagem'],
-                    'sufixo_quarta_dosagem__nome__startswith':dosagem['sufixo_dosagem']
-                })
-        # print(Apresentacao.objects.filter(**filtro).count())                
-        return Apresentacao.objects.filter(**filtro)
+        apresentacao = Apresentacao.objects.get(id =item['apresentacao'].id)
+        return apresentacao.genericos()
 
 
 class PropostasFarmaciaSerializer(serializers.ModelSerializer):

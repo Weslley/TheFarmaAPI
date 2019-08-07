@@ -86,7 +86,7 @@ class ListDosagensProdutoView(generics.GenericAPIView):
         """
         principio_ativo = Produto.objects.filter(nome__istartswith=produto)
         if not principio_ativo.count():
-            raise ValidationError({'detail':'Produto nao encontrado'})
+            raise ValidationError({'detail':'Produto não encontrado'})
         #recupera o principio ativo
         principio_ativo = principio_ativo.first().principio_ativo
         #ve se tem mais um
@@ -108,7 +108,7 @@ class ListDosagensProdutoView(generics.GenericAPIView):
             'results':[]
         }
         #seleciona todas as apresentacoes do produto
-        apresentacoes = Apresentacao.objects.filter(produto__in=self.get_queryset())\
+        apresentacoes = Apresentacao.objects.filter(produto__in=self.get_queryset(), comercializado=True)\
             .exclude(forma_farmaceutica=None).order_by('quantidade','embalagem','quantidade')
 
         #agrupa por {dosagem,embalagem,quantidade e sufixo quantidade}

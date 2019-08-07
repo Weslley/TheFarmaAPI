@@ -23,6 +23,13 @@ class Produto(models.Model):
 
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.principio_ativo)
+    
+    @property
+    def get_manager(self):
+        return self.__class__.objects
+
+    def genericos(self):
+        return self.get_manager.filter(principio_ativo=self.principio_ativo)
 
 
 class MedicamentoApExport(models.Model):

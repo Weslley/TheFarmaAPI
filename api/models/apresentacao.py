@@ -223,6 +223,49 @@ class Apresentacao(models.Model):
     def get_manager(self):
         return self.__class__.objects
 
+    def genericos(self, comercializado=None):
+        #filtros base
+        filtro = {
+            'produto__principio_ativo': self.produto.principio_ativo,
+            'quantidade__gte': self.quantidade,
+            'forma_farmaceutica': self.forma_farmaceutica,
+        }
+
+        if comercializado is not None:
+            filtro.update({
+                'comercializado': comercializado
+            })
+
+        if self.dosagem:
+            filtro.update({
+                'dosagem': self.dosagem,
+                'sufixo_dosagem': self.sufixo_dosagem
+            })
+
+        if self.segunda_dosagem:
+            filtro.update({
+                'segunda_dosagem': self.segunda_dosagem,
+                'sufixo_segunda_dosagem': self.sufixo_segunda_dosagem
+            })
+
+        if self.terceira_dosagem:
+            filtro.update({
+                'terceira_dosagem': self.terceira_dosagem,
+                'sufixo_terceira_dosagem': self.sufixo_terceira_dosagem
+            })
+
+        if self.quarta_dosagem:
+            filtro.update({
+                'quarta_dosagem': self.quarta_dosagem,
+                'sufixo_quarta_dosagem': self.sufixo_quarta_dosagem
+            })
+        
+        return self.get_manager.filter(**filtro)
+
+    @property
+    def embalagem_formatada(self):
+        pass
+
 
 def generate_filename(self, filename):
     return 'apresentacoes/{0}/{1}'.format(self.apresentacao_id, filename)
