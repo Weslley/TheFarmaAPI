@@ -23,7 +23,6 @@ services:
     volumes:
       - static-data:/thefarmaapi/staticfiles
       - media-data:/thefarmaapi/media
-      - .:/thefarmaapi
     expose:
       - "8000"
     restart: always
@@ -37,6 +36,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,contas --hostname=worker_default"
+    # command: bash -c "celery -A thefarmaapi worker -l debug --autoscale=10,3 --queues=default,update_cliente,propostas,contas --hostname=worker_default"
     command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,periodicos --hostname=worker_default"
     volumes:
       - media-data:/thefarmaapi/media
@@ -69,7 +70,6 @@ services:
     volumes:
       - static-data:/thefarmaapi/staticfiles
       - media-data:/thefarmaapi/media
-      - .:/thefarmaapi
     expose:
       - "8000"
     restart: always
@@ -87,7 +87,6 @@ services:
     volumes:
       - media-data:/thefarmaapi/media
       - ./config/prod/ssl:/etc/certificates
-      - .:/thefarmaapi
     expose:
       - "8000"
       - "443"
@@ -102,16 +101,10 @@ services:
     image: redis:alpine
     command: redis-server
     container_name: redis_channels
-    ports:
-      - "6379"
-    restart: always
 
   redis_celery:
     image: redis:alpine
     container_name: redis_celery
-    ports:
-      - "6379"
-    restart: always
 
 volumes:
   static-data:

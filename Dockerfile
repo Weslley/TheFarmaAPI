@@ -1,6 +1,6 @@
 FROM mrlucascardoso/python-slim-postgres
 
-RUN mkdir /thefarmaapi
+MAINTAINER Lucas Cardoso <mr.lucascardoso@gmail.com>
 
 ADD ./ /thefarmaapi
 
