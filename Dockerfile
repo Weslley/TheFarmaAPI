@@ -18,5 +18,3 @@ ENV LANGUAGE pt_BR:pt
 ENV LC_ALL pt_BR.UTF-8
 
 RUN pip install -r requirements.txt --force-reinstall
-RUN pip install cieloApi3 --force-reinstall
-
