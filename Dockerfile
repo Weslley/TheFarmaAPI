@@ -1,10 +1,9 @@
 FROM mrlucascardoso/python-slim-postgres
-
 MAINTAINER Lucas Cardoso <mr.lucascardoso@gmail.com>
 
-ADD ./ /thefarmaapi
-
 WORKDIR /thefarmaapi
+
+COPY . /thefarmaapi/
 
 EXPOSE 8000
 
