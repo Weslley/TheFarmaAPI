@@ -13,90 +13,87 @@ services:
       - web
     restart: always
 
+  redis_channels:
+    image: redis
+    container_name: redis_channels
+    ports:
+      - "6379"
+
+  redis_celery:
+    image: redis
+    container_name: redis_celery
+    ports:
+      - "6379"
+
   web:
     build: .
     container_name: thefarma_api
-    command: bash -c "python manage.py migrate && gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000  --workers 3 --log-level=info"
+    command: bash -c "python manage.py migrate && python manage.py collectstatic --no-input && python manage.py runserver 0.0.0.0:8000" #gunicorn thefarmaapi.wsgi:application -b 0.0.0.0:8000  --workers 3 --log-level=info
     volumes:
       - .:/thefarmaapi/
+    ports:
+      - "8000:8000"
     expose:
       - "8000"
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   worker_default:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     command: bash -c "celery --app=thefarmaapi._celery:app worker --autoscale=10,3 --loglevel=DEBUG --queues=default,update_cliente,propostas,periodicos --hostname=worker_default"
     volumes:
-      - media-data:/thefarmaapi/media
       - .:/thefarmaapi
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   celery_beat:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     command: bash -c "celery -A thefarmaapi beat -l debug"
     volumes:
-      - media-data:/thefarmaapi/media
       - .:/thefarmaapi
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   worker_channels:
     build: .
     container_name: worker_channels
     command: bash -c "python manage.py runworker"
     volumes:
-      - static-data:/thefarmaapi/staticfiles
-      - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
     expose:
       - "8000"
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   channels:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: bash -c "daphne -e -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
+    build: .
+    command: bash -c "daphne -b 0.0.0.0 -p 8000 thefarmaapi.asgi:channel_layer"
     volumes:
-      - media-data:/thefarmaapi/media
+      - .:/thefarmaapi
     expose:
       - "8000"
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
-
-  redis_channels:
-    image: redis:alpine
-    command: redis-server
-    container_name: redis_channels
-
-  redis_celery:
-    image: redis:alpine
-    container_name: redis_celery
+    restart: always
 
 volumes:
   static-data:
