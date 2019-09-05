@@ -128,7 +128,7 @@ class LoginClienteSerializer(serializers.ModelSerializer):
                 if exist_user:
                     user = self.user_queryset.get(email=validated_data['email'], cliente__facebook_id__isnull=False)
                     if user.cliente.facebook_id != validated_data['facebook_id']:
-                        raise serializers.ValidationError('Facebook token enválido.')
+                        raise serializers.ValidationError('Facebook token inválido.')
             else:
                 exist_user = self.user_queryset.filter(cliente__facebook_id=validated_data['facebook_id']).exists()
                 if exist_user:
