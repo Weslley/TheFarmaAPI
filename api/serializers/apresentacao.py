@@ -44,11 +44,7 @@ class ImagemApresentacaoSerializer(serializers.ModelSerializer):
 
 class ApresentacaoBusca(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
-    imagem = VersatileImageFieldSerializer(
-        sizes=[
-            ('square_crop', 'crop__400x400'),
-        ]
-    )
+    imagem = serializers.SerializerMethodField()
     pmc = serializers.SerializerMethodField()
     data_atualizacao = serializers.SerializerMethodField()
     nome = serializers.SerializerMethodField()
@@ -112,6 +108,9 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 
         return round(preco, 2)
 
+    def get_imagem(self, obj):
+        return obj.imagem_url
+
 
 class ProdutoFabricante(serializers.ModelSerializer):
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
@@ -144,12 +143,8 @@ class ProdutoCompletoSerializer(ProdutoSimplesSerializer):
 class ApresentacaoBuscaProduto(serializers.ModelSerializer):
     preco = serializers.SerializerMethodField()
     pmc = serializers.SerializerMethodField()
-    imagem = VersatileImageFieldSerializer(
-        sizes=[
-            ('square_crop', 'crop__400x400'),
-        ]
-    )
-    unidade = serializers.CharField(source='unidade.nome')
+    imagem = serializers.SerializerMethodField()
+    #unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoFabricante()
     nome = serializers.SerializerMethodField()
     embalagem = serializers.SerializerMethodField()
@@ -218,6 +213,10 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
         pmc = locale.currency(pmc, grouping=True, symbol=None)
 
         return pmc
+
+    def get_imagem(self, obj):
+        return obj.imagem_url
+
 
 
 class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):
