@@ -276,7 +276,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         genericos = []
         genericos.append(apresentacao)
 
-        for ap in apresentacao.genericos():
+        for ap in apresentacao.genericos(True):
             if apresentacao.dosagem_formatada == ap.dosagem_formatada:
                 genericos.append(ap)
 
