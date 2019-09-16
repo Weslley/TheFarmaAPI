@@ -1,27 +1,21 @@
-from rest_framework import generics, response
-from apiv2.serializers.pedido import PedidoCreateSerializer
-from rest_framework import permissions
 from api.models.pedido import Pedido
+from api.permissions import IsOnlyCliente
+from api.mixins.base import IsClienteAuthenticatedMixin
 from api.consumers.farmacia import FarmaciaConsumer, PropostaSerializer
-from apiv2.serializers.pedido import PedidoRetriveSerializer
 
-class PedidoCreateListView(generics.ListCreateAPIView):
+from apiv2.serializers.pedido import PedidoCreateSerializer, PedidoRetriveSerializer
+
+from rest_framework import permissions
+from rest_framework import generics, response
+
+
+class PedidoCreateListView(generics.ListCreateAPIView, IsClienteAuthenticatedMixin):
     queryset = Pedido.objects.all()
-    #permission_classes = (permissions.IsAuthenticated,)
-
-    def get_serializer_class(self):
-        if self.request.method.lower() == 'get':
-            return PedidoCreateSerializer
-        else:
-            return PedidoCreateSerializer
-    
-    # def get(self,request,*args,**kwargs):
-    #     p = Pedido.objects.last()
-    #     ps = PropostaSerializer(p)
-    #     FarmaciaConsumer.send(ps.data,id=8)
-    #     return response.Response()
+    serializer_class = PedidoCreateSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOnlyCliente)
 
 
-class PedidoRetriveView(generics.RetrieveAPIView):
+class PedidoRetriveView(generics.RetrieveAPIView, IsClienteAuthenticatedMixin):
     queryset = Pedido.objects.all()
     serializer_class = PedidoRetriveSerializer
+    permission_classes = (permissions.IsAuthenticated,)

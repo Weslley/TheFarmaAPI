@@ -1,9 +1,5 @@
 from datetime import datetime
-
 from decimal import Decimal
-from django.core.validators import MinValueValidator
-from django.db import models
-from django.db.models import F, Sum
 
 from api.models.administradora import Administradora
 from api.models.apresentacao import Apresentacao
@@ -14,13 +10,15 @@ from api.models.conta import Conta
 from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
                               StatusPagamentoCartao, StatusPedido)
 from api.models.enums.status_pagamento import StatusPagamento
-from api.models.enums.tipo_produto import TipoProduto
 from api.models.enums.status_pedido_faturamento import StatusPedidoFaturamento
+from api.models.enums.tipo_produto import TipoProduto
 from api.models.farmacia import Farmacia
 from api.models.log import Log
-from django.contrib.postgres.fields import JSONField
-
 from api.utils.math import truncate
+from django.contrib.postgres.fields import JSONField
+from django.core.validators import MinValueValidator
+from django.db import models
+from django.db.models import F, Sum
 
 
 class Pedido(models.Model):
@@ -252,6 +250,24 @@ class Pedido(models.Model):
                             farmacia=farmacia
                         )
 
+    def clear_proposal(self, farmacia_id = None, permutacao_id = 1):
+        try:
+            if farmacia_id is None:
+                farmacia = ItemPropostaPedido.objects.filter(pedido=self, permutacao_id=permutacao_id).first().farmacia
+            else:
+                farmacia = Farmacia.objects.filter(id=farmacia_id)
+
+            #Limpa itens propostas não utilizadas
+            proposta_itens = ItemPropostaPedido.objects.filter(pedido=self, farmacia=farmacia, permutacao_id=permutacao_id)
+            ItemPropostaPedido.objects.filter(pedido=self).exclude(id__in=[pi.id for pi in proposta_itens]).delete()
+
+            #Limpa itens do pedido não utilizados
+            ItemPedido.objects.filter(pedido=self).exclude(apresentacao__id__in=[pi.apresentacao.id for pi in proposta_itens]).delete()
+            
+        except Exception as err:
+            pass
+
+
     def get_total_farmacia(self, farmacia_id):
         valor = 0
         for item in self.itens_proposta.filter(farmacia_id=farmacia_id, possui=True):
@@ -279,6 +295,8 @@ class ItemPedido(models.Model):
     percentual_generico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_etico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_nao_medicamentos = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    aceita_generico = models.BooleanField(blank=False, default=False)
+    #apresentacao_pedida = models.ForeignKey(Apresentacao, null=True, related_name='itens_pedidos')
 
     class Meta:
         unique_together = ('pedido', 'apresentacao')
@@ -338,6 +356,17 @@ class ItemPropostaPedido(models.Model):
         """
         return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade
 
+    @property
+    def tipo_venda(self):
+        """
+        Property para informar a forma de venda do produto
+        :return:
+        """
+        try:
+            return self.apresentacao.produto.principio_ativo.tipo_venda
+        except Exception as error:
+            return 0
+        
     @ProcessLookupError
     def valor_proposta(self):
         return self.quantidade * self.valor_unitario

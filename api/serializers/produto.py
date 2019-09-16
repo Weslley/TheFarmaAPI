@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
 from api.models.produto import Produto
-from api.serializers.apresentacao import (ApresentacaoBusca,
-                                          ApresentacaoListSerializer)
+from api.serializers.apresentacao import (ApresentacaoBusca, ApresentacaoListSerializer)
 from api.serializers.principio_ativo import PrincipioAtivoBasicSerializer
 
 
@@ -51,13 +50,26 @@ class ProdutoSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class ProdutoNovoSerializer(serializers.Serializer):
-    nome = serializers.CharField()
+class ProdutoNovoSerializer(serializers.ModelSerializer):
     ids = serializers.SerializerMethodField()
+    nome = serializers.CharField()
+    tipo_venda = serializers.SerializerMethodField() 
+
+    class Meta:
+        model = Produto
+        fields = ('ids', 'nome', 'tipo_venda')
 
     def get_ids(self, obj):
         qs = Produto.objects.filter(apresentacoes__isnull=False, nome__iexact=obj['nome']).distinct()
         return [p['id'] for p in qs.values('id')]
+
+    def get_tipo_venda(self, obj):
+        try:
+            qs = Produto.objects.filter(apresentacoes__isnull=False, nome__iexact=obj['nome']).distinct().first()
+            return qs.principio_ativo.tipo_venda
+        except Exception as err:
+            print(str(err))
+            return 0
 
     def update(self, instance, validated_data):
         raise NotImplementedError('`update()` must be implemented.')

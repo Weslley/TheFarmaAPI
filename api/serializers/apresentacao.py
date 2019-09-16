@@ -21,7 +21,7 @@ class ApresentacaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Apresentacao
-        fields = ('codigo_barras', 'nome', 'registro_ms', 'tabelas', 'ativo', 'classe_terapeutica')
+        fields = ('codigo_barras', 'nome', 'registro_ms', 'tabelas', 'ativo')
 
 
 class ApresentacaoExportSerializer(serializers.ModelSerializer):
@@ -49,7 +49,6 @@ class ApresentacaoBusca(serializers.ModelSerializer):
             ('square_crop', 'crop__400x400'),
         ]
     )
-    unidade = serializers.CharField(source='unidade.nome')
     pmc = serializers.SerializerMethodField()
     data_atualizacao = serializers.SerializerMethodField()
     nome = serializers.SerializerMethodField()
@@ -66,11 +65,9 @@ class ApresentacaoBusca(serializers.ModelSerializer):
             'forma_farmaceutica',
             'preco',
             'imagens',
-            'unidade',
             'imagem',
             'pmc',
             'data_atualizacao',
-            'classe_terapeutica'
         )
 
     def get_nome(self, obj):
@@ -168,11 +165,9 @@ class ApresentacaoBuscaProduto(serializers.ModelSerializer):
             'forma_farmaceutica',
             'preco',
             'imagem',
-            'unidade',
             'produto',
             'pmc',
             'quantidade',
-            'classe_terapeutica'
         )
 
     def get_nome(self, obj):
@@ -230,18 +225,13 @@ class ApresentacaoProdutoRetrieve(ApresentacaoBuscaProduto):
 
 
 class ApresentacaoListSerializer(serializers.ModelSerializer):
-    imagem = VersatileImageFieldSerializer(
-        sizes=[
-            ('square_crop', 'crop__400x400'),
-        ]
-    )
-    unidade = serializers.CharField(source='unidade.nome')
     produto = ProdutoSimplesSerializer()
     pmc = serializers.SerializerMethodField()
+    imagem = serializers.SerializerMethodField()
 
     class Meta:
         model = Apresentacao
-        fields = ('nome', 'id', 'imagem', 'unidade', 'produto', 'pmc', 'classe_terapeutica', 'codigo_barras')
+        fields = ('id', 'nome', 'imagem', 'produto', 'pmc', 'codigo_barras')
 
     def get_pmc(self, obj):
         cidade = self.context['cidade'] if 'cidade' in self.context else None
@@ -253,7 +243,7 @@ class ApresentacaoListSerializer(serializers.ModelSerializer):
         except Exception as err:
             pass
 
-        # locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-        # pmc = locale.currency(pmc, grouping=True, symbol=None)
-
         return float(pmc)
+
+    def get_imagem(self, obj):
+        return obj.imagem_url

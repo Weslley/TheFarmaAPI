@@ -29,9 +29,9 @@ def init_proposta(id_pedido):
     busca = True
     farmacias_enviadas = []
     rs_visualizadas = ''
-    #verifica se eh o usuario teste
     pedido = Pedido.objects.get(id=id_pedido)
-    print(pedido.cliente.usuario)
+
+    #verifica se eh o usuario teste
     if check_user_eh_teste(pedido.cliente.usuario):
         print('sim')
         pedido.gerar_proposta([Farmacia.objects.get(pk=8)])
@@ -39,44 +39,9 @@ def init_proposta(id_pedido):
         return None
     else:
         print('nao')
-    # # alteração para globo
-    # queryset = Farmacia.objects.order_by('-data_criacao')[:2]
-    # farmacias = [f for f in queryset]
-    # pedido = Pedido.objects.get(id=id_pedido)
-    # if farmacias:
-    #     farmacias_enviadas.extend(farmacias)
-    #     # gerando  propostas das farmacias
-    #     pedido.gerar_proposta(farmacias)
-    #
-    #     # Selecionando ramdomicamente uma das farmacias
-    #     # para dar um desconto(randomico) em produtos
-    #     import random
-    #     farmacia_id = random.choice([f.id for f in farmacias])
-    #     for item in pedido.itens_proposta.filter(farmacia_id=farmacia_id):
-    #         # escolhendo aleatoriamente um desconto
-    #         if item.valor_unitario >= Decimal(1):
-    #             item.valor_unitario -= ((Decimal(random.choice([15, 20, 25, 30]) / 100)) * item.valor_unitario)
-    #             item.save()
-    #
-    #     # marcando como enviado
-    #     for item in pedido.itens_proposta.all():
-    #         item.status = StatusItemProposta.ENVIADO
-    #         item.possui = True
-    #         item.save()
-    #
-    # # passando o tempo
-    # while busca:
-    #     # verificando se ainda da tempo de buscar mais farmacias
-    #     duracao = datetime.now() - pedido.log.data_criacao
-    #     if duracao >= duracao_proposta or pedido.status != StatusPedido.ABERTO:
-    #         busca = False
-    #     else:
-    #         sleep(5)
 
     while busca:
-        # Atualizando pedido
         pedido = Pedido.objects.get(id=id_pedido)
-        #verifica se eh do usuario de teste
         farmacias_proximas = Farmacia.objects.proximas(pedido)
         farmacias_sem_proposta = Farmacia.objects.proximas(pedido, exclude_farmacias=farmacias_enviadas)
         if farmacias_proximas:

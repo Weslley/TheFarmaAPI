@@ -1,44 +1,51 @@
 import locale
-from api.consumers.farmacia import FarmaciaConsumer
-from api.models.administradora import Administradora
-from api.models.configuracao import Configuracao
-from api.models.conta_pagar import ContaPagar
-import locale
 
+from django.db import transaction
+from datetime import datetime, timedelta
+from rest_framework import serializers
+
+from api.models.log import Log
+from api.models.endereco import Endereco
+from api.models.farmacia import Farmacia
+
+from api.models.ultimo_preco import UltimoPreco
+from api.models.conta_pagar import ContaPagar
+from api.models.configuracao import Configuracao
 from api.models.conta_receber import ContaReceber
+from api.models.administradora import Administradora
+from api.models.representante_legal import RepresentanteLegal
+from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, LogData
+from api.models.notificacao import Notificacao, NotificacoesTemplate, TipoNotificacaoTemplate
+
+from api.models.enums import PagadorContas
+from api.models.enums.tipo_venda import TipoVenda
+from api.models.enums.status_item import StatusItem
+from api.models.enums.forma_pagamento import FormaPagamento
 from api.models.enums.status_pagamento import StatusPagamento
+from api.models.enums.status_item_proposta import StatusItemProposta
 from api.models.enums.status_pagamento_cartao import StatusPagamentoCartao
 from api.models.enums.status_pedido import StatusPedido
-from api.serializers.cartao import CartaoSerializer
+
 from api.utils.generics import print_exception
 from api.utils.firebase_utils import enviar_notif
-from api.models.notificacao import Notificacao, NotificacoesTemplate, TipoNotificacaoTemplate
-from api.models.ultimo_preco import UltimoPreco
-from django.db import transaction
-from rest_framework import serializers
 from api.utils.usuario_teste import check_user_eh_teste, fazer_proposta_faker
 
-from api.models.endereco import Endereco
-from api.models.enums.forma_pagamento import FormaPagamento
-from api.models.enums.status_item import StatusItem
-from api.models.enums.status_item_proposta import StatusItemProposta
-from api.models.enums import PagadorContas
-from api.models.farmacia import Farmacia
-from api.models.log import Log
-from api.models.pedido import ItemPedido, Pedido, ItemPropostaPedido, LogData
+from api.serializers.cartao import CartaoSerializer
 from api.serializers.apresentacao import ApresentacaoListSerializer
 from api.serializers.farmacia import FarmaciaListSerializer, FarmaciaEnderecoSerializer, FarmaciaComandaDado
+
 from api.servico_pagamento import tipo_servicos
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento.servicos.cielo import ServicoCielo, ResponseCieloException
+
 from api.utils import get_client_browser, get_client_ip  # , status_transacao_cartao_cielo
 from api.utils import get_user_lookup, get_tempo_proposta
-from datetime import datetime, timedelta
-from .log import LogSerializer
 
-from api.models.representante_legal import RepresentanteLegal
-from api.models.enums.tipo_venda import TipoVenda
-from api.models.notificacao import Notificacao
+from api.serializers.log import LogSerializer
+
+from api.consumers.farmacia import FarmaciaConsumer
+
+from apiv2.serializers.apresentacao import ApresentacaoPropostaItemSerializer
 
 class PagamentoCartao(object):
     pass
@@ -242,6 +249,7 @@ class PedidoSerializer(PedidoCreateSerializer):
     farmacia = serializers.SerializerMethodField()
     bairro = serializers.SerializerMethodField()
     cartao = CartaoSerializer()
+    data_criacao = serializers.SerializerMethodField()
 
     class Meta:
         model = Pedido
@@ -271,7 +279,8 @@ class PedidoSerializer(PedidoCreateSerializer):
             "valor_bruto",
             "valor_liquido",
             "numero_parcelas",
-            "itens"
+            "itens",
+            "data_criacao"
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -291,8 +300,15 @@ class PedidoSerializer(PedidoCreateSerializer):
             return serializer.data
         return None
 
+    def get_data_criacao(self, obj):
+        if obj.log:
+            return (obj.log.data_criacao.timestamp() * 1000)
+        return None
+
 
 class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
+    apresentacao = ApresentacaoPropostaItemSerializer(read_only=True)
+
     class Meta:
         model = ItemPropostaPedido
         fields = (
@@ -300,7 +316,9 @@ class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
             "quantidade",
             "valor_unitario",
             "possui",
-            "quantidade_inferior"
+            "quantidade_inferior",
+            "tipo_venda",
+            "permutacao_id"
         )
         extra_kwargs = {
             "quantidade": {'read_only': True},
@@ -330,6 +348,7 @@ class PedidoDetalhadoSerializer(PedidoSerializer):
         model = Pedido
         fields = (
             "id",
+            "data_criacao",
             "valor_frete",
             "status",
             "views",
@@ -399,6 +418,8 @@ class ItemPropostaSerializer(serializers.ModelSerializer):
             "status",
             "possui",
             "quantidade_inferior",
+            "tipo_venda",
+            "permutacao_id"
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -418,6 +439,11 @@ class PropostaSerializer(serializers.ModelSerializer):
     log = LogSerializer(read_only=True)
     status_submissao = serializers.SerializerMethodField()
 
+    def get_permutacao_id(self, obj):
+        if 'farmacia' in self.context:
+            obj.itens_proposta.filter(farmacia=self.context['farmacia']).first().permutacao_id
+        return None
+    
     def get_bairro(self, obj):
         if obj.bairro:
             return obj.bairro
@@ -539,10 +565,10 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
         validated_data.pop('itens_proposta')
         itens_proposta = [item for item in self.initial_data['itens_proposta']]
         #verifica se ao menos uma quantidade acima de 0
-        if any(map(lambda x : x['quantidade'],itens_proposta)):
+        if any(map(lambda x : x['quantidade'], itens_proposta)):
             for item in itens_proposta:
                 #ignora o possui que veio
-                item.pop('possui',None)
+                item.pop('possui', None)
                 #verifica a quantidade e atribui o valor do possui
                 item['possui'] = True if item['quantidade'] > 0 else False
                 #recupera a instancia no banco e diz que foi enviado
@@ -562,6 +588,7 @@ class PropostaUpdateSerializer(serializers.ModelSerializer):
             )
             if (not total_notifcacao.count()):
                 enviar_notif(instance.cliente.fcm_token,TipoNotificacaoTemplate.NOVA_PROPOSTA,instance.cliente.id,instance,extra_data={'pedido_id':instance.id},farmacia=farmacia)
+                
         #pusher notification
         # instance.status = StatusPedido.ACEITO
         # instance.save()
@@ -666,6 +693,7 @@ class PagamentoCartaoSerializer(serializers.ModelSerializer):
 
 
 class PedidoCheckoutSerializer(serializers.ModelSerializer):
+    permutacao_id = serializers.IntegerField()
     class Meta:
         model = Pedido
         fields = (
@@ -674,6 +702,7 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
             "troco",
             "cartao",
             "numero_parcelas",
+            "permutacao_id",
         )
 
     def validate_farmacia(self, data):
@@ -705,14 +734,16 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
         else:
             attrs['forma_pagamento'] = FormaPagamento.DINHEIRO
 
+        if 'permutacao_id' not in attrs:
+            raise serializers.ValidationError('Informe a proposta escolhida.')
+
         pedido = getattr(self, 'instance', None)
 
         if pedido:
             if pedido.status_pagamento == StatusPagamento.PAGO:
-                raise serializers.ValidationError('Pedido ja está pago.')
+                raise serializers.ValidationError('Pedido já está pago.')
             elif pedido.status_pagamento == StatusPagamento.CANCELADO:
                 raise serializers.ValidationError('Status de pagamento está cancelado.')
-
         else:
             raise serializers.ValidationError('Deve haver pedido no checkout.')
 
@@ -745,6 +776,17 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         with transaction.atomic():
+            
+            #limpa as propostas não selecionadas
+            farmacia = validated_data['farmacia']
+            permutacao_id = validated_data['permutacao_id']
+            if permutacao_id:
+                instance.clear_proposal(farmacia, permutacao_id)
+            else:
+                instance.clear_proposal(farmacia)
+                
+            instance.save()
+
             instance = self.valida_pagamento(instance, validated_data)
             self.gerar_contas(instance)
             #notifica o cliente
@@ -926,7 +968,7 @@ class VendaPedido(serializers.ModelSerializer):
         return ret
 
 
-class ComandaPeidoSerializer(serializers.ModelSerializer):
+class ComandaPedidoSerializer(serializers.ModelSerializer):
 
     cliente_nome = serializers.SerializerMethodField()
     telefone = serializers.SerializerMethodField()

@@ -24,7 +24,7 @@ from api.models.notificacao import TipoNotificacaoTemplate
 from api.utils.firebase_utils import enviar_notif
 from api.consumers import FarmaciaConsumer
 from api.serializers.pedido import PedidoSerializer, PedidoCreateSerializer, PropostaSerializer, \
-    PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer, ComandaPeidoSerializer
+    PropostaUpdateSerializer, PedidoDetalhadoSerializer, PedidoCheckoutSerializer, ComandaPedidoSerializer
 from rest_framework import permissions, status as stts
 from api.servico_pagamento.pagamento import Pagamento
 from api.servico_pagamento import tipo_servicos
@@ -171,15 +171,17 @@ class PedidoCancelamentoCliente(GenericAPIView, IsClienteAuthenticatedMixin):
 
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or\
-                instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
-            raise ValidationError({'detail': 'Pedido já foi cancelado.'})
+
+        #if instance.status == StatusPedido.CANCELADO_PELO_CLIENTE or instance.status == StatusPedido.CANCELADO_PELA_FARMACIA:
+            #raise ValidationError({'detail': 'Pedido já foi cancelado.'})
 
         if instance.status == StatusPedido.ENVIADO:
             raise ValidationError({'detail': 'Pedido já foi enviado.'})
 
         if instance.status == StatusPedido.ENTREGUE:
             raise ValidationError({'detail': 'Pedido já foi entregue.'})
+    
+        instance.clear_proposal(None, 1)
 
         # Cancelando o pedido
         instance.status = StatusPedido.CANCELADO_PELO_CLIENTE
@@ -438,5 +440,5 @@ class ComandaView(GenericAPIView,IsRepresentanteAuthenticatedMixin):
 
     def get(self,request,*args,**kwargs):
         pedido = self.get_object()
-        serializer = ComandaPeidoSerializer(pedido)
+        serializer = ComandaPedidoSerializer(pedido)
         return Response(serializer.data)

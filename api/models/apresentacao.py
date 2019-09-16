@@ -4,6 +4,7 @@ from api.models.unidade import Unidade
 from api.models.produto import Produto
 from api.models.configuracao import Configuracao
 
+#from django_postgres_extensions.models.fields import ArrayField
 from versatileimagefield.fields import VersatileImageField, PPOIField
 
 import locale
@@ -167,6 +168,7 @@ class Apresentacao(models.Model):
     pbm = models.BooleanField(default=False)
     identificado = models.BooleanField(default=False)
     data_atualizacao_manual = models.DateTimeField(blank=True,null=True)
+    #tags_ids = ArrayField(models.IntegerField(blank=True, null=True), default=[], blank=True, null=True)
 
     objects = ApresentacaoManager()
 
