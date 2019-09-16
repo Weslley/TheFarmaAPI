@@ -776,16 +776,10 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         with transaction.atomic():
-            
             #limpa as propostas não selecionadas
             farmacia = validated_data['farmacia']
             permutacao_id = validated_data['permutacao_id']
-            if permutacao_id:
-                instance.clear_proposal(farmacia, permutacao_id)
-            else:
-                instance.clear_proposal(farmacia)
-                
-            instance.save()
+            instance.clear_proposal(farmacia.id, permutacao_id)
 
             instance = self.valida_pagamento(instance, validated_data)
             self.gerar_contas(instance)

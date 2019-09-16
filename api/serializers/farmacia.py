@@ -243,19 +243,16 @@ class FarmaciaComandaDado(serializers.ModelSerializer):
             return ''
     
     def get_bairro(self,obj):
-        # try:
-        return obj.endereco.bairro
-
-        # except Exception as e:
-        #     print(str(e))
-        #     return ''
-        
-    def get_cidade(self,obj):
         try:
-            return '{} - {}'.format(obj.endereco.cidade.nome,obj.endereco.cidade.uf)
+            return obj.endereco.bairro
         except Exception as e:
             print(str(e))
             return ''
+        
+    def get_cidade(self, obj):
+        if obj.endereco:
+            return str(obj.endereco.cidade)
+        return None
 
     def get_telefone(self,obj):
         return obj.telefone_formatado
