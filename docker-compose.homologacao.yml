@@ -92,3 +92,4 @@ services:
       - redis_channels
       - redis_celery
     restart: always
+
