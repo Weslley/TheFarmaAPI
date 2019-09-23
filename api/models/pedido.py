@@ -1,24 +1,28 @@
-from datetime import datetime
 from decimal import Decimal
+from datetime import datetime
 
-from api.models.administradora import Administradora
-from api.models.apresentacao import Apresentacao
+from django.db import models
+from django.db.models import F, Sum
+from django.core.validators import MinValueValidator
+from django.contrib.postgres.fields import JSONField
+
+from api.models.log import Log
+from api.models.conta import Conta
 from api.models.cartao import Cartao
 from api.models.cidade import Cidade
 from api.models.cliente import Cliente
-from api.models.conta import Conta
-from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
-                              StatusPagamentoCartao, StatusPedido)
+from api.models.produto import Produto
+from api.models.farmacia import Farmacia
+from api.models.apresentacao import Apresentacao
+from api.models.administradora import Administradora
+
+from api.utils.math import truncate
+
+from api.models.enums.tipo_produto import TipoProduto
 from api.models.enums.status_pagamento import StatusPagamento
 from api.models.enums.status_pedido_faturamento import StatusPedidoFaturamento
-from api.models.enums.tipo_produto import TipoProduto
-from api.models.farmacia import Farmacia
-from api.models.log import Log
-from api.utils.math import truncate
-from django.contrib.postgres.fields import JSONField
-from django.core.validators import MinValueValidator
-from django.db import models
-from django.db.models import F, Sum
+from api.models.enums import (FormaPagamento, StatusItem, StatusItemProposta,
+                              StatusPagamentoCartao, StatusPedido)
 
 
 class Pedido(models.Model):
@@ -262,7 +266,7 @@ class Pedido(models.Model):
             ItemPropostaPedido.objects.filter(pedido=self).exclude(id__in=[pi.id for pi in proposta_itens]).delete()
 
             #Limpa itens do pedido não utilizados
-            ItemPedido.objects.filter(pedido=self).exclude(apresentacao__id__in=[pi.apresentacao.id for pi in proposta_itens]).delete()
+            #ItemPedido.objects.filter(pedido=self).exclude(apresentacao__id__in=[pi.apresentacao.id for pi in proposta_itens]).delete()
             
         except Exception as err:
             pass
@@ -296,7 +300,6 @@ class ItemPedido(models.Model):
     percentual_etico = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     percentual_nao_medicamentos = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     aceita_generico = models.BooleanField(blank=False, default=False)
-    #apresentacao_pedida = models.ForeignKey(Apresentacao, null=True, related_name='itens_pedidos')
 
     class Meta:
         unique_together = ('pedido', 'apresentacao')
@@ -346,7 +349,7 @@ class ItemPropostaPedido(models.Model):
     status = models.IntegerField(choices=StatusItemProposta.choices(), default=StatusItemProposta.ABERTO)
     possui = models.BooleanField(default=False)
     permutacao_id = models.IntegerField(default=0)
-
+    apresentacao_pedida = models.ForeignKey(Apresentacao, blank=True, null=True)
 
     @property
     def quantidade_inferior(self):
@@ -354,7 +357,13 @@ class ItemPropostaPedido(models.Model):
         Property para informar se a quantidade deste item é inferior a solicitada
         :return:
         """
-        return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade
+        try:
+            if(self.apresentacao_pedida):
+                return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao_pedida).quantidade
+            else:
+                return self.quantidade < self.pedido.itens.get(apresentacao=self.apresentacao).quantidade
+        except Exception as error:
+            return True
 
     @property
     def tipo_venda(self):
@@ -366,6 +375,13 @@ class ItemPropostaPedido(models.Model):
             return self.apresentacao.produto.principio_ativo.tipo_venda
         except Exception as error:
             return 0
+
+    @property
+    def produto_pesquisado(self):
+        try:
+            return self.apresentacao_pedida.produto
+        except Exception as error:
+            return None
         
     @ProcessLookupError
     def valor_proposta(self):

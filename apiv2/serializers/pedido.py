@@ -152,8 +152,8 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             itens[i].update({'valor_unitario':0})
 
             #add as apresentacoes
-            if item['generico']:
-                item['apresentacao'] = self.get_apresentacoes_produto(item)
+            #if item['generico']:
+                #item['apresentacao'] = self.get_apresentacoes_produto(item)
 
             i+=1
             #convert pra lista
@@ -209,7 +209,8 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         """
         quantidade = item['quantidade']
         valor_unitario = item['valor_unitario']
-        return [{ 'quantidade': quantidade, 'apresentacao': x, 'valor_unitario': valor_unitario } for x in item['apresentacao']]
+        apresentacao_pedida = item['apresentacao_pedida']
+        return [{ 'quantidade': quantidade, 'apresentacao': x, 'valor_unitario': valor_unitario, 'apresentacao_pedida': apresentacao_pedida } for x in item['apresentacao']]
     
     def gerar_proposta_permutada(self, itens, farmacias, pedido):
         """
@@ -219,9 +220,16 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         pedido: Pedido
         return:
         """
+        itens_pedidos = []
+        for item in itens:
+            item['apresentacao_pedida'] = item['apresentacao'][0]
+            if item['generico']:
+                item['apresentacao'] = self.get_apresentacoes_produto(item)
+            itens_pedidos.append(item)
+
         #permuta a lista de itens
         #fazendo antes o parse de dict para lista de dict
-        lista_permutada = list(itertools.product(*map(self.parse_itens_lista_permutacao, itens)))
+        lista_permutada = list(itertools.product(*map(self.parse_itens_lista_permutacao, itens_pedidos)))
         
         print(lista_permutada)
         for farmacia in farmacias:
@@ -241,6 +249,7 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
                         quantidade=item['quantidade'],
                         apresentacao=item['apresentacao'],
                         farmacia=farmacia,
+                        apresentacao_pedida=item['apresentacao_pedida'],
                         permutacao_id=i
                     ))
 
@@ -271,8 +280,8 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         item: Dict{produto,embalagem,quantidade_embalagem,sufixo_quantidade,dosagens}
         return: List<Apresentacoes>
         """
-        apresentacao = Apresentacao.objects.get(id =item['apresentacao'].id)
-
+        #apresentacao = Apresentacao.objects.get(id =item['apresentacao'].id)
+        apresentacao = item['apresentacao'][0]
         genericos = []
         genericos.append(apresentacao)
 
@@ -380,7 +389,8 @@ class PedidoRetriveSerializer(PedidoDetalhadoSerializer):
             #como ja vem ordenado pelo banco
             #o primeiro eh o que possui mais itens e tem o menor preco
             for x in list(group):
-                melhores_propostas.append(PropostasFarmaciaSerializer(Farmacia.objects.get(id=x['farmacia_id']), context={ 'pedido':obj, 'permutacao_id': x['permutacao_id'] }).data)
+                if(x['total_proposta']!=0):
+                    melhores_propostas.append(PropostasFarmaciaSerializer(Farmacia.objects.get(id=x['farmacia_id']), context={ 'pedido':obj, 'permutacao_id': x['permutacao_id'] }).data)
 
             #instancia o serializer da proposta da farmacia passando o pedido e permutacao
             #ja chama o data tambem

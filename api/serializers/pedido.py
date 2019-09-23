@@ -308,17 +308,19 @@ class PedidoSerializer(PedidoCreateSerializer):
 
 class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
     apresentacao = ApresentacaoPropostaItemSerializer(read_only=True)
+    #apresentacao_pedida = ApresentacaoPropostaItemSerializer(read_only=True)
+    produto_pesquisado =  serializers.SerializerMethodField()
 
     class Meta:
         model = ItemPropostaPedido
         fields = (
+            "produto_pesquisado",
             "apresentacao",
             "quantidade",
             "valor_unitario",
             "possui",
             "quantidade_inferior",
-            "tipo_venda",
-            "permutacao_id"
+            "permutacao_id",
         )
         extra_kwargs = {
             "quantidade": {'read_only': True},
@@ -327,6 +329,12 @@ class ItemPropostaSimplificadoSerializer(serializers.ModelSerializer):
             'possui': {'read_only': True},
             'quantidade_inferior': {'read_only': True},
         }
+
+    def get_produto_pesquisado(self, obj):
+        try:
+            return obj.produto_pesquisado.nome
+        except Exception as error:
+            return obj.apresentacao.produto.nome
 
 
 class PedidoDetalhadoSerializer(PedidoSerializer):
@@ -848,6 +856,8 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
     def valida_pagamento(self, instance, validated_data):
         farmacia = validated_data['farmacia']
+        permutacao_id = validated_data['permutacao_id']
+
         valor_total = instance.get_total_farmacia(farmacia)
         valor_frete = farmacia.valor_frete
 
@@ -897,12 +907,13 @@ class PedidoCheckoutSerializer(serializers.ModelSerializer):
 
             if instance.status_cartao != StatusPagamentoCartao.PAGAMENTO_CONFIRMADO:
                 raise serializers.ValidationError({'non_field_errors': 'Pagamento não confirmado'})
-
+        
         proposta = [_ for _ in instance.propostas if _['farmacia'].id == farmacia.id][0]
         itens_proposta = proposta['itens']
 
         for item in instance.itens.all():
-            item_proposta = itens_proposta.get(apresentacao=item.apresentacao)
+            item_proposta = itens_proposta.get(apresentacao_pedida=item.apresentacao)
+            item.apresentacao = item_proposta.apresentacao
             item.valor_unitario = item_proposta.valor_unitario
             item.quantidade_atendida = item_proposta.quantidade
             if item_proposta.possui:

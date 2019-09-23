@@ -115,19 +115,19 @@ class ApresentacaoBusca(serializers.ModelSerializer):
 class ProdutoFabricante(serializers.ModelSerializer):
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
     principio_ativo = PrincipioAtivoBasicSerializer()
-
     class Meta:
         model = Produto
-        fields = ('id', 'nome', 'fabricante', 'tipo', 'principio_ativo')
+        fields = ('id', 'nome', 'fabricante', 'principio_ativo', 'tipo', 'tipo_venda')
 
 
 class ProdutoSimplesSerializer(serializers.ModelSerializer):
     fabricante = serializers.CharField(read_only=True, source='laboratorio.nome')
     principio_ativo = serializers.CharField(read_only=True, source='principio_ativo.nome')
+    tipo_venda = serializers.IntegerField(read_only=True, source='principio_ativo.tipo_venda')
 
     class Meta:
         model = Produto
-        fields = ('id', 'nome', 'fabricante', 'principio_ativo', 'tipo')
+        fields = ('id', 'nome', 'fabricante', 'principio_ativo', 'tipo', 'tipo_venda')
 
 
 class ProdutoCompletoSerializer(ProdutoSimplesSerializer):

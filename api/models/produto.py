@@ -1,5 +1,3 @@
-from django.db import models
-
 from api.models.enums import StatusProduto
 from api.models.fabricante import Fabricante
 from api.models.principio_ativo import PrincipioAtivo
@@ -7,7 +5,7 @@ from api.models.secao import Secao
 from api.models.sintoma import Sintoma
 from api.models.subsecao import Subsecao
 from api.utils import tipo_produto
-
+from django.db import models
 
 class Produto(models.Model):
     nome = models.CharField(max_length=200, null=True, blank=True)
@@ -23,6 +21,13 @@ class Produto(models.Model):
 
     def __str__(self):
         return '{}'.format(self.nome if self.nome else self.principio_ativo)
+
+    @property
+    def tipo_venda(self):
+        try:
+            return self.principio_ativo.tipo_venda
+        except Exception as error:
+            return 0
     
     @property
     def get_manager(self):
