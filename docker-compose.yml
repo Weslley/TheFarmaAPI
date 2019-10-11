@@ -1,20 +1,33 @@
 version: '2'
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
     container_name: thefarma_api_nginx
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./config/prod/nginx:/etc/nginx/conf.d
-      - ./config/prod/ssl:/etc/certificates
-      - ./config/prod/nginx/gsdv.txt:/cert/gsdv.txt
+      - ./config/prod/ssl:/etc/ssl/certs
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
       - static-data:/staticfiles
       - media-data:/mediafiles
     depends_on:
       - web
     restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email thefarmaapp@gmail.com --agree-tos --no-eff-email --staging -d api.thefarma.com.br
 
   web:
     build: .
@@ -109,3 +122,6 @@ services:
 volumes:
   static-data:
   media-data:
+  certbot-etc:
+  certbot-var:
+  
