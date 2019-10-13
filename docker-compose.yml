@@ -16,8 +16,6 @@ services:
       - media-data:/mediafiles
     depends_on:
       - web
-    networks:
-      - app-network
     restart: always
 
   certbot:
@@ -132,7 +130,9 @@ volumes:
   static-data:
   media-data:
   
-networks:
-  app-network:
-    driver: bridge 
+# networks:
+#   - app-network
+# networks:
+#   app-network:
+#     driver: bridge 
   
