@@ -1,7 +1,7 @@
-version: '2'
+version: '3'
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:mainline-alpine
     container_name: thefarma_api_nginx
     ports:
       - "80:80"
@@ -16,19 +16,22 @@ services:
       - media-data:/mediafiles
     depends_on:
       - web
+    networks:
+      - app-network
     restart: always
 
   certbot:
     image: certbot/certbot
     container_name: certbot
+    command: certonly --webroot --webroot-path=/var/www/html --email thefarmaapp@gmail.com --agree-tos --no-eff-email --staging -d api.thefarma.com.br
     volumes:
-      - ./config/prod/ssl:/etc/ssl/certs
+      - web-root:/var/www/html
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
-      - web-root:/var/www/html
+      - ./config/prod/ssl:/etc/ssl/certs
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email thefarmaapp@gmail.com --agree-tos --no-eff-email --staging -d api.thefarma.com.br
+    restart: always
 
   web:
     build: .
@@ -39,12 +42,12 @@ services:
       - media-data:/thefarmaapi/media
     expose:
       - "8000"
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   worker_default:
     build:
@@ -56,12 +59,12 @@ services:
     volumes:
       - media-data:/thefarmaapi/media
       - .:/thefarmaapi
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   celery_beat:
     build:
@@ -76,6 +79,7 @@ services:
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   worker_channels:
     build: .
@@ -86,12 +90,12 @@ services:
       - media-data:/thefarmaapi/media
     expose:
       - "8000"
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   channels:
     build:
@@ -105,12 +109,12 @@ services:
     expose:
       - "8000"
       - "443"
-    restart: always
     env_file:
       - .env
     depends_on:
       - redis_channels
       - redis_celery
+    restart: always
 
   redis_channels:
     image: redis:alpine
@@ -128,4 +132,7 @@ volumes:
   static-data:
   media-data:
   
+networks:
+  app-network:
+    driver: bridge 
   
