@@ -16,6 +16,8 @@ services:
       - media-data:/mediafiles
     depends_on:
       - web
+    networks:
+      - app-network
     restart: always
 
   certbot:
@@ -29,6 +31,8 @@ services:
       - ./config/prod/ssl:/etc/ssl/certs
     depends_on:
       - nginx
+    networks:
+      - app-network
     restart: always
 
   web:
@@ -45,6 +49,8 @@ services:
     depends_on:
       - redis_channels
       - redis_celery
+    networks:
+      - app-network
     restart: always
 
   worker_default:
@@ -62,6 +68,8 @@ services:
     depends_on:
       - redis_channels
       - redis_celery
+    networks:
+      - app-network
     restart: always
 
   celery_beat:
@@ -77,6 +85,8 @@ services:
     depends_on:
       - redis_channels
       - redis_celery
+    networks:
+      - app-network
     restart: always
 
   worker_channels:
@@ -93,6 +103,8 @@ services:
     depends_on:
       - redis_channels
       - redis_celery
+    networks:
+      - app-network
     restart: always
 
   channels:
@@ -112,16 +124,22 @@ services:
     depends_on:
       - redis_channels
       - redis_celery
+    networks:
+      - app-network
     restart: always
 
   redis_channels:
     image: redis:alpine
     command: redis-server
     container_name: redis_channels
+    networks:
+      - app-network
 
   redis_celery:
     image: redis:alpine
     container_name: redis_celery
+    networks:
+      - app-network
 
 volumes:
   web-root:
@@ -130,8 +148,8 @@ volumes:
   static-data:
   media-data:
   
-# networks:
-#   - app-network
+networks:
+  - app-network
 # networks:
 #   app-network:
 #     driver: bridge 
